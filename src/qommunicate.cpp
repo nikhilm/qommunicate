@@ -1,4 +1,5 @@
 #include <QMessageBox>
+#include <QCloseEvent>
 
 #include "about.h"
 #include "settings.h"
@@ -8,6 +9,8 @@ Qommunicate::Qommunicate(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
+    
+    createTrayIcon();
 }
 
 void Qommunicate::on_searchEdit_textChanged(const QString &text)
@@ -33,4 +36,26 @@ void Qommunicate::on_actionBroadcast_triggered()
 void Qommunicate::on_actionQuit_triggered()
 {
     qApp->quit();
+}
+
+void Qommunicate::closeEvent(QCloseEvent * event)
+{
+    setVisible(false);
+    event->ignore();
+}
+
+void Qommunicate::iconActivated(QSystemTrayIcon::ActivationReason reason)
+{
+    trayIcon->showMessage( "Toggling", "Toggling" );
+    setVisible(!isVisible());
+}
+
+void Qommunicate::createTrayIcon()
+{    
+    trayIcon = new QSystemTrayIcon(this);
+    trayIcon->setIcon(windowIcon());
+    
+    connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
+    
+    trayIcon->show();
 }
