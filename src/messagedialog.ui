@@ -1,6 +1,6 @@
 <ui version="4.0" >
- <class>chatDialog</class>
- <widget class="QDialog" name="chatDialog" >
+ <class>MessageDialog</class>
+ <widget class="QDialog" name="MessageDialog" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -13,7 +13,7 @@
    <bool>true</bool>
   </property>
   <property name="windowTitle" >
-   <string>Chat with %1</string>
+   <string>Chat with</string>
   </property>
   <widget class="QWidget" name="verticalLayoutWidget" >
    <property name="geometry" >
@@ -70,7 +70,7 @@
   <connection>
    <sender>sendButton</sender>
    <signal>clicked()</signal>
-   <receiver>chatDialog</receiver>
+   <receiver>MessageDialog</receiver>
    <slot>sendMessage()</slot>
    <hints>
     <hint type="sourcelabel" >
@@ -86,7 +86,7 @@
   <connection>
    <sender>lineEdit</sender>
    <signal>returnPressed()</signal>
-   <receiver>chatDialog</receiver>
+   <receiver>MessageDialog</receiver>
    <slot>sendFile()</slot>
    <hints>
     <hint type="sourcelabel" >

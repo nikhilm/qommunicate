@@ -29,3 +29,8 @@ void Qommunicate::on_actionBroadcast_triggered()
 {
     //BroadcastDialog(this).exec();
 }
+
+void Qommunicate::on_actionQuit_triggered()
+{
+    qApp->quit();
+}

@@ -12,6 +12,7 @@ private slots:
     void on_action_About_triggered();
     void on_action_Settings_triggered();
     void on_actionBroadcast_triggered();
+    void on_actionQuit_triggered();
 
 private:
     Ui::MainWindow ui;

@@ -217,41 +217,8 @@
  <resources>
   <include location="icons.qrc" />
  </resources>
- <connections>
-  <connection>
-   <sender>actionQuit</sender>
-   <signal>activated()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>149</x>
-     <y>267</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>memberTree</sender>
-   <signal>itemDoubleClicked(QTreeWidgetItem*,int)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>showChatDialog(QTreeWidgetItem*,int)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>164</x>
-     <y>178</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>2</x>
-     <y>235</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
  <slots>
-  <slot>showChatDialog(QTreeWidgetItem*,int)</slot>
+  <slot>updateAwayStatus(QString)</slot>
  </slots>
 </ui>
