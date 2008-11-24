@@ -1,5 +1,6 @@
 #include <QMessageBox>
 #include <QCloseEvent>
+#include <QMenu>
 
 #include "about.h"
 #include "settings.h"
@@ -46,8 +47,8 @@ void Qommunicate::closeEvent(QCloseEvent * event)
 
 void Qommunicate::iconActivated(QSystemTrayIcon::ActivationReason reason)
 {
-    trayIcon->showMessage( "Toggling", "Toggling" );
-    setVisible(!isVisible());
+    if( reason == QSystemTrayIcon::Trigger )
+        setVisible(!isVisible());
 }
 
 void Qommunicate::createTrayIcon()
@@ -56,6 +57,11 @@ void Qommunicate::createTrayIcon()
     trayIcon->setIcon(windowIcon());
     
     connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
+    
+    QMenu *menu = new QMenu;
+    menu->addAction(ui.actionBroadcast);
+    menu->addAction(ui.actionQuit);
+    trayIcon->setContextMenu(menu);
     
     trayIcon->show();
 }
