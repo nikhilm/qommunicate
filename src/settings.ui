@@ -123,6 +123,13 @@
       </property>
      </widget>
     </item>
+    <item>
+     <widget class="QCheckBox" name="noBroadcastCB" >
+      <property name="text" >
+       <string>Ignore broadcasts</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
  </widget>
