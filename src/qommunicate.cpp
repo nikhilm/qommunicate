@@ -1,9 +1,11 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 #include <QMenu>
+#include <QTreeWidget>
 
 #include "about.h"
 #include "settings.h"
+#include "messagedialog.h"
 #include "qommunicate.h"
 
 Qommunicate::Qommunicate(QWidget *parent)
@@ -64,4 +66,12 @@ void Qommunicate::createTrayIcon()
     trayIcon->setContextMenu(menu);
     
     trayIcon->show();
+}
+
+void Qommunicate::on_memberTree_itemDoubleClicked(QTreeWidgetItem * item, int col)
+{
+    // TODO: subclass item and set custom types for groups and users
+    MessageDialog dlg;
+    dlg.setModal(false);
+    dlg.exec();
 }

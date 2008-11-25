@@ -14,12 +14,15 @@ protected:
 
 private slots:
     void on_searchEdit_textChanged(const QString &);
+    
     void on_action_About_triggered();
     void on_action_Settings_triggered();
     void on_actionBroadcast_triggered();
     void on_actionQuit_triggered();
     
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
+    
+    void on_memberTree_itemDoubleClicked(QTreeWidgetItem *, int);
 
 private:
     Ui::MainWindow ui;
