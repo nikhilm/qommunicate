@@ -71,7 +71,7 @@ void Qommunicate::createTrayIcon()
 void Qommunicate::on_memberTree_itemDoubleClicked(QTreeWidgetItem * item, int col)
 {
     // TODO: subclass item and set custom types for groups and users
-    MessageDialog dlg;
+    MessageDialog dlg(item->data(0, Qt::DisplayRole).toString());
     dlg.setModal(false);
     dlg.exec();
 }
