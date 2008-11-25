@@ -1,15 +1,18 @@
 #include "ui_settings.h"
 
+class QSettings;
+
 class SettingsDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    SettingsDialog(QWidget *parent = 0) : QDialog(parent)
-    {
-        ui.setupUi(this);
-    }
+    SettingsDialog(QWidget *);
 
+private slots:
+    void on_buttonBox_accepted();
+    
 private:
     Ui::SettingsDialog ui;
+    QSettings *settings;
 };
