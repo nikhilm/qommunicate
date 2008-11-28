@@ -5,11 +5,7 @@ class MessageDialog : public QDialog
     Q_OBJECT
 
 public:
-    MessageDialog(QString title, QWidget *parent = 0) : QDialog(parent)
-    {
-        ui.setupUi(this);
-        setWindowTitle(title);
-    }
+    MessageDialog(QString, QWidget *parent=0);
 
 private:
     Ui::MessageDialog ui;
