@@ -77,16 +77,23 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.5"
-     inkscape:cx="522.16441"
-     inkscape:cy="207.50365"
+     inkscape:zoom="4"
+     inkscape:cx="511.76575"
+     inkscape:cy="272.1241"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1280"
-     inkscape:window-height="745"
+     inkscape:window-height="751"
      inkscape:window-x="-5"
-     inkscape:window-y="30" />
+     inkscape:window-y="24"
+     showguides="true"
+     inkscape:guide-bbox="true">
+    <sodipodi:guide
+       orientation="0,1"
+       position="605,210.75"
+       id="guide3193" />
+  </sodipodi:namedview>
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -254,9 +261,9 @@
        width="168"
        id="rect3301"
        style="fill:#d45500;fill-rule:evenodd;stroke:#999999;stroke-width:1.00282407px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       inkscape:export-filename="/home/nikhil/workspace/qommunicate/src/icons/logo_small.png"
-       inkscape:export-xdpi="22.59099"
-       inkscape:export-ydpi="22.59099" />
+       inkscape:export-filename="/home/nikhil/workspace/qommunicate/src/icons/logo_large.png"
+       inkscape:export-xdpi="60.806637"
+       inkscape:export-ydpi="60.806637" />
     <rect
        style="fill:#ff6600;fill-rule:evenodd;stroke:none;stroke-width:1.00282407px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        id="rect3303"
@@ -266,9 +273,9 @@
        y="650.01801"
        ry="27.152708"
        transform="matrix(1,0,0.1059098,0.9943757,0,0)"
-       inkscape:export-filename="/home/nikhil/workspace/qommunicate/src/icons/logo_small.png"
-       inkscape:export-xdpi="22.59099"
-       inkscape:export-ydpi="22.59099" />
+       inkscape:export-filename="/home/nikhil/workspace/qommunicate/src/icons/logo_large.png"
+       inkscape:export-xdpi="60.806637"
+       inkscape:export-ydpi="60.806637" />
     <rect
        transform="matrix(1,0,0.1059098,0.9943757,0,0)"
        ry="27.152676"
@@ -278,25 +285,24 @@
        width="168"
        id="rect3305"
        style="fill:none;fill-rule:evenodd;stroke:url(#linearGradient3325);stroke-width:1.00282407px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       inkscape:export-filename="/home/nikhil/workspace/qommunicate/src/icons/logo_small.png"
-       inkscape:export-xdpi="22.59099"
-       inkscape:export-ydpi="22.59099" />
+       inkscape:export-filename="/home/nikhil/workspace/qommunicate/src/icons/logo_large.png"
+       inkscape:export-xdpi="60.806637"
+       inkscape:export-ydpi="60.806637" />
     <path
-       style="fill:#ffffff;stroke:none;stroke-opacity:1"
-       d="M 473.11948,813.50664 C 476.02644,755.73416 510.86386,709.86696 573.75562,707.41578 L 584.49994,813.86216 L 473.11948,813.50664 z"
+       style="fill:#ffffff;stroke:none;stroke-opacity:1;fill-opacity:1"
+       d="M 573.75 707.40625 C 510.85824 709.85743 476.03196 755.72751 473.125 813.5 L 555.46875 813.78125 C 554.99409 811.92859 554.75 810.00639 554.75 808 C 554.75002 795.511 564.55 785.375 576.625 785.375 C 578.36759 785.375 580.06229 785.56995 581.6875 785.96875 L 573.75 707.40625 z "
        id="path3307"
-       sodipodi:nodetypes="cccc"
-       inkscape:export-filename="/home/nikhil/workspace/qommunicate/src/icons/logo_small.png"
-       inkscape:export-xdpi="22.59099"
-       inkscape:export-ydpi="22.59099" />
+       inkscape:export-filename="/home/nikhil/workspace/qommunicate/src/icons/logo_large.png"
+       inkscape:export-xdpi="60.806637"
+       inkscape:export-ydpi="60.806637" />
     <path
        sodipodi:nodetypes="ccccccc"
        id="path3309"
        d="M 575.03125,725.375 C 544.11437,724.24178 514.37721,746.59499 501.88732,775.02306 C 496.43581,787.33971 493.62924,800.14997 494.09375,813.625 C 515.12196,813.6019 538.15161,814.42135 559.17891,814.34 C 569.85547,814.11315 579.79913,806.01096 581.70235,795.42118 C 582.968,788.75729 581.24639,782.05345 580.78556,775.38882 C 578.86746,757.38421 576.94935,743.37961 575.03125,725.375 z"
        style="fill:#28220b;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.00282406999999996px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       inkscape:export-filename="/home/nikhil/workspace/qommunicate/src/icons/logo_small.png"
-       inkscape:export-xdpi="22.59099"
-       inkscape:export-ydpi="22.59099" />
+       inkscape:export-filename="/home/nikhil/workspace/qommunicate/src/icons/logo_large.png"
+       inkscape:export-xdpi="60.806637"
+       inkscape:export-ydpi="60.806637" />
     <path
        sodipodi:type="arc"
        style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-linecap:round;stroke-opacity:1"
@@ -307,9 +313,9 @@
        sodipodi:ry="11.5"
        d="M 440,327.86218 A 11.5,11.5 0 1 1 417,327.86218 A 11.5,11.5 0 1 1 440,327.86218 z"
        transform="matrix(1,0,8.6956557e-2,1,-0.509755,366)"
-       inkscape:export-filename="/home/nikhil/workspace/qommunicate/src/icons/logo_small.png"
-       inkscape:export-xdpi="22.59099"
-       inkscape:export-ydpi="22.59099" />
+       inkscape:export-filename="/home/nikhil/workspace/qommunicate/src/icons/logo_large.png"
+       inkscape:export-xdpi="60.806637"
+       inkscape:export-ydpi="60.806637" />
     <path
        transform="matrix(1,0,8.6956557e-2,1,27.490245,392)"
        d="M 440,327.86218 A 11.5,11.5 0 1 1 417,327.86218 A 11.5,11.5 0 1 1 440,327.86218 z"
@@ -320,9 +326,9 @@
        id="path3315"
        style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-linecap:round;stroke-opacity:1"
        sodipodi:type="arc"
-       inkscape:export-filename="/home/nikhil/workspace/qommunicate/src/icons/logo_small.png"
-       inkscape:export-xdpi="22.59099"
-       inkscape:export-ydpi="22.59099" />
+       inkscape:export-filename="/home/nikhil/workspace/qommunicate/src/icons/logo_large.png"
+       inkscape:export-xdpi="60.806637"
+       inkscape:export-ydpi="60.806637" />
     <path
        sodipodi:type="arc"
        style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-linecap:round;stroke-opacity:1"
@@ -333,9 +339,9 @@
        sodipodi:ry="11.5"
        d="M 440,327.86218 A 11.5,11.5 0 1 1 417,327.86218 A 11.5,11.5 0 1 1 440,327.86218 z"
        transform="matrix(1,0,8.6956557e-2,1,64.490245,372)"
-       inkscape:export-filename="/home/nikhil/workspace/qommunicate/src/icons/logo_small.png"
-       inkscape:export-xdpi="22.59099"
-       inkscape:export-ydpi="22.59099" />
+       inkscape:export-filename="/home/nikhil/workspace/qommunicate/src/icons/logo_large.png"
+       inkscape:export-xdpi="60.806637"
+       inkscape:export-ydpi="60.806637" />
     <path
        transform="matrix(1,0,8.6956557e-2,1,50.490245,340)"
        d="M 440,327.86218 A 11.5,11.5 0 1 1 417,327.86218 A 11.5,11.5 0 1 1 440,327.86218 z"
@@ -346,9 +352,9 @@
        id="path3319"
        style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-linecap:round;stroke-opacity:1"
        sodipodi:type="arc"
-       inkscape:export-filename="/home/nikhil/workspace/qommunicate/src/icons/logo_small.png"
-       inkscape:export-xdpi="22.59099"
-       inkscape:export-ydpi="22.59099" />
+       inkscape:export-filename="/home/nikhil/workspace/qommunicate/src/icons/logo_large.png"
+       inkscape:export-xdpi="60.806637"
+       inkscape:export-ydpi="60.806637" />
     <path
        transform="matrix(0.633505,-0.7517497,0.828826,0.5949919,-80.883236,884.21511)"
        d="M 440,327.86218 A 11.5,11.5 0 1 1 417,327.86218 A 11.5,11.5 0 1 1 440,327.86218 z"
@@ -359,9 +365,9 @@
        id="path3321"
        style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-linecap:round;stroke-opacity:1"
        sodipodi:type="arc"
-       inkscape:export-filename="/home/nikhil/workspace/qommunicate/src/icons/logo_small.png"
-       inkscape:export-xdpi="22.59099"
-       inkscape:export-ydpi="22.59099" />
+       inkscape:export-filename="/home/nikhil/workspace/qommunicate/src/icons/logo_large.png"
+       inkscape:export-xdpi="60.806637"
+       inkscape:export-ydpi="60.806637" />
     <path
        sodipodi:type="arc"
        style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-linecap:round;stroke-opacity:1"
@@ -372,16 +378,16 @@
        sodipodi:ry="11.5"
        d="M 440,327.86218 A 11.5,11.5 0 1 1 417,327.86218 A 11.5,11.5 0 1 1 440,327.86218 z"
        transform="matrix(0.633505,-0.7517497,0.828826,0.5949919,-114.51194,873.60804)"
-       inkscape:export-filename="/home/nikhil/workspace/qommunicate/src/icons/logo_small.png"
-       inkscape:export-xdpi="22.59099"
-       inkscape:export-ydpi="22.59099" />
+       inkscape:export-filename="/home/nikhil/workspace/qommunicate/src/icons/logo_large.png"
+       inkscape:export-xdpi="60.806637"
+       inkscape:export-ydpi="60.806637" />
     <path
        style="fill:#28220b;fill-rule:evenodd;stroke:#363018;stroke-width:30;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;fill-opacity:1"
        d="M 547.05801,777.76211 L 565.53646,796.24055"
        id="path3198"
        sodipodi:nodetypes="cc"
-       inkscape:export-filename="/home/nikhil/workspace/qommunicate/src/icons/logo_small.png"
-       inkscape:export-xdpi="22.59099"
-       inkscape:export-ydpi="22.59099" />
+       inkscape:export-filename="/home/nikhil/workspace/qommunicate/src/icons/logo_large.png"
+       inkscape:export-xdpi="60.806637"
+       inkscape:export-ydpi="60.806637" />
   </g>
 </svg>
