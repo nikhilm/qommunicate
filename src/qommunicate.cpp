@@ -13,6 +13,8 @@ Qommunicate::Qommunicate(QWidget *parent)
 {
     ui.setupUi(this);
     
+    ui.memberTree->expandAll();
+    
     createTrayIcon();
 }
 
