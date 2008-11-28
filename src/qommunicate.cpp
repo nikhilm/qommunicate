@@ -33,7 +33,9 @@ void Qommunicate::on_action_Settings_triggered()
 
 void Qommunicate::on_actionBroadcast_triggered()
 {
-    //BroadcastDialog(this).exec();
+    MessageDialog dlg(tr("Broadcast"));
+    dlg.setModal(false);
+    dlg.exec();
 }
 
 void Qommunicate::on_actionQuit_triggered()
@@ -71,7 +73,7 @@ void Qommunicate::createTrayIcon()
 void Qommunicate::on_memberTree_itemDoubleClicked(QTreeWidgetItem * item, int col)
 {
     // TODO: subclass item and set custom types for groups and users
-    MessageDialog dlg(item->data(0, Qt::DisplayRole).toString());
+    MessageDialog dlg(tr("Chat with %1").arg(item->data(0, Qt::DisplayRole).toString()));
     dlg.setModal(false);
     dlg.exec();
 }
