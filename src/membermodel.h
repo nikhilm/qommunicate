@@ -6,6 +6,7 @@ class MemberModel : public QStandardItemModel
     Q_OBJECT
 public:
     MemberModel(QObject *);
+    Qt::ItemFlags flags(const QModelIndex&) const;
 };
 
 class MemberFilter : public QSortFilterProxyModel

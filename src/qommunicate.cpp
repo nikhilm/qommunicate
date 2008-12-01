@@ -91,10 +91,12 @@ void Qommunicate::populateTree()
     }
     
     model->item(2)->appendRow( new QStandardItem(QString("member 2")));
+    model->item(0)->appendRow( new QStandardItem(QString("member 5")));
     
     filterModel->setSourceModel(model);
     filterModel->setDynamicSortFilter(true);
     
+    ui.memberTree->setSelectionMode(ui.memberTree->ExtendedSelection);
     ui.memberTree->setModel(filterModel);
     ui.memberTree->setHeaderHidden(true);
     ui.memberTree->expandAll();
