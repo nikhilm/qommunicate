@@ -55,60 +55,7 @@
       </layout>
      </item>
      <item>
-      <widget class="QTreeWidget" name="memberTree" >
-       <property name="selectionMode" >
-        <enum>QAbstractItemView::ExtendedSelection</enum>
-       </property>
-       <property name="rootIsDecorated" >
-        <bool>true</bool>
-       </property>
-       <property name="sortingEnabled" >
-        <bool>true</bool>
-       </property>
-       <property name="headerHidden" >
-        <bool>true</bool>
-       </property>
-       <column>
-        <property name="text" >
-         <string>1</string>
-        </property>
-       </column>
-       <item>
-        <property name="text" >
-         <string>Tatva</string>
-        </property>
-        <item>
-         <property name="text" >
-          <string>blah</string>
-         </property>
-        </item>
-        <item>
-         <property name="text" >
-          <string>abcdef</string>
-         </property>
-        </item>
-       </item>
-       <item>
-        <property name="text" >
-         <string>Hotshots</string>
-        </property>
-        <item>
-         <property name="text" >
-          <string>stratocaster</string>
-         </property>
-        </item>
-        <item>
-         <property name="text" >
-          <string>nsm</string>
-         </property>
-        </item>
-        <item>
-         <property name="text" >
-          <string>balaclava</string>
-         </property>
-        </item>
-       </item>
-      </widget>
+      <widget class="QTreeView" name="memberTree" />
      </item>
      <item>
       <widget class="QComboBox" name="statusCombo" >

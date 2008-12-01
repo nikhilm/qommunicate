@@ -12,15 +12,15 @@ Qommunicate::Qommunicate(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
-    
-    ui.memberTree->expandAll();
-    
+        
     createTrayIcon();
+    
+    populateTree();
 }
 
 void Qommunicate::on_searchEdit_textChanged(const QString &text)
 {
-    QMessageBox::information(this, tr("Text Changed"), text);
+    filterModel->setFilterFixedString(text);
 }
 
 void Qommunicate::on_action_About_triggered()
@@ -72,10 +72,30 @@ void Qommunicate::createTrayIcon()
     trayIcon->show();
 }
 
-void Qommunicate::on_memberTree_itemDoubleClicked(QTreeWidgetItem * item, int col)
+// void Qommunicate::on_memberTree_itemDoubleClicked(QTreeWidgetItem * item, int col)
+// {
+//     // TODO: subclass item and set custom types for groups and users
+//     MessageDialog dlg(tr("Chat with %1").arg(item->data(0, Qt::DisplayRole).toString()));
+//     dlg.setModal(false);
+//     dlg.exec();
+// }
+
+void Qommunicate::populateTree()
 {
-    // TODO: subclass item and set custom types for groups and users
-    MessageDialog dlg(tr("Chat with %1").arg(item->data(0, Qt::DisplayRole).toString()));
-    dlg.setModal(false);
-    dlg.exec();
+    model = new MemberModel(this);
+    filterModel = new MemberFilter(this);
+    
+    QStandardItem *parent = model->invisibleRootItem();
+    for(int i = 0; i < 5 ; i++) {
+        parent->appendRow( new QStandardItem(QString("group %1").arg(i)) );
+    }
+    
+    model->item(2)->appendRow( new QStandardItem(QString("member 2")));
+    
+    filterModel->setSourceModel(model);
+    filterModel->setDynamicSortFilter(true);
+    
+    ui.memberTree->setModel(filterModel);
+    ui.memberTree->setHeaderHidden(true);
+    ui.memberTree->expandAll();
 }

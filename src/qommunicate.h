@@ -1,5 +1,8 @@
 #include <QSystemTrayIcon>
+#include <QStandardItemModel>
+#include <QSortFilterProxyModel>
 
+#include "membermodel.h"
 #include "ui_qommunicate.h"
 
 class Qommunicate : public QMainWindow
@@ -22,12 +25,16 @@ private slots:
     
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
     
-    void on_memberTree_itemDoubleClicked(QTreeWidgetItem *, int);
+    //void on_memberTree_itemDoubleClicked(QTreeWidgetItem *, int);
 
 private:
     Ui::MainWindow ui;
     
     QSystemTrayIcon *trayIcon;
     
+    MemberModel *model;
+    MemberFilter *filterModel;
+    
     void createTrayIcon();
+    void populateTree();
 };
