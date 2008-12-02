@@ -105,9 +105,21 @@ void Qommunicate::populateTree()
 void Qommunicate::on_memberTree_doubleClicked(const QModelIndex& index)
 {
     QModelIndex item;
-    foreach(item, ui.memberTree->selectionModel()->selectedRows()) {
-        QMessageBox::information(this, "", ui.memberTree->model()->data(item).toString());
+    
+    MessageDialog *dlg;
+    if(index.isValid())
+    {
+        // only single item clicked
+        dlg = new MessageDialog(ui.memberTree->model()->data(index).toString());
     }
+    else
+    {
+        QStringList receivers;
+        foreach(item, ui.memberTree->selectionModel()->selectedRows())
+            receivers << ui.memberTree->model()->data(item).toString() ;
+        dlg = new MessageDialog(receivers);
+    }
+    dlg->exec();
 }
 
 void Qommunicate::keyPressEvent(QKeyEvent *event)
