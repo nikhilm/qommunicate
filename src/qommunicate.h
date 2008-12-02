@@ -23,6 +23,8 @@ private slots:
     void on_actionBroadcast_triggered();
     void on_actionQuit_triggered();
     
+    void on_memberTree_doubleClicked(const QModelIndex&);
+    
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
     
     //void on_memberTree_itemDoubleClicked(QTreeWidgetItem *, int);
@@ -37,4 +39,6 @@ private:
     
     void createTrayIcon();
     void populateTree();
+    
+    void keyPressEvent(QKeyEvent *);
 };

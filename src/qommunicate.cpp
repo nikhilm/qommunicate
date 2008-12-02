@@ -101,3 +101,21 @@ void Qommunicate::populateTree()
     ui.memberTree->setHeaderHidden(true);
     ui.memberTree->expandAll();
 }
+
+void Qommunicate::on_memberTree_doubleClicked(const QModelIndex& index)
+{
+    QModelIndex item;
+    foreach(item, ui.memberTree->selectionModel()->selectedRows()) {
+        QMessageBox::information(this, "", ui.memberTree->model()->data(item).toString());
+    }
+}
+
+void Qommunicate::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_Return) {
+        event->accept();
+        on_memberTree_doubleClicked(QModelIndex());
+        return;
+    }
+    event->ignore();
+}
