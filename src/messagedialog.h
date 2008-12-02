@@ -1,3 +1,5 @@
+#include <QStringList>
+
 #include "ui_messagedialog.h"
 
 class MessageDialog : public QDialog
@@ -6,7 +8,11 @@ class MessageDialog : public QDialog
 
 public:
     MessageDialog(QString, QWidget *parent=0);
+    MessageDialog(QStringList, QWidget *parent=0);
+    MessageDialog(QWidget *parent=0);
 
 private:
     Ui::MessageDialog ui;
+    
+    QStringList* receivers;
 };
