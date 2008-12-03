@@ -8,6 +8,7 @@ SettingsDialog::SettingsDialog(QWidget *parent = 0) : QDialog(parent)
 {
     ui.setupUi(this);
     ui.groupBox->insertItem(0, "None", QString());
+    ui.groupBox->setCurrentIndex(0);
     settings = new QSettings;
 }
 
