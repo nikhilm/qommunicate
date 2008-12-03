@@ -40,7 +40,7 @@ void Qommunicate::on_action_Settings_triggered()
 
 void Qommunicate::on_actionBroadcast_triggered()
 {
-    MessageDialog dlg(tr("Broadcast"));
+    MessageDialog dlg;
     dlg.setModal(false);
     dlg.exec();
 }
