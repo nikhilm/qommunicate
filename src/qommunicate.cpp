@@ -25,6 +25,7 @@ Qommunicate::Qommunicate(QWidget *parent)
 void Qommunicate::on_searchEdit_textChanged(const QString &text)
 {
     filterModel->setFilterFixedString(text);
+    ui.memberTree->expandAll();
 }
 
 void Qommunicate::on_action_About_triggered()
@@ -96,6 +97,7 @@ void Qommunicate::populateTree()
     
     model->item(2)->appendRow( new QStandardItem(QString("member 2")));
     model->item(0)->appendRow( new QStandardItem(QString("member 5")));
+    model->item(0)->appendRow( new QStandardItem(QString("nikhil")));
     
     filterModel->setSourceModel(model);
     filterModel->setDynamicSortFilter(true);
