@@ -1,4 +1,5 @@
 #include <QSettings>
+#include <QDir>
 #include <QMessageBox>
 #include <QInputDialog>
 
@@ -7,9 +8,25 @@
 SettingsDialog::SettingsDialog(QWidget *parent = 0) : QDialog(parent)
 {
     ui.setupUi(this);
-    ui.groupBox->insertItem(0, "None", QString());
-    ui.groupBox->setCurrentIndex(0);
+    
+    loadSettings();
+}
+
+void SettingsDialog::loadSettings()
+{    
     settings = new QSettings;
+    
+    ui.nickEdit->setText( settings->value(tr("nick"), QDir::home().dirName()).toString() );
+    ui.groupBox->insertItem(0, settings->value(tr("group"), tr("None")).toString() );
+    ui.groupBox->setCurrentIndex(0);
+    
+    Qt::CheckState popupState = settings->value(tr("popup_messages")).toBool() ? Qt::Checked : Qt::Unchecked ;
+    Qt::CheckState soundState = settings->value(tr("play_sound")).toBool() ? Qt::Checked : Qt::Unchecked ;
+    Qt::CheckState broadcastState = settings->value(tr("ignore_broadcast")).toBool() ? Qt::Checked : Qt::Unchecked ;
+    
+    ui.popupCB->setCheckState(popupState);
+    ui.playSoundCB->setCheckState(soundState);
+    ui.noBroadcastCB->setCheckState(broadcastState);
 }
 
 void SettingsDialog::on_buttonBox_accepted()

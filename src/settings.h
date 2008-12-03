@@ -17,4 +17,6 @@ private slots:
 private:
     Ui::SettingsDialog ui;
     QSettings *settings;
+    
+    void loadSettings();
 };
