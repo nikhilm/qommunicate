@@ -1,5 +1,7 @@
 #include <QMessageBox>
 #include <QCloseEvent>
+#include <QSettings>
+#include <QFile>
 #include <QMenu>
 #include <QTreeWidget>
 
@@ -16,6 +18,8 @@ Qommunicate::Qommunicate(QWidget *parent)
     createTrayIcon();
     
     populateTree();
+    
+    firstRun();
 }
 
 void Qommunicate::on_searchEdit_textChanged(const QString &text)
@@ -130,4 +134,11 @@ void Qommunicate::keyPressEvent(QKeyEvent *event)
         return;
     }
     event->ignore();
+}
+
+void Qommunicate::firstRun()
+{
+    QSettings s;
+    if( !QFile::exists(s.fileName()) )
+        ui.action_Settings->trigger();
 }

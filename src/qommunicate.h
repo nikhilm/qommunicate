@@ -39,6 +39,7 @@ private:
     
     void createTrayIcon();
     void populateTree();
+    void firstRun();
     
     void keyPressEvent(QKeyEvent *);
 };
