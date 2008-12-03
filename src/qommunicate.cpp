@@ -7,6 +7,7 @@
 
 #include "about.h"
 #include "settings.h"
+#include "ipobjects.h"
 #include "messagedialog.h"
 #include "qommunicate.h"
 
@@ -95,7 +96,7 @@ void Qommunicate::populateTree()
         parent->appendRow( new QStandardItem(QString("group %1").arg(i)) );
     }
     
-    model->item(2)->appendRow( new QStandardItem(QString("member 2")));
+    model->item(2)->appendRow( new Member("nsm", "ironik", "192.168.0.2", "Available") );
     model->item(0)->appendRow( new QStandardItem(QString("member 5")));
     model->item(0)->appendRow( new QStandardItem(QString("nikhil")));
     
