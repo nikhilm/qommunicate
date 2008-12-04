@@ -47,12 +47,9 @@ private:
     
     QString tooltip() {
         return QObject::tr("Host: %1\nStatus: %2").arg(host()).arg(status());
-    }
+    } ;
 };
 
-bool operator==(Member& a, Member& b) {
-    return a.address() == b.address();
-} ;
 
 class Group : public QStandardItem
 {
@@ -64,13 +61,12 @@ public:
     
     QString name() { return m_name; } ;
     
-    void setName(const QString nm) { m_name = nm ; } ;
+    void setName(const QString nm) {
+        m_name = nm ;
+        setData(nm, Qt::DisplayRole);
+    } ;
     
     friend bool operator==(Group&, Group&);
 private:
     QString m_name;
 };
-
-bool operator==(Group& a, Group& b) {
-    return a.name() == b.name();
-} ;

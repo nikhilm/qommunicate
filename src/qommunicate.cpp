@@ -93,7 +93,7 @@ void Qommunicate::populateTree()
     
     QStandardItem *parent = model->invisibleRootItem();
     for(int i = 0; i < 5 ; i++) {
-        parent->appendRow( new QStandardItem(QString("group %1").arg(i)) );
+        parent->appendRow( new Group(QString("group %1").arg(i)) );
     }
     
     model->item(2)->appendRow( new Member("nsm", "ironik", "192.168.0.2", "Available") );
