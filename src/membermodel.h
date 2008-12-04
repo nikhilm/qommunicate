@@ -7,6 +7,12 @@ class MemberModel : public QStandardItemModel
 public:
     MemberModel(QObject *);
     Qt::ItemFlags flags(const QModelIndex&) const;
+    
+private slots:
+    void updateGroupCount(QStandardItem *);
+    
+private:
+    void setGroupCount(QStandardItem*);
 };
 
 class MemberFilter : public QSortFilterProxyModel
