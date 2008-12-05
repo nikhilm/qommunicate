@@ -142,6 +142,6 @@ void Qommunicate::keyPressEvent(QKeyEvent *event)
 void Qommunicate::firstRun()
 {
     QSettings s;
-    if( !QFile::exists(s.fileName()) )
+    if( ! s.contains(tr("nick")) )
         ui.action_Settings->trigger();
 }
