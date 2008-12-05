@@ -1,3 +1,7 @@
+#include <QDragEnterEvent>
+#include <QMessageBox>
+#include <QUrl>
+
 #include "ui_settings.h"
 
 class QSettings;
@@ -14,6 +18,16 @@ public:
         delete settings;
         settings = NULL;
     };
+    
+    void dragEnterEvent(QDragEnterEvent *evt)
+    {
+        if(evt->mimeData()->hasUrls())
+        {
+            evt->acceptProposedAction();
+        }
+    };
+    
+    void dropEvent(QDropEvent *);
 
 private slots:
     void on_buttonBox_accepted();

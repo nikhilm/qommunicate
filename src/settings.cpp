@@ -50,3 +50,30 @@ void SettingsDialog::on_customGrpButton_clicked()
         ui.groupBox->setCurrentIndex(ui.groupBox->count()-1);
     }
 }
+
+void SettingsDialog::dropEvent(QDropEvent *evt)
+{
+    QFile file(evt->mimeData()->urls()[0].toLocalFile()); 
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        QMessageBox::information(this, tr("Error"), tr("Error reading file %1").arg(file.fileName()));
+        return;
+    }
+    
+    int i = 0;
+    while(!file.atEnd())
+    {
+        QString line = QString(file.readLine());
+        line.chop(1);
+        if(!line.contains('='))
+            continue;
+        
+        QString ip = line.split('=')[1].remove('"');
+        if(!ip.contains(QRegExp("[0-255.]*")))
+            continue;
+        
+        settings->setValue(QString("ips/ip%1").arg(i++), ip);
+    }
+    
+    settings->sync();
+}
