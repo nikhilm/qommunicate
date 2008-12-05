@@ -1,5 +1,8 @@
 #include <QUdpSocket>
+#include <QTcpSocket>
+#include <QHostInfo>
 
+#include "constants.h"
 #include "ipobjects.h"
 
 class Message
@@ -18,6 +21,7 @@ public:
     void setPayload(QString py) { m_payload = py; } ;
     
     QString toString();
+    static Message fromString(QString);
     
 private:
     quint32 m_packetNo;
@@ -26,3 +30,52 @@ private:
     QString m_payload;
     
 };
+
+
+class Messenger : public QObject
+{
+    Q_OBJECT
+public:
+    Messenger();
+    ~Messenger()
+    {
+        socket->close();
+        delete socket;
+        socket = NULL;
+        
+        if(fileSocket)
+        {
+            fileSocket->close();
+            delete fileSocket;
+            fileSocket = NULL;
+        }
+    };
+    
+    bool sendMessage(Message, Member*);
+    bool sendMessage(quint32, QString, Member*);
+    
+    bool broadcast(Message);
+    bool broadcast(quint32, QString);
+    
+    void sendFile(QString);
+    
+    bool login();
+    bool logout();
+    void reset();
+    
+signals:
+    void receivedMessage(Message* );
+    // TODO: add user-atomic cases
+    
+private:
+    QUdpSocket* socket;
+    QTcpSocket* fileSocket;
+    quint32 m_packetNo;
+    
+    quint32 packetNo() { return m_packetNo++ ; } ;
+        
+private slots:
+    void receiveData();
+};
+
+const Messenger messenger;
