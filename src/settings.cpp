@@ -31,7 +31,6 @@ void SettingsDialog::loadSettings()
 
 void SettingsDialog::on_buttonBox_accepted()
 {
-    QMessageBox::information(this, tr("Saving"), settings->fileName());
     settings->setValue(tr("nick"), ui.nickEdit->text());
     settings->setValue(tr("group"), ui.groupBox->currentText());
     settings->setValue(tr("popup_messages"), ui.popupCB->isChecked());

@@ -8,6 +8,12 @@ class SettingsDialog : public QDialog
 
 public:
     SettingsDialog(QWidget *);
+    
+    ~SettingsDialog()
+    {
+        delete settings;
+        settings = NULL;
+    };
 
 private slots:
     void on_buttonBox_accepted();
