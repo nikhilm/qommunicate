@@ -1,6 +1,6 @@
 #include "messagedialog.h"
 
-MessageDialog::MessageDialog(QString receiver, QWidget *parent)
+MessageDialog::MessageDialog(QString receiver, QWidget *parent) : QDialog(parent)
 {
     receivers = new QStringList(receiver);
     
@@ -8,7 +8,7 @@ MessageDialog::MessageDialog(QString receiver, QWidget *parent)
     setWindowTitle(tr("Send Message to %1").arg(receiver));
 }
 
-MessageDialog::MessageDialog(QStringList receivers, QWidget *parent)
+MessageDialog::MessageDialog(QStringList receivers, QWidget *parent) : QDialog(parent)
 {
     this->receivers = &receivers;
     
@@ -16,7 +16,7 @@ MessageDialog::MessageDialog(QStringList receivers, QWidget *parent)
     setWindowTitle(tr("Send message to %1").arg(receivers.join(",")));
 }
 
-MessageDialog::MessageDialog(QWidget *parent)
+MessageDialog::MessageDialog(QWidget *parent) : QDialog(parent)
 {
     this->receivers = NULL; // broadcast
     
