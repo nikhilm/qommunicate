@@ -137,9 +137,12 @@
      </widget>
     </item>
     <item>
-     <widget class="QCheckBox" name="noBroadcastCB" >
+     <widget class="QCheckBox" name="noReceiveCB" >
+      <property name="toolTip" >
+       <string>Ignore any messages unless &lt;b>you&lt;/b> have begun the conversation</string>
+      </property>
       <property name="text" >
-       <string>Ignore broadcasts</string>
+       <string>&amp;Ignore received messages</string>
       </property>
      </widget>
     </item>

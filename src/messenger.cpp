@@ -73,12 +73,12 @@ bool Messenger::sendMessage(Message msg, Member* to)
     return socket->writeDatagram(data, *(to->address()), UDP_PORT) != -1;
 }
 
-bool Messenger::broadcast(quint32 command, QString payload)
+bool Messenger::multicast(quint32 command, QString payload, QList<Member*> members)
 {
-    // TODO: how to broadcast and then send individually without duplication
+    // TODO: 
 }
 
-bool Messenger::broadcast(Message msg)
+bool Messenger::multicast(Message msg, QList<Member*> members)
 {
 }
 

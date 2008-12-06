@@ -21,5 +21,5 @@ MessageDialog::MessageDialog(QWidget *parent)
     this->receivers = NULL; // broadcast
     
     ui.setupUi(this);
-    setWindowTitle(tr("Broadcast message"));
+    setWindowTitle(tr("Multicast message"));
 }

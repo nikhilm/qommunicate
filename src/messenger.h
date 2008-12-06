@@ -54,8 +54,8 @@ public:
     bool sendMessage(Message, Member*);
     bool sendMessage(quint32, QString, Member*);
     
-    bool broadcast(Message);
-    bool broadcast(quint32, QString);
+    bool multicast(Message, QList<Member*>);
+    bool multicast(quint32, QString, QList<Member*>);
     
     void sendFile(QString);
     

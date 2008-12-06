@@ -97,7 +97,7 @@
    <attribute name="toolBarBreak" >
     <bool>false</bool>
    </attribute>
-   <addaction name="actionBroadcast" />
+   <addaction name="actionMulticast" />
    <addaction name="separator" />
    <addaction name="action_Settings" />
    <addaction name="action_About" />
@@ -118,19 +118,19 @@
     <enum>QAction::PreferencesRole</enum>
    </property>
   </action>
-  <action name="actionBroadcast" >
+  <action name="actionMulticast" >
    <property name="icon" >
     <iconset resource="icons.qrc" >
      <normaloff>:/newPrefix/icons/broadcast.png</normaloff>:/newPrefix/icons/broadcast.png</iconset>
    </property>
    <property name="text" >
-    <string>&amp;Broadcast</string>
+    <string>&amp;Multicast</string>
    </property>
    <property name="toolTip" >
-    <string>Broadcast message to all members</string>
+    <string>Multicast message</string>
    </property>
    <property name="shortcut" >
-    <string>Ctrl+B</string>
+    <string>Ctrl+M</string>
    </property>
   </action>
   <action name="actionQuit" >

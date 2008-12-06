@@ -39,7 +39,7 @@ void Qommunicate::on_action_Settings_triggered()
     SettingsDialog(this).exec();
 }
 
-void Qommunicate::on_actionBroadcast_triggered()
+void Qommunicate::on_actionMulticast_triggered()
 {
     MessageDialog dlg;
     dlg.setModal(false);
@@ -71,20 +71,12 @@ void Qommunicate::createTrayIcon()
     connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
     
     QMenu *menu = new QMenu;
-    menu->addAction(ui.actionBroadcast);
+    menu->addAction(ui.actionMulticast);
     menu->addAction(ui.actionQuit);
     trayIcon->setContextMenu(menu);
     
     trayIcon->show();
 }
-
-// void Qommunicate::on_memberTree_itemDoubleClicked(QTreeWidgetItem * item, int col)
-// {
-//     // TODO: subclass item and set custom types for groups and users
-//     MessageDialog dlg(tr("Chat with %1").arg(item->data(0, Qt::DisplayRole).toString()));
-//     dlg.setModal(false);
-//     dlg.exec();
-// }
 
 void Qommunicate::populateTree()
 {
