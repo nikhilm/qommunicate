@@ -113,9 +113,9 @@ void Messenger::receiveData()
     {
         QByteArray data;
         data.resize(socket->pendingDatagramSize());
-        QHostAddress sender;
+        QHostAddress from;
         
-        socket->readDatagram(data.data(), data.size(), &sender);
+        socket->readDatagram(data.data(), data.size(), &from);
         data.replace('\0', QOM_HOSTLIST_SEPARATOR);
         
         Message msg = Message::fromString(QString(data.data()));
@@ -123,16 +123,18 @@ void Messenger::receiveData()
         //NOTE: this is important too
         msg.setCommand(msg.command() & 0xff);
         
+        msg.sender()->setAddress(from.toString());
+        
         qDebug() << "Received "<<msg.toString();
         
         switch(msg.command())
         {
             case QOM_ANSENTRY:
-                //emit addMember(msg);
+                emit msg_ansEntry(msg);
                 break;
             
             case QOM_BR_ENTRY:
-                //emit loginMember(msg);
+                emit msg_entry(msg);
                 break;
         }
     }

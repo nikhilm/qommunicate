@@ -70,6 +70,9 @@ signals:
     void receivedMessage(Message* );
     // TODO: add user-atomic cases
     
+    void msg_ansEntry(Message);
+    void msg_entry(Message);
+    
 private:
     
     QUdpSocket* socket;
