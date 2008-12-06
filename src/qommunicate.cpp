@@ -8,6 +8,7 @@
 #include "about.h"
 #include "settings.h"
 #include "ipobjects.h"
+#include "messenger.h"
 #include "messagedialog.h"
 #include "qommunicate.h"
 
@@ -21,6 +22,9 @@ Qommunicate::Qommunicate(QWidget *parent)
     populateTree();
     
     firstRun();
+    messenger()->login();
+    
+    connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanup()));
 }
 
 void Qommunicate::on_searchEdit_textChanged(const QString &text)
@@ -136,4 +140,10 @@ void Qommunicate::firstRun()
     QSettings s;
     if( ! s.contains(tr("nick")) )
         ui.action_Settings->trigger();
+}
+
+void Qommunicate::cleanup()
+{
+    messenger()->logout();
+    delete messenger();
 }
