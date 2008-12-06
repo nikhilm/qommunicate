@@ -6,6 +6,8 @@
 #include <QSortFilterProxyModel>
 
 #include "membermodel.h"
+#include "messenger.h"
+
 #include "ui_qommunicate.h"
 
 class Qommunicate : public QMainWindow
@@ -31,6 +33,9 @@ private slots:
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
     
     void cleanup();
+    
+    // Incoming message related slots
+    void addMember(Message);
 
 private:
     Ui::MainWindow ui;

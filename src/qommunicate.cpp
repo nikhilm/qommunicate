@@ -25,6 +25,8 @@ Qommunicate::Qommunicate(QWidget *parent)
     messenger()->login();
     
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanup()));
+    
+    connect(messenger(), SIGNAL(msg_ansEntry(Message)), this, SLOT(addMember(Message)));
 }
 
 void Qommunicate::on_searchEdit_textChanged(const QString &text)
@@ -146,4 +148,10 @@ void Qommunicate::cleanup()
 {
     messenger()->logout();
     delete messenger();
+}
+
+// Message handling slots
+void Qommunicate::addMember(Message msg)
+{
+    model->appendRow(new Member(msg.payload().split('\a')[0], "", "", ""));
 }
