@@ -80,6 +80,9 @@ void Messenger::reset()
 Message Messenger::makeMessage(quint32 command, QString payload)
 {
     Message msg(packetNo(), &member_me, command, payload);
+    // NOTE: This is an IMPORTANT step. that's why sniffing the data will give you big command numbers
+    msg.setCommand(msg.command() | QOM_ENCRYPTOPT | QOM_FILEATTACHOPT);
+    
     return msg;
 }
 
@@ -89,10 +92,7 @@ bool Messenger::sendMessage(quint32 command, QString payload, Member* to)
 }
 
 bool Messenger::sendMessage(Message msg, Member* to)
-{
-    // NOTE: This is an IMPORTANT step. that's why sniffing the data will give you big command numbers
-    msg.setCommand(msg.command() | QOM_ENCRYPTOPT | QOM_FILEATTACHOPT);
-    
+{    
     const QByteArray data = msg.toString().toAscii();
     
     return socket->writeDatagram(data, *(to->address()), UDP_PORT) != -1;
@@ -116,15 +116,25 @@ void Messenger::receiveData()
         QHostAddress sender;
         
         socket->readDatagram(data.data(), data.size(), &sender);
+        data.replace('\0', QOM_HOSTLIST_SEPARATOR);
         
-        Message msg = Message::fromString(data.data());
-        
-        qDebug() << "Received "<<msg.toString();
-        
+        Message msg = Message::fromString(QString(data.data()));
+                
         //NOTE: this is important too
         msg.setCommand(msg.command() & 0xff);
         
-        //TODO:emit signals
+        qDebug() << "Received "<<msg.toString();
+        
+        switch(msg.command())
+        {
+            case QOM_ANSENTRY:
+                //emit addMember(msg);
+                break;
+            
+            case QOM_BR_ENTRY:
+                //emit loginMember(msg);
+                break;
+        }
     }
 }
 
