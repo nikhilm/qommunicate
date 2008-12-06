@@ -1,3 +1,6 @@
+#ifndef QOM_CONSTANTS
+#define QOM_CONSTANTS
+
 const int INT_VERSION=1;
 
 const int UDP_PORT = 2425;
@@ -106,3 +109,4 @@ const int QOM_FILE_UNICODEFNAME=0x00000041	;
 const char QOM_FILELIST_SEPARATOR='\a';
 const char QOM_HOSTLIST_SEPARATOR='\a';
 const char QOM_HOSTLIST_DUMMY=	'\b';
+#endif
