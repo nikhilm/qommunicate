@@ -1,3 +1,6 @@
+#ifndef QOM_IPOBJECTS
+#define QOM_IPOBJECTS
+
 #include <QStandardItem>
 #include <QHostAddress>
 
@@ -70,3 +73,5 @@ public:
 private:
     QString m_name;
 };
+
+#endif
