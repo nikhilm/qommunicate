@@ -1,6 +1,18 @@
+#include <QSettings>
+
 #include "messenger.h"
 
 Member member_me("", QHostInfo::localHostName(), QHostAddress(QHostAddress::LocalHost).toString(), "Available");
+Group group_me("");
+
+Messenger* m = NULL;
+
+Messenger* messenger()
+{
+    if(!m)
+        m = new Messenger;
+    return m;
+}
 
 Message::Message(quint32 pNo, Member* sender, quint32 cmd, QString payload)
 {
@@ -13,13 +25,12 @@ Message::Message(quint32 pNo, Member* sender, quint32 cmd, QString payload)
 QString Message::toString()
 {
     QStringList lst;
-    lst << QString(INT_VERSION) ; // TODO: use version
-    lst << QString(packetNo());
+    lst << QString("%1").arg(INT_VERSION) ; // TODO: use version
+    lst << QString("%1").arg(packetNo());
     lst << sender()->name();
     lst << sender()->host();
-    lst << QString(command());
+    lst << QString("%1").arg(command());
     lst << payload();
-    
     return lst.join(":");
 }
 
@@ -41,26 +52,40 @@ Message Message::fromString(QString s)
 
 Messenger::Messenger() : QObject()
 {
+    socket = NULL;
+    fileSocket = NULL;
     reset();
 }
 
 void Messenger::reset()
 {
-    m_packetNo = 0;
+    m_packetNo = 1;
     
-    delete socket;
-    socket = NULL;
+    if(socket) {
+        socket->close();
+        delete socket;
+        socket = NULL;
+    }
     
-    socket = new QUdpSocket;
-    socket->bind(QHostAddress::LocalHost, UDP_PORT);
+    socket = new QUdpSocket(this);
+    socket->bind(UDP_PORT);
+    
+    QSettings s;
+    member_me.setName(s.value(tr("nick")).toString());
+    group_me.setName(s.value(tr("group")).toString());
     
     connect(socket, SIGNAL(readyRead()), this, SLOT(receiveData()));
 }
 
-bool Messenger::sendMessage(quint32 command, QString payload, Member* to)
+Message Messenger::makeMessage(quint32 command, QString payload)
 {
     Message msg(packetNo(), &member_me, command, payload);
-    return sendMessage( msg, to );
+    return msg;
+}
+
+bool Messenger::sendMessage(quint32 command, QString payload, Member* to)
+{
+    return sendMessage( makeMessage(command, payload), to );
 }
 
 bool Messenger::sendMessage(Message msg, Member* to)
@@ -94,9 +119,50 @@ void Messenger::receiveData()
         
         Message msg = Message::fromString(data.data());
         
+        qDebug() << "Received "<<msg.toString();
+        
         //NOTE: this is important too
         msg.setCommand(msg.command() & 0xff);
         
         //TODO:emit signals
+    }
+}
+
+QStringList Messenger::ips() const
+{
+    QSettings s;
+    s.beginGroup("ips");
+    
+    QStringList ret;
+    
+    QString ipKey;
+    foreach(ipKey, s.childKeys())
+    {
+        ret << s.value(ipKey).toString();
+    }
+    
+    return ret;
+}
+
+bool Messenger::login()
+{
+    QByteArray data(makeMessage(QOM_BR_ENTRY, member_me.name()+"\0"+group_me.name()).toString().toAscii());
+    
+    QString ip;
+    foreach(ip, ips())
+    {
+        socket->writeDatagram(data.data(), data.size(), QHostAddress(ip), UDP_PORT);
+    }
+    qDebug() << QHostAddress::LocalHost;
+}
+
+bool Messenger::logout()
+{
+    QByteArray data(makeMessage(QOM_BR_EXIT, member_me.name()+"\0"+group_me.name()).toString().toAscii());
+    
+    QString ip;
+    foreach(ip, ips())
+    {
+        socket->writeDatagram(data.data(), data.size(), QHostAddress(ip), UDP_PORT);
     }
 }
