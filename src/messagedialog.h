@@ -1,3 +1,6 @@
+#ifndef QOM_MESSAGEDIALOG
+#define QOM_MESSAGEDIALOG
+
 #include <QStringList>
 
 #include "ui_messagedialog.h"
@@ -16,3 +19,5 @@ private:
     
     QStringList* receivers;
 };
+
+#endif

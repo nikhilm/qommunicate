@@ -1,3 +1,6 @@
+#ifndef QOM_QOMMUNICATE
+#define QOM_QOMMUNICATE
+
 #include <QSystemTrayIcon>
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
@@ -27,7 +30,7 @@ private slots:
     
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
     
-    //void on_memberTree_itemDoubleClicked(QTreeWidgetItem *, int);
+    void cleanup();
 
 private:
     Ui::MainWindow ui;
@@ -43,3 +46,5 @@ private:
     
     void keyPressEvent(QKeyEvent *);
 };
+
+#endif

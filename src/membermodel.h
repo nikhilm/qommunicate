@@ -1,3 +1,6 @@
+#ifndef QOM_MEMBERMODEL
+#define QOM_MEMBERMODEL
+
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
 
@@ -23,3 +26,5 @@ public:
 protected:
     bool filterAcceptsRow(int , const QModelIndex &) const;
 };
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef QOM_ABOUT
+#define QOM_ABOUT
+
 #include "ui_about.h"
 
 class AboutDialog : public QDialog
@@ -13,3 +16,5 @@ public:
 private:
     Ui::AboutDialog ui;
 };
+
+#endif

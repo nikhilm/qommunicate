@@ -1,3 +1,6 @@
+#ifndef QOM_SETTINGS
+#define QOM_SETTINGS
+
 #include <QDragEnterEvent>
 #include <QMessageBox>
 #include <QUrl>
@@ -40,3 +43,5 @@ private:
     
     void loadSettings();
 };
+
+#endif
