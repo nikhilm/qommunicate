@@ -1,3 +1,6 @@
+#ifndef QOM_MESSENGER
+#define QOM_MESSENGER
+
 #include <QUdpSocket>
 #include <QTcpSocket>
 #include <QHostInfo>
@@ -35,7 +38,7 @@ private:
 class Messenger : public QObject
 {
     Q_OBJECT
-public:
+public:    
     Messenger();
     ~Messenger()
     {
@@ -68,14 +71,20 @@ signals:
     // TODO: add user-atomic cases
     
 private:
+    
     QUdpSocket* socket;
     QTcpSocket* fileSocket;
     quint32 m_packetNo;
     
     quint32 packetNo() { return m_packetNo++ ; } ;
-        
+    
+    QStringList ips() const; // used for login and logout
+    
+    Message makeMessage(quint32, QString);
+    
 private slots:
     void receiveData();
 };
 
-const Messenger messenger;
+Messenger * messenger();
+#endif
