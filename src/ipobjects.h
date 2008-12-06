@@ -40,7 +40,10 @@ public:
         setData(tooltip(), Qt::ToolTipRole);
     } ;
     
-    friend bool operator==(Member&, Member&);
+    friend bool operator==(Member& a, Member& b)
+    {
+        return a.address() == b.address();
+    };
     
 private:
     QString m_name;
@@ -52,7 +55,6 @@ private:
         return QObject::tr("Host: %1\nStatus: %2").arg(host()).arg(status());
     } ;
 };
-
 
 class Group : public QStandardItem
 {
