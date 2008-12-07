@@ -158,7 +158,7 @@ QStringList Messenger::ips() const
 
 bool Messenger::login()
 {
-    QByteArray data(makeMessage(QOM_BR_ENTRY, member_me.name()+"\0"+group_me.name()).toString().toAscii());
+    QByteArray data(makeMessage(QOM_BR_ENTRY, member_me.name()+'\0'+group_me.name()).toString().toAscii());
     
     QString ip;
     foreach(ip, ips())
