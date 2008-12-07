@@ -1,4 +1,6 @@
 #include <QMessageBox>
+
+#include "ipobjects.h"
 #include "membermodel.h"
 
 
@@ -10,6 +12,27 @@ MemberFilter::MemberFilter(QObject *parent=0) : QSortFilterProxyModel(parent) {}
 Qt::ItemFlags MemberModel::flags(const QModelIndex& index) const
 {
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDropEnabled ;
+}
+
+bool MemberModel::okToInsert( Member* item )
+{
+    if(members.contains(item))
+        return false;
+    qDebug()<<"Ok to insert "<<item->address()->toString();
+    members.insert(item);
+    return true;
+}
+
+void MemberModel::insertRow( int row, QStandardItem* item )
+{
+    if(okToInsert((Member*)item))
+        QStandardItemModel::insertRow(row, item);
+}
+
+void MemberModel::appendRow( QStandardItem * item)
+{
+    if(okToInsert((Member*)item))
+        QStandardItemModel::appendRow(item);
 }
 
 void MemberModel::setGroupCount(QStandardItem* group)

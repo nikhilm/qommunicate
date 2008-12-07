@@ -3,6 +3,9 @@
 
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
+#include <QSet>
+
+class Member;
 
 class MemberModel : public QStandardItemModel
 {
@@ -11,11 +14,17 @@ public:
     MemberModel(QObject *);
     Qt::ItemFlags flags(const QModelIndex&) const;
     
+    void insertRow(int, QStandardItem*);
+    void appendRow(QStandardItem*);
+    
 private slots:
     void updateGroupCount(QStandardItem *);
     
 private:
+    QSet<Member*> members;
+    
     void setGroupCount(QStandardItem*);
+    bool okToInsert(Member*);
 };
 
 class MemberFilter : public QSortFilterProxyModel
