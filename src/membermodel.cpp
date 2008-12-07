@@ -16,10 +16,10 @@ Qt::ItemFlags MemberModel::flags(const QModelIndex& index) const
 
 bool MemberModel::okToInsert( Member* item )
 {
-    if(members.contains(item))
+    if(members.contains(item->addressString()))
         return false;
-    qDebug()<<"Ok to insert "<<item->address()->toString();
-    members.insert(item);
+    
+    members.insert(item->addressString());
     return true;
 }
 

@@ -22,6 +22,7 @@ public:
     QString name() const { return m_name; } ;
     QString host() const { return m_host; } ;
     QHostAddress* address() const { return m_address; } ;
+    QString addressString() const { return m_address->toString(); } ;
     QString status() const { return m_status; } ;
     
     void setName(const QString nm) {
@@ -40,10 +41,7 @@ public:
         setData(tooltip(), Qt::ToolTipRole);
     } ;
     
-    friend bool operator==(Member& a, Member& b)
-    {
-        return a.address() == b.address();
-    };
+    friend bool operator==(Member&, Member&);
     
 private:
     QString m_name;
@@ -55,6 +53,16 @@ private:
         return QObject::tr("Host: %1\nStatus: %2").arg(host()).arg(status());
     } ;
 };
+
+inline bool operator==(Member& a, Member& b)
+{
+    return a.address() == b.address();
+}
+
+inline uint qHash(const Member& a)
+{
+    return qHash(a.address());
+}
 
 class Group : public QStandardItem
 {

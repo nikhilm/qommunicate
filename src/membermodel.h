@@ -21,7 +21,7 @@ private slots:
     void updateGroupCount(QStandardItem *);
     
 private:
-    QSet<Member*> members;
+    QSet<QString> members;
     
     void setGroupCount(QStandardItem*);
     bool okToInsert(Member*);
