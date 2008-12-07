@@ -80,7 +80,7 @@ Message Messenger::makeMessage(quint32 command, QString payload)
 {
     Message msg(packetNo(), &member_me, command, payload);
     // NOTE: This is an IMPORTANT step. that's why sniffing the data will give you big command numbers
-    msg.setCommand(msg.command() | QOM_ENCRYPTOPT | QOM_FILEATTACHOPT);
+    msg.setCommand(msg.command() /*| QOM_ENCRYPTOPT*/ | QOM_FILEATTACHOPT);
     
     return msg;
 }
@@ -124,8 +124,7 @@ void Messenger::receiveData()
         
         msg.sender()->setAddress(from.toString());
         
-        qDebug() << "Received "<<msg.toString() << " from "<<msg.sender()->addressString();
-        
+        qDebug() << msg.toString() ;
         switch(msg.command())
         {
             case QOM_ANSENTRY:
