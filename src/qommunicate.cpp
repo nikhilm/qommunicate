@@ -153,5 +153,6 @@ void Qommunicate::cleanup()
 // Message handling slots
 void Qommunicate::addMember(Message msg)
 {
+    msg.sender()->setName(msg.payload().split('\a')[0]);
     model->appendRow(msg.sender());
 }

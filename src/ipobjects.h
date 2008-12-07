@@ -9,7 +9,10 @@ const int TYPE_GROUP = QStandardItem::UserType+2;
 class Member : public QStandardItem
 {
 public:
-    Member() : QStandardItem() {};
+    Member() : QStandardItem()
+    {
+        m_address.setAddress(QHostAddress::LocalHost);
+    };
     Member(QString name, QString host, QString ip, QString status) : QStandardItem()
     {
         setName(name);
@@ -21,8 +24,8 @@ public:
     
     QString name() const { return m_name; } ;
     QString host() const { return m_host; } ;
-    QHostAddress* address() const { return m_address; } ;
-    QString addressString() const { return m_address->toString(); } ;
+    QHostAddress address() const { return m_address; } ;
+    QString addressString() const { return m_address.toString(); } ;
     QString status() const { return m_status; } ;
     
     void setName(const QString nm) {
@@ -34,7 +37,7 @@ public:
         setData(tooltip(), Qt::ToolTipRole);
     } ;
     
-    void setAddress(QString ip) { m_address = new QHostAddress(ip); } ;
+    void setAddress(QString ip) { m_address.setAddress(ip); } ;
     
     void setStatus(const QString st) {
         m_status = st;
@@ -46,11 +49,11 @@ public:
 private:
     QString m_name;
     QString m_host;
-    QHostAddress* m_address;
+    QHostAddress m_address;
     QString m_status;
     
     QString tooltip() {
-        return QObject::tr("Host: %1\nStatus: %2").arg(host()).arg(status());
+        return QObject::tr("Host: %1\nIP:%3\nStatus: %2").arg(host()).arg(status()).arg(addressString());
     } ;
 };
 

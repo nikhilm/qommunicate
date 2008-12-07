@@ -40,7 +40,6 @@ Message Message::fromString(QString s)
     quint32 pNo = tokens[1].toInt();
     
     Member* m = new Member;
-    m->setName(tokens[2]);
     m->setHost(tokens[3]);
     
     quint32 cmd = tokens[4].toInt();
@@ -95,7 +94,7 @@ bool Messenger::sendMessage(Message msg, Member* to)
 {    
     const QByteArray data = msg.toString().toAscii();
     
-    return socket->writeDatagram(data, *(to->address()), UDP_PORT) != -1;
+    return socket->writeDatagram(data, to->address(), UDP_PORT) != -1;
 }
 
 bool Messenger::multicast(quint32 command, QString payload, QList<Member*> members)
@@ -125,7 +124,7 @@ void Messenger::receiveData()
         
         msg.sender()->setAddress(from.toString());
         
-        qDebug() << "Received "<<msg.toString();
+        qDebug() << "Received "<<msg.toString() << " from "<<msg.sender()->addressString();
         
         switch(msg.command())
         {
