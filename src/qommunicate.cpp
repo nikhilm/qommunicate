@@ -95,8 +95,8 @@ void Qommunicate::populateTree()
     }
     
     model->item(2)->appendRow( new Member("nsm", "ironik", "192.168.0.2", "Available") );
-    model->item(0)->appendRow( new QStandardItem(QString("member 5")));
-    model->item(0)->appendRow( new QStandardItem(QString("nikhil")));
+    model->item(0)->appendRow( new Member("nikhil", "jupiter", "192.168.0.5", "Available"));
+    model->item(0)->appendRow( new Member("canada", "montreal", "192.168.23.5", "Available"));
     
     filterModel->setSourceModel(model);
     filterModel->setDynamicSortFilter(true);
@@ -104,27 +104,65 @@ void Qommunicate::populateTree()
     ui.memberTree->setSelectionMode(ui.memberTree->ExtendedSelection);
     ui.memberTree->setModel(filterModel);
     ui.memberTree->setHeaderHidden(true);
+    ui.memberTree->setExpandsOnDoubleClick(false);
     ui.memberTree->expandAll();
 }
 
-void Qommunicate::on_memberTree_doubleClicked(const QModelIndex& index)
+/*
+If item is a group, adds all submembers to receivers and returns true.
+otherwise assumes item is a member, inserts in receivers and returns false
+*/
+bool Qommunicate::createGroupMemberList(QStandardItem* item, QSet<QString>& receivers)
 {
-    QModelIndex item;
+    if(item->type() == TYPE_GROUP)
+    {
+        if(!item->hasChildren())
+            return true;
+        
+        qDebug()<<"group!";
+        for(int i = 0; i < item->rowCount(); i++)
+        {
+            receivers << ( (Member*)item->child(i, 0) )->name();
+        }
+        return true;
+    }
+    receivers << ( (Member*)item )->name();
+    return false;
+}
+
+void Qommunicate::on_memberTree_doubleClicked(const QModelIndex& proxyIndex)
+{
     
-    MessageDialog *dlg;
+    MessageDialog* dlg;
+    QSet<QString> receivers;
+    
+    MemberModel* model = (MemberModel*) ( (MemberFilter*) ui.memberTree->model() )->sourceModel();
+    QModelIndex index = ((MemberFilter*)ui.memberTree->model())->mapToSource(proxyIndex);
+    
     if(index.isValid())
     {
         // only single item clicked
-        dlg = new MessageDialog(ui.memberTree->model()->data(index).toString());
+        createGroupMemberList(model->itemFromIndex(index), receivers);
     }
     else
     {
-        QStringList receivers;
-        foreach(item, ui.memberTree->selectionModel()->selectedRows())
-            receivers << ui.memberTree->model()->data(item).toString() ;
-        dlg = new MessageDialog(receivers);
+        QModelIndex i;
+        foreach(i, ui.memberTree->selectionModel()->selectedRows())
+        {            
+            QStandardItem* item = model->itemFromIndex(i);
+            createGroupMemberList(item, receivers);
+        }
     }
+    
+    if(receivers.isEmpty())
+        return;
+    dlg = new MessageDialog(receivers.toList());
     dlg->exec();
+}
+
+void Qommunicate::on_statusCombo_currentIndexChanged(const QString& text)
+{
+    //TODO: status change
 }
 
 void Qommunicate::keyPressEvent(QKeyEvent *event)

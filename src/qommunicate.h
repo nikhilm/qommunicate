@@ -29,6 +29,7 @@ private slots:
     void on_actionQuit_triggered();
     
     void on_memberTree_doubleClicked(const QModelIndex&);
+    void on_statusCombo_currentIndexChanged(const QString&);
     
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
     
@@ -50,6 +51,7 @@ private:
     void firstRun();
     
     void keyPressEvent(QKeyEvent *);
+    bool createGroupMemberList(QStandardItem*, QSet<QString>&);
 };
 
 #endif
