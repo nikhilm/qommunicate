@@ -112,21 +112,20 @@ void Qommunicate::populateTree()
 If item is a group, adds all submembers to receivers and returns true.
 otherwise assumes item is a member, inserts in receivers and returns false
 */
-bool Qommunicate::createGroupMemberList(QStandardItem* item, QSet<QString>& receivers)
+bool Qommunicate::createGroupMemberList(QStandardItem* item, QSet<Member*>& receivers)
 {
     if(item->type() == TYPE_GROUP)
     {
         if(!item->hasChildren())
             return true;
         
-        qDebug()<<"group!";
         for(int i = 0; i < item->rowCount(); i++)
         {
-            receivers << ( (Member*)item->child(i, 0) )->name();
+            receivers << (Member*)item->child(i, 0);
         }
         return true;
     }
-    receivers << ( (Member*)item )->name();
+    receivers << (Member*)item;
     return false;
 }
 
@@ -134,7 +133,7 @@ void Qommunicate::on_memberTree_doubleClicked(const QModelIndex& proxyIndex)
 {
     
     MessageDialog* dlg;
-    QSet<QString> receivers;
+    QSet<Member*> receivers;
     
     MemberModel* model = (MemberModel*) ( (MemberFilter*) ui.memberTree->model() )->sourceModel();
     QModelIndex index = ((MemberFilter*)ui.memberTree->model())->mapToSource(proxyIndex);
@@ -156,8 +155,21 @@ void Qommunicate::on_memberTree_doubleClicked(const QModelIndex& proxyIndex)
     
     if(receivers.isEmpty())
         return;
-    dlg = new MessageDialog(receivers.toList());
-    dlg->exec();
+    
+    QList<Member*> toDialog = receivers.toList();
+    if(toDialog.size() == 1 && openConversations.contains(toDialog[0]))
+        return;
+    
+    if(toDialog.size() == 1)
+    {
+        if(!openConversations.contains(toDialog[0]))
+            dlg = new MessageDialog( toDialog[0], this );
+    }
+    else
+        dlg = new MessageDialog( toDialog, this );
+    
+    dlg->setModal(false);
+    dlg->show();
 }
 
 void Qommunicate::on_statusCombo_currentIndexChanged(const QString& text)
@@ -180,6 +192,16 @@ void Qommunicate::firstRun()
     QSettings s;
     if( ! s.contains(tr("nick")) )
         ui.action_Settings->trigger();
+}
+
+void Qommunicate::dialogOpened(Member* m)
+{
+    openConversations << m;
+}
+
+void Qommunicate::dialogClosed(Member *m)
+{
+    openConversations.remove(m);
 }
 
 void Qommunicate::cleanup()

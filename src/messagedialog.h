@@ -1,8 +1,10 @@
 #ifndef QOM_MESSAGEDIALOG
 #define QOM_MESSAGEDIALOG
 
-#include <QStringList>
+#include <QCloseEvent>
+#include <QList>
 
+#include "ipobjects.h"
 #include "ui_messagedialog.h"
 
 class MessageDialog : public QDialog
@@ -10,14 +12,17 @@ class MessageDialog : public QDialog
     Q_OBJECT
 
 public:
-    MessageDialog(QString, QWidget *parent=0);
-    MessageDialog(QStringList, QWidget *parent=0);
+    MessageDialog(Member*, QWidget *parent=0);
+    MessageDialog(QList<Member*>, QWidget *parent=0);
     MessageDialog(QWidget *parent=0);
+    
+protected:
+    void closeEvent(QCloseEvent*);
 
 private:
     Ui::MessageDialog ui;
     
-    QStringList* receivers;
+    QList<Member*> receivers;
 };
 
 #endif

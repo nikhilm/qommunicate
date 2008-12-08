@@ -16,6 +16,8 @@ class Qommunicate : public QMainWindow
 
 public:
     Qommunicate(QWidget *parent = 0);
+    void dialogOpened(Member*);
+    void dialogClosed(Member*);
     
 protected:
     void closeEvent(QCloseEvent *);
@@ -33,6 +35,7 @@ private slots:
     
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
     
+    
     void cleanup();
     
     // Incoming message related slots
@@ -46,12 +49,14 @@ private:
     MemberModel *model;
     MemberFilter *filterModel;
     
+    QSet<Member*> openConversations;
+    
     void createTrayIcon();
     void populateTree();
     void firstRun();
     
     void keyPressEvent(QKeyEvent *);
-    bool createGroupMemberList(QStandardItem*, QSet<QString>&);
+    bool createGroupMemberList(QStandardItem*, QSet<Member*>&);
 };
 
 #endif
