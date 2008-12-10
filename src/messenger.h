@@ -72,6 +72,7 @@ signals:
     
     void msg_ansEntry(Message);
     void msg_entry(Message);
+    void msg_recvMsg(Message);
     
 private:
     

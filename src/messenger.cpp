@@ -40,6 +40,7 @@ Message Message::fromString(QString s)
     quint32 pNo = tokens[1].toInt();
     
     Member* m = new Member;
+    m->setName(tokens[2]); // default name, this will be replaced when BR_ENTRY is received
     m->setHost(tokens[3]);
     
     quint32 cmd = tokens[4].toInt();
@@ -134,6 +135,9 @@ void Messenger::receiveData()
             case QOM_BR_ENTRY:
                 emit msg_entry(msg);
                 break;
+                
+            case QOM_SENDMSG:
+                emit msg_recvMsg(msg);
         }
     }
 }
@@ -163,7 +167,6 @@ bool Messenger::login()
     {
         socket->writeDatagram(data.data(), data.size(), QHostAddress(ip), UDP_PORT);
     }
-    qDebug() << QHostAddress::LocalHost;
 }
 
 bool Messenger::logout()

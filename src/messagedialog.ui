@@ -29,7 +29,7 @@
      <enum>QLayout::SetMaximumSize</enum>
     </property>
     <item>
-     <widget class="QTextEdit" name="textEdit" >
+     <widget class="QTextEdit" name="messageEdit" >
       <property name="sizePolicy" >
        <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
         <horstretch>0</horstretch>
@@ -47,7 +47,7 @@
        <enum>QLayout::SetMinimumSize</enum>
       </property>
       <item>
-       <widget class="QLineEdit" name="lineEdit" >
+       <widget class="QLineEdit" name="messageInput" >
         <property name="toolTip" >
          <string>Type message here</string>
         </property>
@@ -84,7 +84,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>lineEdit</sender>
+   <sender>messageInput</sender>
    <signal>returnPressed()</signal>
    <receiver>MessageDialog</receiver>
    <slot>sendFile()</slot>

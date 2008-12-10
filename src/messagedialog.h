@@ -5,6 +5,7 @@
 #include <QList>
 
 #include "ipobjects.h"
+#include "messenger.h"
 #include "ui_messagedialog.h"
 
 class MessageDialog : public QDialog
@@ -18,6 +19,9 @@ public:
     
 protected:
     void closeEvent(QCloseEvent*);
+    
+public slots:
+    void incomingMessage(Message);
 
 private:
     Ui::MessageDialog ui;
