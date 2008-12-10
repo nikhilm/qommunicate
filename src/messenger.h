@@ -77,7 +77,6 @@ signals:
 private:
     
     QUdpSocket* socket;
-    QTcpSocket* fileSocket;
     quint32 m_packetNo;
     
     quint32 packetNo() { return m_packetNo++ ; } ;
