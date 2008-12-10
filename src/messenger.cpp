@@ -53,7 +53,6 @@ Message Message::fromString(QString s)
 Messenger::Messenger() : QObject()
 {
     socket = NULL;
-    fileSocket = NULL;
     reset();
 }
 

@@ -44,14 +44,7 @@ public:
     {
         socket->close();
         delete socket;
-        socket = NULL;
-        
-        if(fileSocket)
-        {
-            fileSocket->close();
-            delete fileSocket;
-            fileSocket = NULL;
-        }
+        socket = NULL;        
     };
     
     bool sendMessage(Message, Member*);
