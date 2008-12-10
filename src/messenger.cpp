@@ -37,6 +37,11 @@ QString Message::toString()
 Message Message::fromString(QString s)
 {
     QStringList tokens = s.split(":");
+    
+    // reconstitute payload, if payload itself contains ':'
+    for(int i = 6; i < tokens.size(); i++)
+        tokens[5] += ":"+tokens[i];
+    
     quint32 pNo = tokens[1].toInt();
     
     Member* m = new Member;
