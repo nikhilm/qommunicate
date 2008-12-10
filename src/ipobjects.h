@@ -64,7 +64,14 @@ inline bool operator==(Member& a, Member& b)
 
 inline uint qHash(const Member& a)
 {
+    qDebug() << "Hash called";
     return qHash(a.address());
+}
+
+inline uint qHash(Member* m)
+{
+    qDebug() << "ptrHash";
+    return qHash(m->address());
 }
 
 class Group : public QStandardItem
