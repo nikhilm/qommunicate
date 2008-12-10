@@ -19,14 +19,15 @@ Qommunicate::Qommunicate(QWidget *parent)
         
     createTrayIcon();
     
-    populateTree();
-    
+    MemberUtils::init();
+    populateTree();    
     firstRun();
     messenger()->login();
     
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanup()));
     
     connect(messenger(), SIGNAL(msg_ansEntry(Message)), this, SLOT(addMember(Message)));
+    connect(messenger(), SIGNAL(msg_recvMsg(Message)), this, SLOT(openDialog(Message)));
 }
 
 void Qommunicate::on_searchEdit_textChanged(const QString &text)
@@ -157,12 +158,12 @@ void Qommunicate::on_memberTree_doubleClicked(const QModelIndex& proxyIndex)
         return;
     
     QList<Member*> toDialog = receivers.toList();
-    if(toDialog.size() == 1 && openConversations.contains(toDialog[0]))
+    if(toDialog.size() == 1 && MemberUtils::contains("open_conversations", toDialog[0]))
         return;
     
     if(toDialog.size() == 1)
     {
-        if(!openConversations.contains(toDialog[0]))
+        if(!MemberUtils::contains("open_conversations", toDialog[0]))
             dlg = new MessageDialog( toDialog[0], this );
     }
     else
@@ -196,12 +197,12 @@ void Qommunicate::firstRun()
 
 void Qommunicate::dialogOpened(Member* m)
 {
-    openConversations << m;
+    MemberUtils::insert("open_conversations", m);
 }
 
 void Qommunicate::dialogClosed(Member *m)
 {
-    openConversations.remove(m);
+    MemberUtils::remove("open_conversations", m);
 }
 
 void Qommunicate::cleanup()
@@ -215,4 +216,18 @@ void Qommunicate::addMember(Message msg)
 {
     msg.sender()->setName(msg.payload().split('\a')[0]);
     model->appendRow(msg.sender());
+}
+
+void Qommunicate::openDialog(Message msg)
+{
+    if(MemberUtils::contains("open_conversations", msg.sender()))
+        return;
+    
+    Member* with = MemberUtils::get("members_list", msg.sender());
+    if(!with->isValid())
+        with = msg.sender();
+    MessageDialog *dlg = new MessageDialog(with, this);
+    dlg->setModal(false);
+    dlg->show();
+    dlg->incomingMessage(msg);
 }

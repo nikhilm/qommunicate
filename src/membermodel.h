@@ -5,6 +5,8 @@
 #include <QSortFilterProxyModel>
 #include <QSet>
 
+#include "memberutils.h"
+
 class Member;
 
 class MemberModel : public QStandardItemModel
@@ -21,7 +23,6 @@ private slots:
     void updateGroupCount(QStandardItem *);
     
 private:
-    QSet<QString> members;
     
     void setGroupCount(QStandardItem*);
     bool okToInsert(Member*);

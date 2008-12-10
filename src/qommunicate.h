@@ -7,6 +7,7 @@
 
 #include "membermodel.h"
 #include "messenger.h"
+#include "memberutils.h"
 
 #include "ui_qommunicate.h"
 
@@ -40,6 +41,7 @@ private slots:
     
     // Incoming message related slots
     void addMember(Message);
+    void openDialog(Message);
 
 private:
     Ui::MainWindow ui;
@@ -48,9 +50,7 @@ private:
     
     MemberModel *model;
     MemberFilter *filterModel;
-    
-    QSet<Member*> openConversations;
-    
+        
     void createTrayIcon();
     void populateTree();
     void firstRun();
