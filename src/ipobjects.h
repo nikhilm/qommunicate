@@ -11,7 +11,6 @@ class Member : public QStandardItem
 public:
     Member() : QStandardItem()
     {
-        m_address.setAddress(QHostAddress::LocalHost);
     };
     Member(QString name, QString host, QString ip, QString status) : QStandardItem()
     {
@@ -44,6 +43,8 @@ public:
         setData(tooltip(), Qt::ToolTipRole);
     } ;
     
+    bool  isValid() { return !m_address.isNull(); } ;
+    
     friend bool operator==(Member&, Member&);
     
 private:
@@ -64,13 +65,11 @@ inline bool operator==(Member& a, Member& b)
 
 inline uint qHash(const Member& a)
 {
-    qDebug() << "Hash called";
     return qHash(a.address());
 }
 
 inline uint qHash(Member* m)
 {
-    qDebug() << "ptrHash";
     return qHash(m->address());
 }
 
