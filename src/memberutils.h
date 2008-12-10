@@ -1,7 +1,7 @@
 #ifndef QOM_MEMBERUTILS
 #define QOM_MEMBERUTILS
 
-#include <QSet>
+#include <QHash>
 
 #include "ipobjects.h"
 
@@ -16,7 +16,7 @@ public:
     static bool contains(QString, Member*);
     inline static bool contains(const char* c, Member *m) { return contains(QString(c), m); } ;
     
-    static QSet<Member*> get(QString);
+    static QHash<QString,Member*> get(QString);
     static Member* get(QString, Member*);
     static Member* get(QString, QString); // IP based
     inline static Member* get(const char* c, QString ip) { return get(QString(c), ip); } ;
@@ -27,7 +27,7 @@ public:
     inline static Member* remove(const char* c, QString ip) { return remove(QString(c), ip); } ;
     
 private:
-    static QHash<QString, QSet<Member*> > m_hash;
+    static QHash<QString, QHash<QString, Member*> > m_hash;
 };
 
 #endif

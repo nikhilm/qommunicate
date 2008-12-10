@@ -1,6 +1,6 @@
 #include "memberutils.h"
 
-QHash<QString, QSet<Member*> > MemberUtils::m_hash;
+QHash<QString, QHash<QString, Member*> > MemberUtils::m_hash;
 
 void MemberUtils::init()
 {
@@ -8,16 +8,15 @@ void MemberUtils::init()
 
 void MemberUtils::insert(QString group, Member* m)
 {
-    m_hash[group] << m ;
+    m_hash[group][m->addressString()] = m ;
 }
 
 bool MemberUtils::contains(QString group, Member* m)
 {
-    qDebug() << "contains " << m->addressString() << "?" << m_hash[group].contains(m);
-    return m_hash[group].contains(m);
+    return m_hash[group].contains(m->addressString());
 }
 
-QSet<Member*> MemberUtils::get(QString group)
+QHash<QString, Member*> MemberUtils::get(QString group)
 {
     return m_hash[group];
 }
@@ -45,13 +44,8 @@ Member* MemberUtils::get(QString group, QString ip)
 
 Member* MemberUtils::remove(QString group, Member* m)
 {
-    QList<Member*> list = m_hash[group].toList();
-    int index = list.indexOf(m);
-    if(index == -1)
-        return new Member;
-    
-    Member* ret = list.takeAt(index);
-    m_hash[group] = list.toSet();
+    Member* ret = m_hash[group][m->addressString()];
+    m_hash[group].remove(m->addressString());
     return ret;
 }
 
