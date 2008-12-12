@@ -66,6 +66,7 @@ signals:
     void msg_ansEntry(Message);
     void msg_entry(Message);
     void msg_recvMsg(Message);
+    void msg_recvConfirmMsg(Message);
     
 private:
     
@@ -82,5 +83,6 @@ private slots:
     void receiveData();
 };
 
-Messenger * messenger();
+Member me();
+Messenger* messenger();
 #endif

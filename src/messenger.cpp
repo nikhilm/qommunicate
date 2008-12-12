@@ -14,6 +14,11 @@ Messenger* messenger()
     return m;
 }
 
+Member me()
+{
+    return member_me;
+}
+
 Message::Message(quint32 pNo, Member* sender, quint32 cmd, QString payload)
 {
     setPacketNo(pNo);
@@ -129,7 +134,6 @@ void Messenger::receiveData()
         
         msg.sender()->setAddress(from.toString());
         
-        qDebug() << msg.toString() ;
         switch(msg.command())
         {
             case QOM_ANSENTRY:
@@ -142,6 +146,9 @@ void Messenger::receiveData()
                 
             case QOM_SENDMSG:
                 emit msg_recvMsg(msg);
+                
+            case QOM_RECVMSG:
+                emit msg_recvConfirmMsg(msg);
         }
     }
 }
