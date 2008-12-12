@@ -5,7 +5,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>401</width>
+    <width>402</width>
     <height>300</height>
    </rect>
   </property>
@@ -51,6 +51,9 @@
         <property name="toolTip" >
          <string>Type message here</string>
         </property>
+        <property name="maxLength" >
+         <number>200</number>
+        </property>
        </widget>
       </item>
       <item>
@@ -65,43 +68,28 @@
    </layout>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>messageInput</tabstop>
+  <tabstop>sendButton</tabstop>
+  <tabstop>messageEdit</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
-   <sender>sendButton</sender>
-   <signal>clicked()</signal>
-   <receiver>MessageDialog</receiver>
-   <slot>sendMessage()</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>348</x>
-     <y>278</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>309</x>
-     <y>294</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>messageInput</sender>
    <signal>returnPressed()</signal>
-   <receiver>MessageDialog</receiver>
-   <slot>sendFile()</slot>
+   <receiver>sendButton</receiver>
+   <slot>click()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>149</x>
-     <y>271</y>
+     <x>268</x>
+     <y>277</y>
     </hint>
     <hint type="destinationlabel" >
-     <x>204</x>
-     <y>255</y>
+     <x>353</x>
+     <y>280</y>
     </hint>
    </hints>
   </connection>
  </connections>
- <slots>
-  <slot>sendMessage()</slot>
-  <slot>sendFile()</slot>
- </slots>
 </ui>

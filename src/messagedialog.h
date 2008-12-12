@@ -3,6 +3,8 @@
 
 #include <QCloseEvent>
 #include <QList>
+#include <QTimer>
+#include <QMessageBox>
 
 #include "ipobjects.h"
 #include "messenger.h"
@@ -22,11 +24,18 @@ protected:
     
 public slots:
     void incomingMessage(Message);
+    void messageRecvConfirm();
 
 private:
     Ui::MessageDialog ui;
     
     QList<Member*> receivers;
+    
+    QTimer* messageTimer;
+    
+private slots:
+    void messageTimeout();
+    void on_sendButton_clicked();
 };
 
 #endif
