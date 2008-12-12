@@ -18,7 +18,7 @@ bool MemberModel::okToInsert( Member* item )
 {
     if(MemberUtils::contains("members_list", item))
         return false;
-    
+
     MemberUtils::insert("members_list", item);
     return true;
 }
