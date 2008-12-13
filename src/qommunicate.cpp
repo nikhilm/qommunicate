@@ -49,8 +49,7 @@ void Qommunicate::on_action_Settings_triggered()
 
 void Qommunicate::on_actionMulticast_triggered()
 {
-    MessageDialog dlg;
-    dlg.setModal(false);
+    MessageDialog dlg(this);
     dlg.exec();
 }
 
@@ -90,15 +89,6 @@ void Qommunicate::populateTree()
 {
     model = new MemberModel(this);
     filterModel = new MemberFilter(this);
-    
-    QStandardItem *parent = model->invisibleRootItem();
-    for(int i = 0; i < 5 ; i++) {
-        parent->appendRow( new Group(QString("group %1").arg(i)) );
-    }
-    
-    model->item(2)->appendRow( new Member("nsm", "ironik", "192.168.0.2", "Available") );
-    model->item(0)->appendRow( new Member("nikhil", "jupiter", "192.168.0.5", "Available"));
-    model->item(0)->appendRow( new Member("canada", "montreal", "192.168.23.5", "Available"));
     
     filterModel->setSourceModel(model);
     filterModel->setDynamicSortFilter(true);
