@@ -55,7 +55,7 @@ void MessageDialog::on_sendButton_clicked()
     Member* m;
     foreach(m, receivers)
     {
-        messenger()->sendMessage(QOM_SENDMSG, ui.messageInput->text(), m);
+        messenger()->sendMessage(QOM_SENDMSG|QOM_SENDCHECKOPT, ui.messageInput->text(), m);
     }
     if(receivers.size() == 1)
     {
