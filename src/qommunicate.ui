@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>298</width>
-    <height>535</height>
+    <width>217</width>
+    <height>425</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -17,71 +17,68 @@
     <normaloff>:/newPrefix/icons/logo_small.png</normaloff>:/newPrefix/icons/logo_small.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget" >
-   <widget class="QWidget" name="verticalLayoutWidget" >
-    <property name="geometry" >
-     <rect>
-      <x>9</x>
-      <y>10</y>
-      <width>281</width>
-      <height>451</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout" >
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout" >
-       <item>
-        <widget class="QLineEdit" name="searchEdit" >
-         <property name="inputMask" >
-          <string/>
-         </property>
-         <property name="text" >
-          <string/>
-         </property>
-         <property name="maxLength" >
-          <number>32767</number>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="memberSearchLabel" >
-         <property name="text" >
-          <string/>
-         </property>
-         <property name="pixmap" >
-          <pixmap resource="icons.qrc" >:/newPrefix/icons/edit-find.png</pixmap>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <widget class="QTreeView" name="memberTree" />
-     </item>
-     <item>
-      <widget class="QComboBox" name="statusCombo" >
-       <property name="toolTip" >
-        <string>Set Status</string>
-       </property>
-       <property name="editable" >
-        <bool>true</bool>
-       </property>
-       <property name="duplicatesEnabled" >
-        <bool>true</bool>
-       </property>
-       <item>
-        <property name="text" >
-         <string>Available</string>
+   <layout class="QVBoxLayout" name="verticalLayout_2" >
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout" >
+      <property name="sizeConstraint" >
+       <enum>QLayout::SetNoConstraint</enum>
+      </property>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout" >
+        <item>
+         <widget class="QLineEdit" name="searchEdit" >
+          <property name="inputMask" >
+           <string/>
+          </property>
+          <property name="text" >
+           <string/>
+          </property>
+          <property name="maxLength" >
+           <number>32767</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="memberSearchLabel" >
+          <property name="text" >
+           <string/>
+          </property>
+          <property name="pixmap" >
+           <pixmap resource="icons.qrc" >:/newPrefix/icons/edit-find.png</pixmap>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QTreeView" name="memberTree" />
+      </item>
+      <item>
+       <widget class="QComboBox" name="statusCombo" >
+        <property name="toolTip" >
+         <string>Set Status</string>
         </property>
-       </item>
-       <item>
-        <property name="text" >
-         <string>Stepped out</string>
+        <property name="editable" >
+         <bool>true</bool>
         </property>
-       </item>
-      </widget>
-     </item>
-    </layout>
-   </widget>
+        <property name="duplicatesEnabled" >
+         <bool>true</bool>
+        </property>
+        <item>
+         <property name="text" >
+          <string>Available</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Stepped out</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
   </widget>
   <widget class="QStatusBar" name="statusbar" />
   <widget class="QToolBar" name="toolBar" >
