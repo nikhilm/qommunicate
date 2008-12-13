@@ -1,4 +1,5 @@
 #include <QSettings>
+#include <QNetworkInterface>
 
 #include "messenger.h"
 
@@ -137,6 +138,12 @@ void Messenger::receiveData()
         QHostAddress from;
         
         socket->readDatagram(data.data(), data.size(), &from);
+        
+        if(QNetworkInterface::allAddresses().contains(from))
+        {
+            continue;
+        }
+        
         data.replace('\0', QOM_HOSTLIST_SEPARATOR);
         
         Message msg = Message::fromString(QString(data.data()));
