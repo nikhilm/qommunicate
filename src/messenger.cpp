@@ -19,6 +19,11 @@ Member me()
     return member_me;
 }
 
+Group myGroup()
+{
+    return group_me;
+}
+
 Message::Message(quint32 pNo, Member* sender, quint32 cmd, QString payload)
 {
     setPacketNo(pNo);
@@ -103,7 +108,6 @@ bool Messenger::sendMessage(quint32 command, QString payload, Member* to)
 bool Messenger::sendMessage(Message msg, Member* to)
 {    
     const QByteArray data = msg.toString().toAscii();
-    
     return socket->writeDatagram(data, to->address(), UDP_PORT) != -1;
 }
 

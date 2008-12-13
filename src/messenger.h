@@ -84,5 +84,6 @@ private slots:
 };
 
 Member me();
+Group myGroup();
 Messenger* messenger();
 #endif
