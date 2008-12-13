@@ -41,6 +41,7 @@ private slots:
     
     // Incoming message related slots
     void addMember(Message);
+    void addMemberAndAnswer(Message);
     void openDialog(Message);
 
 private:

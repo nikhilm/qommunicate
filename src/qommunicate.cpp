@@ -27,6 +27,7 @@ Qommunicate::Qommunicate(QWidget *parent)
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanup()));
     
     connect(messenger(), SIGNAL(msg_ansEntry(Message)), this, SLOT(addMember(Message)));
+    connect(messenger(), SIGNAL(msg_entry(Message)), this, SLOT(addMemberAndAnswer(Message)));
     connect(messenger(), SIGNAL(msg_recvMsg(Message)), this, SLOT(openDialog(Message)));
 }
 
@@ -149,7 +150,7 @@ void Qommunicate::on_memberTree_doubleClicked(const QModelIndex& proxyIndex)
         QModelIndex i;
         foreach(i, ui.memberTree->selectionModel()->selectedRows())
         {            
-            QStandardItem* item = model->itemFromIndex(i);
+            QStandardItem* item = model->itemFromIndex(((MemberFilter*)ui.memberTree->model())->mapToSource(i));
             createGroupMemberList(item, receivers);
         }
     }
@@ -216,6 +217,12 @@ void Qommunicate::addMember(Message msg)
 {
     msg.sender()->setName(msg.payload().split('\a')[0]);
     model->appendRow(msg.sender());
+}
+
+void Qommunicate::addMemberAndAnswer(Message msg)
+{
+    addMember(msg);
+    messenger()->sendMessage(QOM_ANSENTRY, me().name()+'\0'+myGroup().name(), msg.sender());
 }
 
 void Qommunicate::openDialog(Message msg)
