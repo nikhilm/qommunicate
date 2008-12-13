@@ -46,7 +46,7 @@ void MessageDialog::closeEvent(QCloseEvent *evt)
 
 void MessageDialog::incomingMessage(Message msg)
 {
-    ui.messageEdit->append(QString("<b style=\"color:blue;\">&lt;%1&gt;</b> %2\n").arg(receivers[0]->name()).arg(msg.payload().trimmed()));
+    ui.messageEdit->append(QString("<b style=\"color:blue;\">&lt;%1&gt;</b> %2\n").arg(receivers[0]->name()).arg(msg.payload().replace('\a', "")));
     
     if(msg.command() & QOM_SENDCHECKOPT)
         messenger()->sendMessage(QOM_RECVMSG, QString::number(msg.packetNo()), receivers[0]);
@@ -54,6 +54,9 @@ void MessageDialog::incomingMessage(Message msg)
 
 void MessageDialog::on_sendButton_clicked()
 {
+    if(ui.messageInput->text().trimmed().isEmpty())
+        return;
+    
     if(receivers.isEmpty())
     {
         messenger()->multicast(QOM_SENDMSG, ui.messageInput->text());
@@ -100,7 +103,8 @@ void MessageDialog::messageTimeout()
 
 void MessageDialog::messageRecvConfirm()
 {
-    ui.messageEdit->append(QString("<b style=\"color:red;\">&lt;%1&gt;</b> %2").arg(me().name()).arg(ui.messageInput->text()));
+    if(! ui.messageInput->text().trimmed().isEmpty())
+        ui.messageEdit->append(QString("<b style=\"color:red;\">&lt;%1&gt;</b> %2").arg(me().name()).arg(ui.messageInput->text()));
     
     ui.messageInput->clear();
     ui.messageInput->setEnabled(true);
