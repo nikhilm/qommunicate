@@ -111,13 +111,21 @@ bool Messenger::sendMessage(Message msg, Member* to)
     return socket->writeDatagram(data, to->address(), UDP_PORT) != -1;
 }
 
-bool Messenger::multicast(quint32 command, QString payload, QList<Member*> members)
+/*
+ * Sends a broadcast
+ * and then also multicasts to all ips stored in the Settings
+ */
+bool Messenger::multicast(quint32 command, QString payload)
 {
-    // TODO: 
-}
-
-bool Messenger::multicast(Message msg, QList<Member*> members)
-{
+    QByteArray data = makeMessage(command, payload).toString().toAscii();
+    
+    socket->writeDatagram(data, QHostAddress::Broadcast, UDP_PORT);
+    
+    QString ip;
+    foreach(ip, ips())
+    {
+        socket->writeDatagram(data, QHostAddress(ip), UDP_PORT);
+    }
 }
 
 void Messenger::receiveData()
@@ -175,22 +183,10 @@ QStringList Messenger::ips() const
 
 bool Messenger::login()
 {
-    QByteArray data(makeMessage(QOM_BR_ENTRY, member_me.name()+'\0'+group_me.name()).toString().toAscii());
-    
-    QString ip;
-    foreach(ip, ips())
-    {
-        socket->writeDatagram(data.data(), data.size(), QHostAddress(ip), UDP_PORT);
-    }
+    multicast(QOM_BR_ENTRY, member_me.name()+'\0'+group_me.name());
 }
 
 bool Messenger::logout()
 {
-    QByteArray data(makeMessage(QOM_BR_EXIT, member_me.name()+"\0"+group_me.name()).toString().toAscii());
-    
-    QString ip;
-    foreach(ip, ips())
-    {
-        socket->writeDatagram(data.data(), data.size(), QHostAddress(ip), UDP_PORT);
-    }
+    multicast(QOM_BR_EXIT, member_me.name()+'\0'+group_me.name());
 }
