@@ -43,6 +43,7 @@ private slots:
     void addMember(Message);
     void addMemberAndAnswer(Message);
     void openDialog(Message);
+    void sendAbsenceInfo(Message);
 
 private:
     Ui::MainWindow ui;

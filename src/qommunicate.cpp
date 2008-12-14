@@ -29,6 +29,7 @@ Qommunicate::Qommunicate(QWidget *parent)
     connect(messenger(), SIGNAL(msg_ansEntry(Message)), this, SLOT(addMember(Message)));
     connect(messenger(), SIGNAL(msg_entry(Message)), this, SLOT(addMemberAndAnswer(Message)));
     connect(messenger(), SIGNAL(msg_recvMsg(Message)), this, SLOT(openDialog(Message)));
+    connect(messenger(), SIGNAL(msg_getAbsenceInfo(Message)), this, SLOT(sendAbsenceInfo(Message)));
 }
 
 void Qommunicate::on_searchEdit_textChanged(const QString &text)
@@ -166,7 +167,7 @@ void Qommunicate::on_memberTree_doubleClicked(const QModelIndex& proxyIndex)
 
 void Qommunicate::on_statusCombo_currentIndexChanged(const QString& text)
 {
-    //TODO: status change
+    messenger()->multicast(QOM_BR_ABSENCE, me().name()+'\0'+myGroup().name());
 }
 
 void Qommunicate::keyPressEvent(QKeyEvent *event)
@@ -228,3 +229,12 @@ void Qommunicate::openDialog(Message msg)
     dlg->show();
     dlg->incomingMessage(msg);
 }
+
+void Qommunicate::sendAbsenceInfo(Message msg)
+{
+    QString payload = ui.statusCombo->currentText();
+    if(payload == tr("Available"))
+        payload = "Not absence mode";
+    messenger()->multicast(QOM_SENDABSENCEINFO, payload);
+}
+        
