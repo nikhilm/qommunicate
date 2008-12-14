@@ -36,7 +36,10 @@ public:
         setData(tooltip(), Qt::ToolTipRole);
     } ;
     
-    void setAddress(QString ip) { m_address.setAddress(ip); } ;
+    void setAddress(QString ip) {
+        m_address.setAddress(ip);        
+        setData(tooltip(), Qt::ToolTipRole);
+    } ;
     
     void setStatus(const QString st) {
         m_status = st;
