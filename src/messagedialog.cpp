@@ -64,13 +64,12 @@ void MessageDialog::on_sendButton_clicked()
         return;
     }
     
-    Member* m;
-    foreach(m, receivers)
+    foreach(Member* m, receivers)
     {
         messenger()->sendMessage(
             QOM_SENDMSG|QOM_SENDCHECKOPT |
-            //( ui.notifyReadCB->isChecked() ? QOM_READCHECKOPT : 0 ) |
-            ( ui.sealCB->isChecked() ? QOM_SECRETOPT : 0 ) ,
+            ( ui.notifyReadCB->isChecked() ? QOM_SECRETOPT | QOM_READCHECKOPT : 0 ),
+            //( ui.sealCB->isChecked() ? QOM_SECRETOPT : 0 ) ,
             ui.messageInput->text(), m);
     }
     if(receivers.size() == 1)
@@ -111,6 +110,7 @@ void MessageDialog::messageRecvConfirm()
         ui.messageEdit->append(QString("<b style=\"color:red;\">&lt;%1&gt;</b> %2").arg(me().name()).arg(ui.messageInput->text()));
     
     ui.messageInput->clear();
+    ui.messageInput->setFocus();
     ui.messageInput->setEnabled(true);
     
     if(receivers.size() == 1 && messageTimer != NULL)
