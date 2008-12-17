@@ -124,7 +124,7 @@ bool Messenger::sendMessage(quint32 command, QByteArray payload, Member* to)
 
 bool Messenger::sendMessage(Message msg, Member* to)
 {    
-    const QByteArray data = msg.toString().toAscii();
+    const QByteArray data = msg.toAscii();
     return socket->writeDatagram(data, to->address(), UDP_PORT) != -1;
 }
 
