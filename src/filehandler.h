@@ -12,6 +12,7 @@ class FileHandler : public QObject
     
 public:
     FileHandler() : QObject() { m_id = 0 ; } ;
+    ~FileHandler() { } ;
     
     // UDP
     void sendFilesRequest(QStringList, Member*, QString);
@@ -19,7 +20,7 @@ public:
     // usually shouldn't be called from outside, see the .cpp for details
     void sendDirectoryRequest(QString, Member*);
     
-    inline void sendFilesRequest(QString filename, Member*) { return sendFilesRequest(QStringList(filename)); } ;
+    inline void sendFilesRequest(QString filename, Member* to, QString message="") { return sendFilesRequest(QStringList(filename), to, message); } ;
     
     // TCP
     //void sendFiles(QStringList);
@@ -38,8 +39,9 @@ signals:
 private:
     int m_id;
     int nextId() { return m_id++ ; } ;
+    QString formatFileData(QString);
 };
 
-FileHandler fileHandler();
+FileHandler* fileHandler();
 
 #endif
