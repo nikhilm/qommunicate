@@ -129,6 +129,6 @@ void MessageDialog::dropEvent(QDropEvent *evt)
     
     foreach(Member* to, receivers)
     {
-        fileHandler()->sendFilesRequest(files, to, "");
+        fileHandler()->sendFilesRequest(files, to, ui.messageInput->text());
     }
 }

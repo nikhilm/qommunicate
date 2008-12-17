@@ -26,7 +26,7 @@ void FileHandler::sendFilesRequest(QStringList filenames, Member* to, QString me
             payload << formatFileData(filename);
         }
     }
-    
+    qDebug() << "files "<<payload.join("").toAscii();
     QByteArray out = message.toAscii() + '\0' + payload.join("").toAscii();
     messenger()->sendMessage(QOM_SENDMSG | QOM_FILEATTACHOPT | QOM_SENDCHECKOPT, out, to);
 }
