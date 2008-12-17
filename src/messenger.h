@@ -53,8 +53,6 @@ public:
     
     bool multicast(quint32, QByteArray);
     
-    void sendFile(QString);
-    
     bool login();
     bool logout();
     void reset();
