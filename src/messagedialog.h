@@ -3,6 +3,7 @@
 
 #include <QCloseEvent>
 #include <QList>
+#include <QUrl>
 #include <QTimer>
 #include <QMessageBox>
 
@@ -18,6 +19,16 @@ public:
     MessageDialog(Member*, QWidget *parent=0);
     MessageDialog(QList<Member*>, QWidget *parent=0);
     MessageDialog(QWidget *parent=0);
+    
+    void dragEnterEvent(QDragEnterEvent *evt)
+    {
+        if(evt->mimeData()->hasUrls())
+        {
+            evt->acceptProposedAction();
+        }
+    };
+    
+    void dropEvent(QDropEvent *);
     
 protected:
     void closeEvent(QCloseEvent*);

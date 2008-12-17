@@ -25,7 +25,7 @@ Group myGroup()
     return group_me;
 }
 
-Message::Message(quint32 pNo, Member* sender, quint32 cmd, QString payload)
+Message::Message(quint32 pNo, Member* sender, quint32 cmd, QByteArray payload)
 {
     setPacketNo(pNo);
     setSender(sender);
@@ -33,21 +33,33 @@ Message::Message(quint32 pNo, Member* sender, quint32 cmd, QString payload)
     setPayload(payload);
 }
 
-QString Message::toString()
+QByteArray Message::toAscii()
 {
-    QStringList lst;
-    lst << QString("%1").arg(INT_VERSION) ; // TODO: use version
-    lst << QString("%1").arg(packetNo());
-    lst << sender()->name();
-    lst << sender()->host();
-    lst << QString("%1").arg(command());
-    lst << payload();
-    return lst.join(":");
+    QByteArray arr;
+    
+    arr += QByteArray::number(INT_VERSION);
+    arr += ':';
+    arr += QByteArray::number(packetNo());
+    arr += ':';
+    arr += sender()->name().toAscii();
+    arr += ':';
+    arr += sender()->host().toAscii();
+    arr += ':';
+    arr += QByteArray::number(command());
+    arr += ':';
+    arr += payload();
+    
+    return arr;
 }
 
-Message Message::fromString(QString s)
+QString Message::toString()
 {
-    QStringList tokens = s.split(":");
+    return QString(toAscii());
+}
+
+Message Message::fromAscii(QByteArray arr)
+{
+    QList<QByteArray> tokens = arr.split(':');
     
     // reconstitute payload, if payload itself contains ':'
     for(int i = 6; i < tokens.size(); i++)
@@ -56,15 +68,19 @@ Message Message::fromString(QString s)
     quint32 pNo = tokens[1].toInt();
     
     Member* m = new Member;
-    m->setName(tokens[2]); // default name, this will be replaced when BR_ENTRY is received
-    m->setHost(tokens[3]);
+    m->setName(QString(tokens[2])); // default name, this will be replaced when BR_ENTRY is received
+    m->setHost(QString(tokens[3]));
     
     quint32 cmd = tokens[4].toInt();
-    QString py = tokens[5];
+    QByteArray py = tokens[5];
     
     return Message(pNo, m, cmd, py);
 }
 
+Message Message::fromString(QString s)
+{
+    return Message::fromAscii(s.toAscii());
+}
 
 Messenger::Messenger() : QObject()
 {
@@ -92,7 +108,7 @@ void Messenger::reset()
     connect(socket, SIGNAL(readyRead()), this, SLOT(receiveData()));
 }
 
-Message Messenger::makeMessage(quint32 command, QString payload)
+Message Messenger::makeMessage(quint32 command, QByteArray payload)
 {
     Message msg(packetNo(), &member_me, command, payload);
     // NOTE: This is an IMPORTANT step. that's why sniffing the data will give you big command numbers
@@ -101,7 +117,7 @@ Message Messenger::makeMessage(quint32 command, QString payload)
     return msg;
 }
 
-bool Messenger::sendMessage(quint32 command, QString payload, Member* to)
+bool Messenger::sendMessage(quint32 command, QByteArray payload, Member* to)
 {
     return sendMessage( makeMessage(command, payload), to );
 }
@@ -116,9 +132,9 @@ bool Messenger::sendMessage(Message msg, Member* to)
  * Sends a broadcast
  * and then also multicasts to all ips stored in the Settings
  */
-bool Messenger::multicast(quint32 command, QString payload)
+bool Messenger::multicast(quint32 command, QByteArray payload)
 {
-    QByteArray data = makeMessage(command, payload).toString().toAscii();
+    QByteArray data = makeMessage(command, payload).toAscii();
     
     socket->writeDatagram(data, QHostAddress::Broadcast, UDP_PORT);
     
@@ -146,7 +162,7 @@ void Messenger::receiveData()
         
         data.replace('\0', QOM_HOSTLIST_SEPARATOR);
         
-        Message msg = Message::fromString(QString(data.data()));
+        Message msg = Message::fromAscii(data.data());
 
         msg.sender()->setAddress(from.toString());
         
@@ -192,10 +208,10 @@ QStringList Messenger::ips() const
 
 bool Messenger::login()
 {
-    multicast(QOM_BR_ENTRY, member_me.name()+'\0'+group_me.name());
+    multicast(QOM_BR_ENTRY, member_me.name().toAscii()+'\0'+group_me.name().toAscii());
 }
 
 bool Messenger::logout()
 {
-    multicast(QOM_BR_EXIT, member_me.name()+'\0'+group_me.name());
+    multicast(QOM_BR_EXIT, member_me.name().toAscii()+'\0'+group_me.name().toAscii());
 }

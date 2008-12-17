@@ -167,7 +167,7 @@ void Qommunicate::on_memberTree_doubleClicked(const QModelIndex& proxyIndex)
 
 void Qommunicate::on_statusCombo_currentIndexChanged(const QString& text)
 {
-    messenger()->multicast(QOM_BR_ABSENCE, me().name()+'\0'+myGroup().name());
+    messenger()->multicast(QOM_BR_ABSENCE, me().name().toAscii()+'\0'+myGroup().name().toAscii());
 }
 
 void Qommunicate::keyPressEvent(QKeyEvent *event)
@@ -213,7 +213,7 @@ void Qommunicate::addMember(Message msg)
 void Qommunicate::addMemberAndAnswer(Message msg)
 {
     addMember(msg);
-    messenger()->sendMessage(QOM_ANSENTRY, me().name()+'\0'+myGroup().name(), msg.sender());
+    messenger()->sendMessage(QOM_ANSENTRY, (me().name()+'\0'+myGroup().name()).toAscii(), msg.sender());
 }
 
 void Qommunicate::openDialog(Message msg)
@@ -235,6 +235,6 @@ void Qommunicate::sendAbsenceInfo(Message msg)
     QString payload = ui.statusCombo->currentText();
     if(payload == tr("Available"))
         payload = "Not absence mode";
-    messenger()->multicast(QOM_SENDABSENCEINFO, payload);
+    messenger()->multicast(QOM_SENDABSENCEINFO, payload.toAscii());
 }
         
