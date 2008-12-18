@@ -1,7 +1,10 @@
 #include <QMessageBox>
+#include <QMimeData>
+#include <QUrl>
 
 #include "ipobjects.h"
 #include "membermodel.h"
+#include "filehandler.h"
 
 
 MemberModel::MemberModel(QObject *parent=0) : QStandardItemModel(parent) {
@@ -46,6 +49,17 @@ void MemberModel::updateGroupCount(QStandardItem *item)
     {
         setGroupCount(item->parent());
     }
+}
+
+bool MemberModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent)
+{
+    QStringList files;
+    foreach(QUrl url, data->urls())
+    {
+        files << url.toLocalFile();
+    }
+    
+    fileHandler()->sendFilesRequest(files, (Member*)itemFromIndex(parent.child(row, column)), "");
 }
 
 bool MemberFilter::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const

@@ -97,6 +97,7 @@ void Qommunicate::populateTree()
     ui.memberTree->setSelectionMode(ui.memberTree->ExtendedSelection);
     ui.memberTree->setModel(filterModel);
     ui.memberTree->setHeaderHidden(true);
+    ui.memberTree->setAcceptDrops(true);
     ui.memberTree->setExpandsOnDoubleClick(false);
     ui.memberTree->expandAll();
 }
