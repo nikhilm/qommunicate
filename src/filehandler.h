@@ -2,6 +2,7 @@
 #define QOM_FILEHANDLER
 
 #include <QTcpSocket>
+#include <QTcpServer>
 
 #include "messenger.h"
 #include "ipobjects.h"
@@ -11,7 +12,7 @@ class FileHandler : public QObject
     Q_OBJECT
     
 public:
-    FileHandler() : QObject() { m_id = 0 ; } ;
+    FileHandler();
     ~FileHandler() { } ;
     
     // UDP
@@ -38,8 +39,14 @@ signals:
     
 private:
     int m_id;
+    
+    QTcpServer* m_server;
+    
     int nextId() { return m_id++ ; } ;
     QString formatFileData(QString);
+    
+private slots:
+    void startSendFile();
 };
 
 FileHandler* fileHandler();

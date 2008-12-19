@@ -12,6 +12,14 @@ FileHandler* fileHandler()
     return handler;
 }
 
+FileHandler::FileHandler() : QObject() {
+    m_id = 0 ;
+    
+    m_server = new QTcpServer(this);
+    m_server->listen(QHostAddress::Any, UDP_PORT);
+    connect(m_server, SIGNAL(newConnection()), this, SLOT(startSendFile()));
+}
+
 void FileHandler::sendFilesRequest(QStringList filenames, Member* to, QString message="")
 {
     QStringList payload;
@@ -45,4 +53,14 @@ QString FileHandler::formatFileData(QString filename)
     data << QString::number( info.isDir() ? QOM_FILE_DIR : QOM_FILE_REGULAR, 16);
     
     return data.join(":")+":\a";
+}
+
+void FileHandler::startSendFile()
+{
+    while(m_server->hasPendingConnections())
+    {
+        // create new thread with the connection
+        QTcpSocket* sock = m_server->nextPendingConnection();
+        qDebug() << "Began new connection "<<sock->peerAddress()<<sock->peerPort();
+    }
 }
