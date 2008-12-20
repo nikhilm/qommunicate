@@ -28,6 +28,7 @@ Qommunicate::Qommunicate(QWidget *parent)
     
     connect(messenger(), SIGNAL(msg_ansEntry(Message)), this, SLOT(addMember(Message)));
     connect(messenger(), SIGNAL(msg_entry(Message)), this, SLOT(addMemberAndAnswer(Message)));
+    connect(messenger(), SIGNAL(msg_exit(Message)), this, SLOT(removeMember(Message)));
     connect(messenger(), SIGNAL(msg_recvMsg(Message)), this, SLOT(openDialog(Message)));
     connect(messenger(), SIGNAL(msg_getAbsenceInfo(Message)), this, SLOT(sendAbsenceInfo(Message)));
 }
@@ -215,6 +216,16 @@ void Qommunicate::addMemberAndAnswer(Message msg)
 {
     addMember(msg);
     messenger()->sendMessage(QOM_ANSENTRY, (me().name()+'\0'+myGroup().name()).toAscii(), msg.sender());
+}
+
+void Qommunicate::removeMember(Message msg)
+{
+    Member* rem = MemberUtils::get("members_list", msg.sender());
+    if(rem == NULL || rem->name().isEmpty())
+        return;
+    
+    if(model->removeRow(rem->row(), rem->parent() == NULL ? QModelIndex() : rem->parent()->index()))
+        MemberUtils::remove("members_list", rem);
 }
 
 void Qommunicate::openDialog(Message msg)

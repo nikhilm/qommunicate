@@ -66,6 +66,7 @@ signals:
     void msg_recvMsg(Message);
     void msg_recvConfirmMsg(Message);
     void msg_getAbsenceInfo(Message);
+    void msg_exit(Message);
     
 private:
     

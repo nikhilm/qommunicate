@@ -176,6 +176,10 @@ void Messenger::receiveData()
                 emit msg_entry(msg);
                 break;
                 
+            case QOM_BR_EXIT:
+                emit msg_exit(msg);
+                break;
+                
             case QOM_SENDMSG:
                 emit msg_recvMsg(msg);
                 break;
