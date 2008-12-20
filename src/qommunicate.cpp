@@ -208,8 +208,31 @@ void Qommunicate::cleanup()
 // Message handling slots
 void Qommunicate::addMember(Message msg)
 {
-    msg.sender()->setName(msg.payload().split('\a')[0]);
-    model->appendRow(msg.sender());
+    QList<QByteArray> tokens = msg.payload().split('\a');
+    msg.sender()->setName(tokens[0]);
+    
+    QString groupName;
+    if(tokens.size() > 1)
+        groupName = tokens[1];
+    
+    if(groupName.isEmpty())
+    {
+        model->appendRow(msg.sender());
+    }
+    else
+    {
+        QList<QStandardItem*> matches = model->findItems(groupName);
+        if(!matches.isEmpty() && matches[0]->type() == TYPE_GROUP)
+        {
+            matches[0]->appendRow(msg.sender());
+        }
+        else
+        {
+            Group * group = new Group(groupName);
+            group->appendRow(msg.sender());
+            model->appendRow(group);
+        }
+    }
 }
 
 void Qommunicate::addMemberAndAnswer(Message msg)
