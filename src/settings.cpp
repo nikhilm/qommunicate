@@ -17,7 +17,7 @@ void SettingsDialog::loadSettings()
     settings = new QSettings;
     
     ui.nickEdit->setText( settings->value(tr("nick"), QDir::home().dirName()).toString() );
-    ui.groupBox->insertItem(0, settings->value(tr("group"), tr("None")).toString() );
+    ui.groupBox->insertItem(0, settings->value(tr("group"), "").toString() );
     ui.groupBox->setCurrentIndex(0);
     
     //Qt::CheckState popupState = settings->value(tr("popup_messages")).toBool() ? Qt::Checked : Qt::Unchecked ;
