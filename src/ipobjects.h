@@ -11,6 +11,7 @@ class Member : public QStandardItem
 public:
     Member() : QStandardItem()
     {
+        m_address.setAddress(QHostAddress::Null);
     };
     Member(QString name, QString host, QString ip, QString status) : QStandardItem()
     {
@@ -19,6 +20,11 @@ public:
         setAddress(ip);
         setStatus(status);
     } ;
+    
+    ~Member()
+    {
+        m_address.setAddress(QHostAddress::Null);
+    }
     int type() const { return TYPE_MEMBER; } ;
     
     QString name() const { return m_name; } ;

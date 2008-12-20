@@ -30,8 +30,7 @@ QHash<QString, Member*> MemberUtils::get(QString group)
 Member* MemberUtils::get(QString group, Member* m)
 {    
     Member* ret = remove(group, m);
-    if(ret->isValid())
-        insert(group, ret);
+    insert(group, ret);
     return ret;
 }
 
