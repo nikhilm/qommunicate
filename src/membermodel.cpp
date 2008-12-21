@@ -28,14 +28,16 @@ bool MemberModel::okToInsert( Member* item )
 
 void MemberModel::insertRow( int row, QStandardItem* item )
 {
-    if(okToInsert((Member*)item))
-        QStandardItemModel::insertRow(row, item);
+    if(item->type() == TYPE_MEMBER && !okToInsert((Member*)item))
+        return;
+    QStandardItemModel::insertRow(row, item);
 }
 
 void MemberModel::appendRow( QStandardItem * item)
-{
-    if(okToInsert((Member*)item))
-        QStandardItemModel::appendRow(item);
+{   
+    if(item->type() == TYPE_MEMBER && !okToInsert((Member*)item))
+        return;
+    QStandardItemModel::appendRow(item);
 }
 
 void MemberModel::setGroupCount(QStandardItem* group)
