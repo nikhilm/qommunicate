@@ -16,15 +16,14 @@ public:
     static bool contains(QString, Member*);
     inline static bool contains(const char* c, Member *m) { return contains(QString(c), m); } ;
     
-    static QHash<QString,Member*> get(QString);
     static Member* get(QString, Member*);
     static Member* get(QString, QString); // IP based
     inline static Member* get(const char* c, QString ip) { return get(QString(c), ip); } ;
     
-    static Member* remove(QString, Member*);
-    inline static Member* remove(const char* c, Member* m) { return remove(QString(c), m); } ;
-    static Member* remove(QString, QString);
-    inline static Member* remove(const char* c, QString ip) { return remove(QString(c), ip); } ;
+    static void remove(QString, Member*);
+    inline static void remove(const char* c, Member* m) { return remove(QString(c), m); } ;
+    static void remove(QString, QString);
+    inline static void remove(const char* c, QString ip) { return remove(QString(c), ip); } ;
     
 private:
     static QHash<QString, QHash<QString, Member*> > m_hash;
