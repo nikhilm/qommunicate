@@ -243,12 +243,30 @@ void Qommunicate::addMemberAndAnswer(Message msg)
 
 void Qommunicate::removeMember(Message msg)
 {
-    Member* rem = MemberUtils::get("members_list", msg.sender());
-    if(rem == NULL || rem->name().isEmpty())
-        return;
+    QList<QByteArray> tokens = msg.payload().split('\a');
+    QString groupName;
+    if(tokens.size() > 1)
+        groupName = tokens[1];
     
-    if(model->removeRow(rem->row(), rem->parent() == NULL ? QModelIndex() : rem->parent()->index()))
-        MemberUtils::remove("members_list", rem);
+    for(int i = 0; i < model->rowCount(); i++)
+    {
+        QStandardItem* it = model->item(i, 0);
+        if(it->type() == TYPE_MEMBER && ((Member*)it)->name() == msg.sender()->addressString())
+        {
+            model->removeRow(it->row());
+        }
+        else
+        {
+            for(int j = 0; j < it->rowCount(); i++)
+            {
+                if(((Member*)it->child(j))->addressString() == msg.sender()->addressString())
+                    it->removeRow(j);
+            }
+            if(it->rowCount() == 0)
+                model->removeRow(it->row());
+        }        
+    }
+    MemberUtils::remove("members_list", msg.sender()->addressString());
 }
 
 void Qommunicate::openDialog(Message msg)
