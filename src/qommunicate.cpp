@@ -208,6 +208,9 @@ void Qommunicate::cleanup()
 // Message handling slots
 void Qommunicate::addMember(Message msg)
 {
+    if(MemberUtils::contains("members_list", msg.sender()))
+        return;
+    
     QList<QByteArray> tokens = msg.payload().split('\a');
     msg.sender()->setName(tokens[0]);
     
