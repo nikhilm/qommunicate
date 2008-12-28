@@ -108,22 +108,5 @@
   <tabstop>messageEdit</tabstop>
  </tabstops>
  <resources/>
- <connections>
-  <connection>
-   <sender>messageInput</sender>
-   <signal>returnPressed()</signal>
-   <receiver>sendButton</receiver>
-   <slot>click()</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>268</x>
-     <y>277</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>353</x>
-     <y>280</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>
