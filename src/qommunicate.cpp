@@ -261,7 +261,7 @@ void Qommunicate::removeMember(Message msg)
         }
         else
         {
-            for(int j = 0; j < it->rowCount(); i++)
+            for(int j = 0; j < it->rowCount(); j++)
             {
                 if(((Member*)it->child(j))->addressString() == msg.sender()->addressString())
                     it->removeRow(j);
