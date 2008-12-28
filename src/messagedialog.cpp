@@ -47,7 +47,7 @@ void MessageDialog::closeEvent(QCloseEvent *evt)
 
 void MessageDialog::incomingMessage(Message msg)
 {
-    ui.messageEdit->append(QString("<b style=\"color:blue;\">&lt;%1&gt;</b> \n").arg(receivers[0]->name()));
+    ui.messageEdit->append(QString("<b style=\"color:blue;\">&lt;%1&gt;</b> ").arg(receivers[0]->name()));
     ui.messageEdit->append(msg.payload().replace('\a', "").trimmed());
     
     if(msg.command() & QOM_SENDCHECKOPT)
@@ -61,7 +61,7 @@ void MessageDialog::on_sendButton_clicked()
     
     if(receivers.isEmpty())
     {
-        messenger()->multicast(QOM_SENDMSG, ui.messageInput->text().toAscii());
+        messenger()->multicast(QOM_SENDMSG|QOM_BROADCASTOPT, ui.messageInput->text().toAscii());
         QTimer::singleShot(500, this, SLOT(accept()));
         return;
     }
