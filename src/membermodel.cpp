@@ -17,29 +17,6 @@ Qt::ItemFlags MemberModel::flags(const QModelIndex& index) const
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDropEnabled ;
 }
 
-bool MemberModel::okToInsert( Member* item )
-{
-    if(MemberUtils::contains("members_list", item))
-        return false;
-
-    MemberUtils::insert("members_list", item);
-    return true;
-}
-
-void MemberModel::insertRow( int row, QStandardItem* item )
-{
-    if(item->type() == TYPE_MEMBER && !okToInsert((Member*)item))
-        return;
-    QStandardItemModel::insertRow(row, item);
-}
-
-void MemberModel::appendRow( QStandardItem * item)
-{   
-    if(item->type() == TYPE_MEMBER && !okToInsert((Member*)item))
-        return;
-    QStandardItemModel::appendRow(item);
-}
-
 void MemberModel::setGroupCount(QStandardItem* group)
 {
     group->setData(tr("Members: %1").arg(group->rowCount()), Qt::ToolTipRole);

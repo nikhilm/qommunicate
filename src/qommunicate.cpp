@@ -233,6 +233,9 @@ void Qommunicate::addMember(Message msg)
             model->appendRow(group);
         }
     }
+    
+    MemberUtils::insert("members_list", msg.sender());
+    
 }
 
 void Qommunicate::addMemberAndAnswer(Message msg)
@@ -243,6 +246,7 @@ void Qommunicate::addMemberAndAnswer(Message msg)
 
 void Qommunicate::removeMember(Message msg)
 {
+    qDebug() << msg.sender()->name() << "Exited";
     QList<QByteArray> tokens = msg.payload().split('\a');
     QString groupName;
     if(tokens.size() > 1)

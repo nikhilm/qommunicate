@@ -16,9 +16,6 @@ public:
     MemberModel(QObject *);
     Qt::ItemFlags flags(const QModelIndex&) const;
     
-    void insertRow(int, QStandardItem*);
-    void appendRow(QStandardItem*);
-    
     bool dropMimeData(const QMimeData*, Qt::DropAction, int, int, const QModelIndex&);
     
 private slots:
@@ -27,7 +24,6 @@ private slots:
 private:
     
     void setGroupCount(QStandardItem*);
-    bool okToInsert(Member*);
 };
 
 class MemberFilter : public QSortFilterProxyModel
