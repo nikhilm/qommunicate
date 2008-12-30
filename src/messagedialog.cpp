@@ -47,8 +47,9 @@ void MessageDialog::closeEvent(QCloseEvent *evt)
 
 void MessageDialog::incomingMessage(Message msg)
 {
-    ui.messageEdit->append(QString("<b style=\"color:blue;\">&lt;%1&gt;</b> ").arg(receivers[0]->name()));
-    ui.messageEdit->append(msg.payload().replace('\a', "").trimmed());
+    QString text = QString("<b style=\"color:blue;\">&lt;%1&gt;</b> ").arg(receivers[0]->name());
+    text += msg.payload().replace('\a', "").trimmed();
+    ui.messageEdit->append(text);
     
     if(msg.command() & QOM_SENDCHECKOPT)
         messenger()->sendMessage(QOM_RECVMSG, QByteArray::number(msg.packetNo()), receivers[0]);
