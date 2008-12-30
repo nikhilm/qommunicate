@@ -280,6 +280,14 @@ void Qommunicate::openDialog(Message msg)
     if(MemberUtils::contains("open_conversations", msg.sender()))
         return;
     
+    // if set to ignore received messages
+    QSettings s;
+    if(s.value(tr("no_receive")).toBool())
+    {
+        qDebug() << "Ignoring message";
+        return;
+    }
+    
     Member* with = MemberUtils::get("members_list", msg.sender());
     if(!with->isValid())
         with = msg.sender();
