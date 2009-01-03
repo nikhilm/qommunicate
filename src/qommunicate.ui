@@ -26,6 +26,22 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout" >
         <item>
+         <widget class="QLabel" name="memberSearchLabel" >
+          <property name="text" >
+           <string>S&amp;earch:</string>
+          </property>
+          <property name="textFormat" >
+           <enum>Qt::AutoText</enum>
+          </property>
+          <property name="scaledContents" >
+           <bool>false</bool>
+          </property>
+          <property name="buddy" >
+           <cstring>searchEdit</cstring>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QLineEdit" name="searchEdit" >
           <property name="inputMask" >
            <string/>
@@ -35,16 +51,6 @@
           </property>
           <property name="maxLength" >
            <number>32767</number>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="memberSearchLabel" >
-          <property name="text" >
-           <string/>
-          </property>
-          <property name="pixmap" >
-           <pixmap resource="icons.qrc" >:/newPrefix/icons/edit-find.png</pixmap>
           </property>
          </widget>
         </item>
