@@ -1,5 +1,6 @@
 #include <QSettings>
 #include <QNetworkInterface>
+#include <QMessageBox>
 
 #include "messenger.h"
 
@@ -99,7 +100,12 @@ void Messenger::reset()
     }
     
     socket = new QUdpSocket(this);
-    socket->bind(UDP_PORT);
+    
+    if(!socket->bind(UDP_PORT))
+    {
+        QMessageBox::critical(0, tr("Connection Error"), tr("Could not bind, perhaps port %1 is being used by another application.").arg(UDP_PORT));
+        exit(1);
+    }
     
     QSettings s;
     member_me.setName(s.value(tr("nick")).toString());
