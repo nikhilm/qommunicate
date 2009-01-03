@@ -94,6 +94,7 @@ void Qommunicate::populateTree()
     
     filterModel->setSourceModel(model);
     filterModel->setDynamicSortFilter(true);
+    filterModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
     
     ui.memberTree->setSelectionMode(ui.memberTree->ExtendedSelection);
     ui.memberTree->setModel(filterModel);
