@@ -47,6 +47,9 @@ void MessageDialog::closeEvent(QCloseEvent *evt)
 
 void MessageDialog::incomingMessage(Message msg)
 {
+    if(msg.sender()->addressString() != receivers[0]->addressString())
+        return;
+    
     QString text = QString("<b style=\"color:blue;\">&lt;%1&gt;</b> ").arg(receivers[0]->name());
     text += msg.payload().replace('\a', "").trimmed();
     ui.messageEdit->append(text);
