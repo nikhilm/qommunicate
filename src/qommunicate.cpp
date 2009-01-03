@@ -239,7 +239,7 @@ void Qommunicate::addMember(Message msg)
     }
     
     MemberUtils::insert("members_list", msg.sender());
-    
+    ui.memberTree->expandAll();
 }
 
 void Qommunicate::addMemberAndAnswer(Message msg)
