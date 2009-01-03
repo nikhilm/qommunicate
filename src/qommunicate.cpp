@@ -293,7 +293,7 @@ void Qommunicate::openDialog(Message msg)
     Member* with = MemberUtils::get("members_list", msg.sender());
     if(!with->isValid())
         with = msg.sender();
-    MessageDialog *dlg = new MessageDialog(with, this);
+    MessageDialog *dlg = new MessageDialog(with);
     dlg->setModal(false);
     dlg->show();
     dlg->incomingMessage(msg);
