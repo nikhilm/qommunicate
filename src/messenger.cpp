@@ -172,6 +172,9 @@ void Messenger::receiveData()
 
         msg.sender()->setAddress(from.toString());
         
+        //qDebug() << "Received" << msg.toAscii() ;
+        //qDebug() << "from" << msg.sender()->name() << msg.sender()->addressString();
+        
         switch(msg.command() & 255)
         {
             case QOM_ANSENTRY:

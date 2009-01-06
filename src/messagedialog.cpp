@@ -3,7 +3,7 @@
 #include "qommunicate.h"
 #include "messenger.h"
 #include "constants.h"
-#include "filehandler.h"
+#include "transferdialogs.h"
 
 MessageDialog::MessageDialog(Member* receiver, QWidget *parent) : QDialog(parent)
 {
@@ -133,6 +133,8 @@ void MessageDialog::dropEvent(QDropEvent *evt)
     
     foreach(Member* to, receivers)
     {
-        fileHandler()->sendFilesRequest(files, to, ui.messageInput->text());
+        //fileHandler()->sendFilesRequest(files, to, ui.messageInput->text());
+        qDebug() << "Received drop" ;
+        new FileSendProgressDialog(files, to, ui.messageInput->text());
     }
 }

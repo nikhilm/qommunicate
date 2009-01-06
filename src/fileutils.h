@@ -1,5 +1,5 @@
-#ifndef QOM_FILEHANDLER
-#define QOM_FILEHANDLER
+#ifndef QOM_FILEUTILS
+#define QOM_FILEUTILS
 
 #include <QTcpSocket>
 #include <QTcpServer>
@@ -7,21 +7,37 @@
 #include "messenger.h"
 #include "ipobjects.h"
 
-class FileHandler : public QObject
+class FileTcpServer : public QTcpServer
+{
+    Q_OBJECT
+public:
+    FileTcpServer(QObject* parent=0) : QTcpServer(parent)
+    {
+    };
+    
+protected:
+    void incomingConnection(int socketDescriptor)
+    {
+        emit incomingConnectionDescriptor(socketDescriptor);
+    }
+    
+signals:
+    void incomingConnectionDescriptor(int);
+};
+
+class FileUtils : public QObject
 {
     Q_OBJECT
     
 public:
-    FileHandler();
-    ~FileHandler() { } ;
+    FileUtils();
+    ~FileUtils() { } ;
     
     // UDP
-    void sendFilesRequest(QStringList, Member*, QString);
+    QString formatSendFilesRequest(QStringList);
     
     // usually shouldn't be called from outside, see the .cpp for details
     void sendDirectoryRequest(QString, Member*);
-    
-    inline void sendFilesRequest(QString filename, Member* to, QString message="") { return sendFilesRequest(QStringList(filename), to, message); } ;
     
     // TCP
     //void sendFiles(QStringList);
@@ -34,21 +50,28 @@ signals:
      * int is the bytes written till now
      * int is the total bytes
      */
+    void incomingTcpConnection(int);
     void updateSend(QString, int, int);
     void finishedSending(QString);
+    void filePath(QString);
+    void notifyUpstreamProgress(int);
+    
+public slots:
+    void resolveFilePath(int);
     
 private:
     int m_id;
     
     QTcpServer* m_server;
+    QHash<int, QString> m_fileIdHash;
     
     int nextId() { return m_id++ ; } ;
     QString formatFileData(QString);
     
 private slots:
-    void startSendFile();
+    // void startSendFile();
 };
 
-FileHandler* fileHandler();
+FileUtils* fileUtils();
 
 #endif

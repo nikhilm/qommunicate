@@ -4,7 +4,7 @@
 
 #include "ipobjects.h"
 #include "membermodel.h"
-#include "filehandler.h"
+#include "fileutils.h"
 
 
 MemberModel::MemberModel(QObject *parent=0) : QStandardItemModel(parent) {
@@ -38,7 +38,7 @@ bool MemberModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int
         files << url.toLocalFile();
     }
     
-    fileHandler()->sendFilesRequest(files, (Member*)itemFromIndex(parent.child(row, column)), "");
+    //fileUtils()->SendFilesRequest(files, (Member*)itemFromIndex(parent.child(row, column)), "");
 }
 
 bool MemberFilter::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
