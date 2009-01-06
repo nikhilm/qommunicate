@@ -45,6 +45,12 @@ void MessageDialog::closeEvent(QCloseEvent *evt)
     evt->accept();
 }
 
+void MessageDialog::reject()
+{
+    ((Qommunicate*) parent())->dialogClosed(receivers[0]);
+    QDialog::reject();
+}
+
 void MessageDialog::incomingMessage(Message msg)
 {
     if(msg.sender()->addressString() != receivers[0]->addressString())

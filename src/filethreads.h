@@ -25,7 +25,7 @@ public:
         }
         qDebug() << "FileSendThread: socket setup";
         connect(m_socket, SIGNAL(readyRead()), this, SLOT(nextFileRequested()));  
-        connect(m_socket, SIGNAL(disconnected()), this, SLOT(quit()));
+        connect(m_socket, SIGNAL(disconnected()), this, SLOT(done()));
         connect(m_socket, SIGNAL(disconnected()), m_socket, SLOT(deleteLater()));
         connect(m_socket, SIGNAL(bytesWritten(qint64)), this, SLOT(updateProgress(qint64)));
         
@@ -59,6 +59,7 @@ public slots:
     void acceptFilePath(QString);
     void nextFileRequested();
     void sendFiles();
+    void done();
     
 private slots:
     void socketError(QTcpSocket::SocketError) ;

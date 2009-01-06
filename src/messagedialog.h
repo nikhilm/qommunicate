@@ -36,6 +36,7 @@ protected:
 public slots:
     void incomingMessage(Message);
     void messageRecvConfirm();
+    void reject();
 
 private:
     Ui::MessageDialog ui;

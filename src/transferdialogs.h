@@ -13,6 +13,8 @@ public:
     FileSendProgressDialog(QStringList files, Member* to, const QString& msg, QWidget* parent=0) : 
         QProgressDialog(tr("Waiting for %1 to accept").arg(to->name()), tr("&Cancel"), 0, 100, parent)
     {
+        setAttribute(Qt::WA_DeleteOnClose);
+        
         //m_files = files;
         m_to = to;
         m_fst = NULL;
@@ -20,8 +22,7 @@ public:
         QByteArray out = msg.toAscii() + '\0' + fileUtils()->formatSendFilesRequest(files).toAscii();
         messenger()->sendMessage(QOM_SENDMSG | QOM_FILEATTACHOPT | QOM_SENDCHECKOPT, out, m_to);
         qDebug() << "Sent UPD request for send" ;
-        connect(fileUtils(), SIGNAL(incomingTcpConnection(int)), this, SLOT(startSend(int)));
-        
+        connect(fileUtils(), SIGNAL(incomingTcpConnection(int)), this, SLOT(startSend(int)));        
     }
     
 private slots:

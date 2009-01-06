@@ -70,8 +70,15 @@ void FileSendThread::acceptFilePath(QString fileName)
 void FileSendThread::updateProgress(qint64 bytes)
 {
     m_totalSent += bytes;
-    qDebug() << "Wrote" << m_totalSent/m_file->size() << "%";
-    emit notifyProgress(m_totalSent/m_file->size());
+    qDebug() << "Wrote" << m_totalSent/m_file->size() * 100 << "%";
+    emit notifyProgress(m_totalSent/m_file->size() * 100);
+    
+}
+
+void FileSendThread::done()
+{
+    qDebug() << "Socket disconnected, transfer done" ;
+    terminate();
 }
 
 void FileSendThread::sendFiles()
