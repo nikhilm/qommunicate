@@ -122,11 +122,12 @@ void MessageDialog::messageRecvConfirm()
         ui.messageEdit->append(QString("<b style=\"color:red;\">&lt;%1&gt;</b> %2").arg(me().name()).arg(ui.messageInput->text()));
     
     ui.messageInput->clear();
-    ui.messageInput->setFocus();
     ui.messageInput->setEnabled(true);
     
     if(receivers.size() == 1 && messageTimer != NULL)
         messageTimer->stop();
+    
+    ui.messageInput->setFocus();
 }
 
 void MessageDialog::dropEvent(QDropEvent *evt)
