@@ -42,7 +42,7 @@ public:
     // TCP
     //void sendFiles(QStringList);
     //void sendDirectory(QString);
-    
+    QByteArray formatHeirarchialTcpRequest(const QString&);
 signals:
     /**
      * Emitted every time a certain number of bytes are transmitted

@@ -1,5 +1,6 @@
 #include <QFileInfo>
 #include <QDateTime>
+#include <QDir>
 
 #include "fileutils.h"
 #include "filethreads.h"
@@ -26,14 +27,9 @@ QString FileUtils::formatSendFilesRequest(QStringList filenames)
     QStringList payload;
     foreach(QString filename, filenames)
     {
-        if(QFileInfo(filename).isDir())
-        {
-            payload << formatFileData(filename);
-        }
-        else
-        {
-            payload << formatFileData(filename);
-        }
+        int id = nextId();
+        m_fileIdHash.insert(id, filename);
+        payload << (QString::number(id)+":"+formatFileData(filename)) ;
     }
     return payload.join("");
 }
@@ -44,18 +40,40 @@ QString FileUtils::formatFileData(QString filename)
     if(! info.exists() )
         return "";
     
-    int id = nextId();
-    m_fileIdHash.insert(id, info.absoluteFilePath());
     
     QStringList data;
     
-    data << QString::number(id);
     data << info.fileName().replace(':', "::");
     data << QString::number(info.size(), 16);
     data << QString::number(info.lastModified().toTime_t(), 16);
     data << QString::number( info.isDir() ? QOM_FILE_DIR : QOM_FILE_REGULAR, 16);
     
     return data.join(":")+":\a";
+}
+
+/*
+Returns header-size:filename:file-size:fileattr[:extend-attr=val1
+    [,val2...][:extend-attr2=...]]: for each file.
+    Caller should tack on content-data
+*/
+QByteArray FileUtils::formatHeirarchialTcpRequest(const QString& dirName)
+{
+    QByteArray data;
+    QDir dir(dirName);
+    QStringList entries = dir.entryList(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::NoSymLinks);
+    QString fileName;
+    foreach(fileName, entries)
+    {
+        QStringList formattedData = formatFileData(dir.absoluteFilePath(fileName)).split(':');
+        formattedData.removeAt(2); //drop mtime
+        formattedData.prepend("") ; // a colon at the front to simplify things
+        QString headerData = formattedData.join(":");
+        int headerSize = headerData.length();
+        headerSize += QString::number(headerSize, 16).length();
+        data.append(( QString::number(headerSize, 16) + headerData ).toAscii()) ;
+        data.append(QFile(dir.absoluteFilePath(fileName)).readAll()) ;
+    }
+    return data;
 }
 
 // FileSendThread* FileUtils::startSendFile()

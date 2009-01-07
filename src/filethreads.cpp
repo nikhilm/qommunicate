@@ -2,6 +2,8 @@
 
 #include <QMessageBox>
 #include <QProgressDialog>
+#include <QDir>
+#include <QFileInfo>
 
 #include "constants.h"
 
@@ -34,7 +36,7 @@ void FileSendThread::nextFileRequested()
     QList<QByteArray> metadata = m_socket->readAll().split(':');
     qDebug() << metadata;
     // this 8 thing is because the last token in metadata is blank
-    if(metadata.size() <= 8)
+    if(metadata.size() < 8)
     {
         qWarning() << "Error: Bad request from receiver" ;
         return;
@@ -44,16 +46,27 @@ void FileSendThread::nextFileRequested()
     switch(command)
     {
         case QOM_GETFILEDATA:
-            qDebug() << "Command was GETFILEDATA" ;
-            emit requestFilePath(metadata[6].toInt());
             m_offset = ( metadata[7].isEmpty() ? 0 : metadata[7].toInt() );
+            // NOTE: The fallthrough is important here
+            
+        case QOM_GETDIRFILES:
+            emit requestFilePath(metadata[6].toInt());            
             break;
     }
 }
 
 void FileSendThread::acceptFilePath(QString fileName)
 {
-    qDebug() << " acceptFilePath: preparing to send" << fileName;
+    qDebug() << " acceptFilePath: preparing to send" << fileName;    
+    
+    if(QFileInfo(fileName).isDir())
+    {
+        qDebug() << "Writing dir data";
+        qDebug() << fileUtils()->formatHeirarchialTcpRequest(fileName) ;
+        m_socket->write(fileUtils()->formatHeirarchialTcpRequest(fileName));
+        return;
+    }
+    
     emit sendingNextFile(fileName);
     m_file = new QFile(fileName);
     if(!m_file->open(QIODevice::ReadOnly))
@@ -69,6 +82,8 @@ void FileSendThread::acceptFilePath(QString fileName)
 
 void FileSendThread::updateProgress(qint64 bytes)
 {
+    if( m_file == NULL || m_file->size() == 0 )
+        return;
     m_totalSent += bytes;
     qDebug() <<"Progress:"<<(float)m_totalSent/m_file->size()*100.0<<"%";
     emit notifyProgress((float)m_totalSent/m_file->size() * 100.0);
