@@ -23,12 +23,12 @@ void FileSendThread::nextFileRequested()
     m_offset = 0;
     m_totalSent = 0;
     
-//     if(m_file != NULL)
-//     {
-//         m_file->close();
-//         delete m_file;
-//         m_file = NULL;
-//     }
+    if(m_file != NULL)
+    {
+        m_file->close();
+        delete m_file;
+        m_file = NULL;
+    }
     
     qint64 offset;
     QList<QByteArray> metadata = m_socket->readAll().split(':');
@@ -70,15 +70,9 @@ void FileSendThread::acceptFilePath(QString fileName)
 void FileSendThread::updateProgress(qint64 bytes)
 {
     m_totalSent += bytes;
-    qDebug() << "Wrote" << m_totalSent/m_file->size() * 100 << "%";
-    emit notifyProgress(m_totalSent/m_file->size() * 100);
+    qDebug() <<"Progress:"<<(float)m_totalSent/m_file->size()*100.0<<"%";
+    emit notifyProgress((float)m_totalSent/m_file->size() * 100.0);
     
-}
-
-void FileSendThread::done()
-{
-    qDebug() << "Socket disconnected, transfer done" ;
-    terminate();
 }
 
 void FileSendThread::sendFiles()

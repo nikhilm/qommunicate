@@ -25,7 +25,8 @@ public:
         }
         qDebug() << "FileSendThread: socket setup";
         connect(m_socket, SIGNAL(readyRead()), this, SLOT(nextFileRequested()));  
-        connect(m_socket, SIGNAL(disconnected()), this, SLOT(done()));
+        connect(m_socket, SIGNAL(disconnected()), this, SLOT(quit()));
+        connect(m_socket, SIGNAL(disconnected()), this, SIGNAL(sendDone()));
         connect(m_socket, SIGNAL(disconnected()), m_socket, SLOT(deleteLater()));
         connect(m_socket, SIGNAL(bytesWritten(qint64)), this, SLOT(updateProgress(qint64)));
         
@@ -38,7 +39,24 @@ public:
         //emit requestMemberName(m_socket->peerAddress().toString());
     } ;
     
-    ~FileSendThread() { };
+    ~FileSendThread() {
+//         if(m_socket != NULL)
+//         {
+//             m_socket->close();
+//             delete m_socket;
+//             m_socket = NULL;
+//         }
+//         qDebug() << "Deleted socket";
+        if(m_file != NULL)
+        {
+            m_file->close();
+            delete m_file;
+            m_file = NULL;
+        }
+        qDebug() << "Delete file ptr";
+        
+        qDebug() << "FileSendThread destroyed" ;
+    };
     
     void run();
     
@@ -54,12 +72,12 @@ signals:
     void readyToSend();
     void connectionError(QString);
     void sendingNextFile(QString);
+    void sendDone();
     
 public slots:
     void acceptFilePath(QString);
     void nextFileRequested();
     void sendFiles();
-    void done();
     
 private slots:
     void socketError(QTcpSocket::SocketError) ;

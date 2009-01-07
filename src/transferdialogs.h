@@ -25,6 +25,9 @@ public:
         connect(fileUtils(), SIGNAL(incomingTcpConnection(int)), this, SLOT(startSend(int)));        
     }
     
+public slots:
+    void accept();
+    
 private slots:
     void startSend(int);
     void sendFiles();
