@@ -22,7 +22,9 @@ public:
         QByteArray out = msg.toAscii() + '\0' + fileUtils()->formatSendFilesRequest(files).toAscii();
         messenger()->sendMessage(QOM_SENDMSG | QOM_FILEATTACHOPT | QOM_SENDCHECKOPT, out, m_to);
         qDebug() << "Sent UPD request for send" ;
-        connect(fileUtils(), SIGNAL(incomingTcpConnection(int)), this, SLOT(startSend(int)));        
+        connect(fileUtils(), SIGNAL(incomingTcpConnection(int)), this, SLOT(startSend(int)));
+        
+        exec();
     }
     
 public slots:
