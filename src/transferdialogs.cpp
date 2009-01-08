@@ -36,4 +36,5 @@ void FileSendProgressDialog::accept()
     delete m_fst;
     m_fst = NULL;
     qDebug() << m_fst;
+    QProgressDialog::accept();
 }
