@@ -56,24 +56,27 @@ Returns header-size:filename:file-size:fileattr[:extend-attr=val1
     [,val2...][:extend-attr2=...]]: for each file.
     Caller should tack on content-data
 */
-QByteArray FileUtils::formatHeirarchialTcpRequest(const QString& dirName)
+QStringList FileUtils::formatHeirarchialTcpRequest(const QString& dirName)
 {
-    QByteArray data;
+    QStringList headers;
     QDir dir(dirName);
     QStringList entries = dir.entryList(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::NoSymLinks);
+    entries << ".";
     QString fileName;
     foreach(fileName, entries)
     {
         QStringList formattedData = formatFileData(dir.absoluteFilePath(fileName)).split(':');
         formattedData.removeAt(2); //drop mtime
         formattedData.prepend("") ; // a colon at the front to simplify things
+        if(fileName == ".")
+            formattedData.replace(3, QString::number(QOM_FILE_RETPARENT));
         QString headerData = formattedData.join(":");
         int headerSize = headerData.length();
         headerSize += QString::number(headerSize, 16).length();
-        data.append(( QString::number(headerSize, 16) + headerData ).toAscii()) ;
-        data.append(QFile(dir.absoluteFilePath(fileName)).readAll()) ;
+        headers << ( QString::number(headerSize, 16) + headerData ) ;
+        
     }
-    return data;
+    return headers;
 }
 
 // FileSendThread* FileUtils::startSendFile()

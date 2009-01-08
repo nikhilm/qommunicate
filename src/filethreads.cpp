@@ -62,8 +62,18 @@ void FileSendThread::acceptFilePath(QString fileName)
     if(QFileInfo(fileName).isDir())
     {
         qDebug() << "Writing dir data";
-        qDebug() << fileUtils()->formatHeirarchialTcpRequest(fileName) ;
-        m_socket->write(fileUtils()->formatHeirarchialTcpRequest(fileName));
+        QDir dir(fileName);
+        //qDebug() << fileUtils()->formatHeirarchialTcpRequest(fileName) ;
+        foreach(QString header, fileUtils()->formatHeirarchialTcpRequest(fileName))
+        {
+            qDebug() << header;
+            QFile f(dir.absoluteFilePath(header.section(':', 1, 1)));
+            if(!f.open(QIODevice::ReadOnly))
+                qDebug() << "Error opening file" << f.error();
+            m_socket->write(header.toAscii());
+            m_socket->write(f.readAll());
+        }
+        emit sendingNextFile(fileName);
         return;
     }
     
