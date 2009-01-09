@@ -14,8 +14,9 @@ public:
         QProgressDialog(tr("Waiting for %1 to accept").arg(to->name()), tr("&Cancel"), 0, 100, parent)
     {
         setAttribute(Qt::WA_DeleteOnClose);
+        setRange(0, 0);
         
-        //m_files = files;
+        m_filesSent = files.size();
         m_to = to;
         m_fst = NULL;
         
@@ -39,6 +40,7 @@ private:
     //QStringList m_files;
     Member* m_to;
     FileSendThread* m_fst;
+    int m_filesSent;
 };
 
 #endif

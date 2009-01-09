@@ -55,6 +55,14 @@ void FileSendThread::nextFileRequested()
     }
 }
 
+void FileSendThread::writeOut(QTcpSocket* sock, QFile* f)
+{
+    while(!f->atEnd())
+    {
+        sock->write(f->read(1024));
+    }
+}
+
 void FileSendThread::acceptFilePath(QString fileName)
 {
     qDebug() << " acceptFilePath: preparing to send" << fileName;    
@@ -71,7 +79,7 @@ void FileSendThread::acceptFilePath(QString fileName)
             if(!f.open(QIODevice::ReadOnly))
                 qDebug() << "Error opening file" << f.error();
             m_socket->write(header.toAscii());
-            m_socket->write(f.readAll());
+            writeOut(m_socket, &f);
         }
         emit sendingNextFile(fileName);
         return;
@@ -87,7 +95,7 @@ void FileSendThread::acceptFilePath(QString fileName)
     m_file->seek(m_offset);
     m_totalSent = m_offset;
     qDebug() << "Preparing to write";
-    m_socket->write(m_file->readAll());
+    writeOut(m_socket, m_file);
 }
 
 void FileSendThread::updateProgress(qint64 bytes)
@@ -95,7 +103,7 @@ void FileSendThread::updateProgress(qint64 bytes)
     if( m_file == NULL || m_file->size() == 0 )
         return;
     m_totalSent += bytes;
-    qDebug() <<"Progress:"<<(float)m_totalSent/m_file->size()*100.0<<"%";
+    //qDebug() <<"Progress:"<<(float)m_totalSent/m_file->size()*100.0<<"%";
     emit notifyProgress((float)m_totalSent/m_file->size() * 100.0);
     
 }

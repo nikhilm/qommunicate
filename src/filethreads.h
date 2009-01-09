@@ -93,6 +93,7 @@ private:
     qint64 m_totalSent;
     
     //QProgressDialog(s
+    void writeOut(QTcpSocket*, QFile* );
     
 };
 

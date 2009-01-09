@@ -16,6 +16,7 @@ void FileSendProgressDialog::startSend(int socketDescriptor)
     connect(m_fst, SIGNAL(connectionError(QString)), this, SLOT(error(QString)));
     connect(m_fst, SIGNAL(sendDone()), this, SLOT(accept()));
     connect(m_fst, SIGNAL(notifyProgress(int)), this, SLOT(setValue(int)));
+    connect(m_fst, SIGNAL(sendingNextFile(QString)), this, SLOT(setRange(0, 100)));
     connect(m_fst, SIGNAL(sendingNextFile(QString)), this, SLOT(setLabelText(QString)));
 }
 
@@ -36,5 +37,16 @@ void FileSendProgressDialog::accept()
     delete m_fst;
     m_fst = NULL;
     qDebug() << m_fst;
-    QProgressDialog::accept();
+    m_filesSent--;
+    qDebug() << "Files remaining" << m_filesSent;
+    if(m_filesSent == 0)
+    {
+        qDebug() << "All files sent";
+        QProgressDialog::accept();
+    }
+    else
+    {
+        setLabelText(tr("Waiting for %1 to accept").arg(m_to->name()));
+        setRange(0, 0);
+    }
 }
