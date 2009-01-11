@@ -109,4 +109,7 @@ const int QOM_FILE_UNICODEFNAME=0x00000041	;
 const char QOM_FILELIST_SEPARATOR='\a';
 const char QOM_HOSTLIST_SEPARATOR='\a';
 const char QOM_HOSTLIST_DUMMY=	'\b';
+
+const int QOM_TIMEOUT = 10000;
+const int QOM_FILE_WRITE_SIZE = 1024;
 #endif

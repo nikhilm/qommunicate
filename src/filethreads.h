@@ -14,49 +14,10 @@ class FileSendThread : public QThread
     Q_OBJECT
     
 public:
-    FileSendThread(int socketDescriptor, QObject* parent=0) : QThread(parent)
-    {        
-        m_file = NULL;
-        
-        m_socket = new QTcpSocket;
-        if(!m_socket->setSocketDescriptor(socketDescriptor)) {
-            emit socketError(m_socket->error());
-            return;
-        }
-        qDebug() << "FileSendThread: socket setup";
-        connect(m_socket, SIGNAL(readyRead()), this, SLOT(nextFileRequested()));  
-        connect(m_socket, SIGNAL(disconnected()), this, SLOT(quit()));
-        connect(m_socket, SIGNAL(disconnected()), this, SIGNAL(sendDone()));
-        connect(m_socket, SIGNAL(disconnected()), m_socket, SLOT(deleteLater()));
-        connect(m_socket, SIGNAL(bytesWritten(qint64)), this, SLOT(updateProgress(qint64)));
-        
-        connect(this, SIGNAL(requestFilePath(int)), fileUtils(), SLOT(resolveFilePath(int)));
-        connect(fileUtils(), SIGNAL(filePath(QString)), this, SLOT(acceptFilePath(QString)));
-        
-        start();
-        
-        //setMember(MemberUtils::get("members_list", m_socket->peerAddress().toString()));
-        //emit requestMemberName(m_socket->peerAddress().toString());
-    } ;
+    FileSendThread(int socketDescriptor, QObject* parent=0);
     
     ~FileSendThread() {
-//         if(m_socket != NULL)
-//         {
-//             m_socket->close();
-//             delete m_socket;
-//             m_socket = NULL;
-//         }
-//         qDebug() << "Deleted socket";
-        if(m_file != NULL)
-        {
-            m_file->close();
-            delete m_file;
-            m_file = NULL;
-        }
-        qDebug() << "Delete file ptr";
         
-        qDebug() << "FileSendThread destroyed" ;
-    };
     
     void run();
     
@@ -73,6 +34,7 @@ signals:
     void connectionError(QString);
     void sendingNextFile(QString);
     void sendDone();
+    void fileSent(QString);
     
 public slots:
     void acceptFilePath(QString);
@@ -84,6 +46,7 @@ private slots:
     void updateProgress(qint64);
     
 private:
+    int m_descriptor;
     QTcpSocket* m_socket;
     //Member* m_member;
     
@@ -92,8 +55,11 @@ private:
     
     qint64 m_totalSent;
     
+    QTimer* m_timer;
+    
     //QProgressDialog(s
     void writeOut(QTcpSocket*, QFile* );
+    void initTimer();
     
 };
 

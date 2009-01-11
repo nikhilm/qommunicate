@@ -140,8 +140,7 @@ void MessageDialog::dropEvent(QDropEvent *evt)
     
     foreach(Member* to, receivers)
     {
-        //fileHandler()->sendFilesRequest(files, to, ui.messageInput->text());
-        qDebug() << "Received drop" ;
-        new FileSendProgressDialog(files, to, ui.messageInput->text());
+        //new FileSendProgressDialog(files, to, ui.messageInput->text());
+        fileUtils()->sendFilesUdpRequest(files, to, ui.messageInput->text());
     }
 }

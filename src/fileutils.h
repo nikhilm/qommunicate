@@ -43,6 +43,8 @@ public:
     //void sendFiles(QStringList);
     //void sendDirectory(QString);
     QStringList formatHeirarchialTcpRequest(const QString&);
+    
+    void sendFilesUdpRequest(QStringList, Member*, QString);
 signals:
     /**
      * Emitted every time a certain number of bytes are transmitted
@@ -50,11 +52,8 @@ signals:
      * int is the bytes written till now
      * int is the total bytes
      */
-    void incomingTcpConnection(int);
-    void updateSend(QString, int, int);
-    void finishedSending(QString);
     void filePath(QString);
-    void notifyUpstreamProgress(int);
+    void newFileSendSocket(QTcpSocket*);
     
 public slots:
     void resolveFilePath(int);
@@ -70,6 +69,7 @@ private:
     
 private slots:
     // void startSendFile();
+    void newConnection();
 };
 
 FileUtils* fileUtils();

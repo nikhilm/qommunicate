@@ -10,6 +10,8 @@
 #include "ipobjects.h"
 #include "messenger.h"
 #include "messagedialog.h"
+#include "fileutils.h"
+#include "transferdialogs.h"
 #include "qommunicate.h"
 
 Qommunicate::Qommunicate(QWidget *parent)
@@ -31,6 +33,9 @@ Qommunicate::Qommunicate(QWidget *parent)
     connect(messenger(), SIGNAL(msg_exit(Message)), this, SLOT(removeMember(Message)));
     connect(messenger(), SIGNAL(msg_recvMsg(Message)), this, SLOT(openDialog(Message)));
     connect(messenger(), SIGNAL(msg_getAbsenceInfo(Message)), this, SLOT(sendAbsenceInfo(Message)));
+    
+    
+    connect(fileUtils(), SIGNAL(newFileSendSocket(QTcpSocket*)), this, SLOT(fileSendRequested(QTcpSocket*)));
 }
 
 void Qommunicate::on_searchEdit_textChanged(const QString &text)
@@ -306,5 +311,11 @@ void Qommunicate::sendAbsenceInfo(Message msg)
     if(payload == tr("Available"))
         payload = "Not absence mode";
     messenger()->multicast(QOM_SENDABSENCEINFO, payload.toAscii());
+}
+
+void Qommunicate::fileSendRequested(QTcpSocket* sock)
+{
+    qDebug() << "\n\nReceived new connection";
+    new FileSendProgressDialog(sock);
 }
         

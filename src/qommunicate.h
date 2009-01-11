@@ -11,6 +11,8 @@
 
 #include "ui_qommunicate.h"
 
+class QTcpSocket;
+
 class Qommunicate : public QMainWindow
 {
     Q_OBJECT
@@ -45,6 +47,8 @@ private slots:
     void openDialog(Message);
     void sendAbsenceInfo(Message);
     void removeMember(Message msg);
+    
+    void fileSendRequested(QTcpSocket*);
 
 private:
     Ui::MainWindow ui;
