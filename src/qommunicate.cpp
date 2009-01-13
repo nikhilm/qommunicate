@@ -324,5 +324,7 @@ void Qommunicate::fileSendRequested(QTcpSocket* sock)
 void Qommunicate::fileRecvRequested(Message msg)
 {
     qDebug() << "\n\nRequest for file receiving";
+    if(msg.command() & QOM_SENDCHECKOPT)
+        messenger()->sendMessage(QOM_RECVMSG, QByteArray::number(msg.packetNo()), msg.sender());
     new RecvFileProgressDialog(msg);
 }
