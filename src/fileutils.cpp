@@ -62,31 +62,39 @@ QStringList FileUtils::formatHeirarchialTcpRequest(const QString& dirName)
     QDir dir(dirName);
     QStringList entries = dir.entryList(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::NoSymLinks);
     entries.prepend(dirName);
-    entries << ".";
     QString fileName;
     foreach(fileName, entries)
     {
-        QStringList formattedData = formatFileData(dir.absoluteFilePath(fileName)).split(':');
-        if(formattedData.isEmpty())
-            continue;
-        if(formattedData.last() == "\a")
-        {
-            formattedData.removeLast(); //remove \a at the end
-            formattedData.append("");
-        }
-        formattedData.removeAt(2); //drop mtime
-        formattedData.prepend(""); // a colon at the front to simplify things
-        if(fileName == ".")
-            formattedData.replace(3, QString::number(QOM_FILE_RETPARENT));
-        QString headerData = formattedData.join(":");
-        int headerSize = headerData.length();
-        headerSize += QString::number(headerSize, 16).length();
-        headers << ( QString::number(headerSize, 16) + headerData ) ;
-        
+        headers << formatFileHeader(dir.absoluteFilePath(fileName)); 
     }
+    
+    headers << formatFileHeader(".");
     return headers;
 }
 
+QString FileUtils::formatFileHeader(const QString& path) 
+{    
+    QFileInfo info(path);
+    
+    QStringList header;
+    header << ""; //get in the colon right after the header size
+    header << info.fileName();
+    header << QString::number((info.isDir() ? 0 : info.size()), 16);
+    
+    int attr = QOM_FILE_REGULAR;
+    if(info.fileName() == ".")
+        attr = QOM_FILE_RETPARENT;
+    else if(info.isDir())
+        attr = QOM_FILE_DIR;
+    
+    header << QString::number(attr, 16);
+    header << ""; //end colon
+    
+    QString headerString = header.join(":");
+    int headerSize = headerString.length();
+    headerSize += QString::number(headerSize, 16).length();
+    return QString::number(headerSize, 16) + headerString ;
+}
 // FileSendThread* FileUtils::startSendFile()
 // {
 //     while(m_server->hasPendingConnections())

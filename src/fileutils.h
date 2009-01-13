@@ -43,6 +43,7 @@ public:
     //void sendFiles(QStringList);
     //void sendDirectory(QString);
     QStringList formatHeirarchialTcpRequest(const QString&);
+    QString formatFileHeader(const QString&);
     
     void sendFilesUdpRequest(QStringList, Member*, QString);
 signals:

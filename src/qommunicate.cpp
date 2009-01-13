@@ -11,7 +11,8 @@
 #include "messenger.h"
 #include "messagedialog.h"
 #include "fileutils.h"
-#include "transferdialogs.h"
+#include "sendfileprogressdialog.h"
+#include "recvfileprogressdialog.h"
 #include "qommunicate.h"
 
 Qommunicate::Qommunicate(QWidget *parent)

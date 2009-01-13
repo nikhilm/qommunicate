@@ -1,4 +1,4 @@
-#include "transferdialogs.h"
+#include "sendfileprogressdialog.h"
 
 #include <QFileInfo>
 #include <QDir>
@@ -32,19 +32,17 @@ void FileSendProgressDialog::accept()
 void FileSendProgressDialog::updateStatus(qint64 bytes)
 {
     //qDebug() << "\n@@ Wrote to socket file?"<<(m_currentFile == NULL ? "NULL":m_currentFile->fileName());
-    if( m_currentFile == NULL || m_currentFile->size() == 0 )
-        return;
-    setRange(0, 100);
-    setLabelText(tr("Sending %1").arg(m_currentFile->fileName()));
+    qDebug() << "bytes written";
     m_totalSent += bytes;
-    m_currentFile->seek(m_totalSent);
-    if(m_totalSent == m_currentFile->size())
+    
+    setValue((float)m_totalSent/m_fileSize * 100.0);
+    
+    if(m_totalSent == m_fileSize)
     {
-        qDebug() << "File" << m_currentFile->fileName() << "sent";
+        qDebug() << "File sent";
         return;
     }
-    //qDebug() <<"Progress:"<<(float)m_totalSent/m_file->size()*100.0<<"%";
-    setValue((float)m_totalSent/m_currentFile->size() * 100.0);
+    
 }
 
 void FileSendProgressDialog::nextFileRequested()
@@ -52,13 +50,6 @@ void FileSendProgressDialog::nextFileRequested()
     qDebug() << "next file requested from" << receiver()->name();
     m_offset = 0;
     m_totalSent = 0;
-    
-    if(m_currentFile != NULL)
-    {
-        m_currentFile->close();
-        delete m_currentFile;
-        m_currentFile = NULL;
-    }
     
     qint64 offset;
     QList<QByteArray> metadata = m_socket->readAll().split(':');
@@ -83,68 +74,92 @@ void FileSendProgressDialog::nextFileRequested()
     }
 }
 
+bool FileSendProgressDialog::writeBlock(QByteArray b)
+{
+    int bytesToWrite = b.size();
+    int bytesWritten = 0;
+    do
+    {
+        bytesWritten = m_socket->write(b);
+        if(bytesWritten == -1)
+            return false;
+        b.remove(0, bytesWritten);
+        bytesToWrite -= bytesWritten;
+    } while(bytesToWrite > 0);
+    return true;
+}
+
 void FileSendProgressDialog::acceptFilePath(QString fileName)
 {
     //qDebug() << " acceptFilePath: preparing to send" << fileName;    
     
     if(QFileInfo(fileName).isDir())
     {
-        qDebug() << "Writing dir data";
-        QDir dir(fileName);
-        QStringList headers = fileUtils()->formatHeirarchialTcpRequest(fileName);
-        
-        // the directory requires special handling, otherwise QFile tries to open
-        // <dirname>/<dirname> which does not exist
-        QString first = headers.takeFirst();
-        qDebug() << first.toAscii();
-        m_socket->write(first.toAscii());
-        foreach(QString header, headers)
-        {
-            QString path = dir.absoluteFilePath(header.section(':', 1, 1));
-            
-            if(header.section(':', 1, 1) == ".")
-            {
-                //qDebug() << header.toAscii() << header.size() << (int)header.toAscii()[8];
-                m_socket->write(header.toAscii());
-            }
-            else if(QFileInfo(path).isDir())
-            {
-                //qDebug() << "\n\n>> Going down one level\n\n";
-                acceptFilePath(path);
-                //qDebug() << "\n\n<< Back up\n\n";
-            }
-            else
-            {
-                m_offset = 0;
-                if(!QFileInfo(path).isReadable())
-                    continue;
-                m_socket->write(header.toAscii());
-                acceptFilePath(path);
-            }
-        }
+        sendDir(fileName);
         return;
     }
     
-    m_currentFile = new QFile(fileName);
-    if(!m_currentFile->open(QIODevice::ReadOnly))
-    {
-        qWarning() << "Could not open file for reading" << m_currentFile->fileName()<<m_currentFile->errorString();
-        return;
-    }
-    m_currentFile->seek(m_offset);
-    m_totalSent = m_offset;
-    writeOut(m_socket, m_currentFile);
+    sendFile(fileName, m_offset);
 }
 
-void FileSendProgressDialog::writeOut(QTcpSocket* sock, QFile* f)
+void FileSendProgressDialog::sendFile(const QString& fileName, int offset)
+{
+    QFile f(fileName);
+    if(!f.open(QIODevice::ReadOnly))
+    {
+        qWarning() << "Could not open file for reading" << f.fileName()<<f.errorString();
+        return;
+    }
+    m_fileSize = f.size();
+    f.seek(offset);
+    m_totalSent = offset;
+    setRange(0, 100);
+    setLabelText(tr("Sending %1").arg(f.fileName()));
+    qDebug() << "Now sending " << f.fileName();
+    writeFile(m_socket, &f);
+}
+
+void FileSendProgressDialog::sendDir(const QString& fileName)
+{
+    qDebug() << "Writing dir data";
+    QDir dir(fileName);
+    QStringList headers = fileUtils()->formatHeirarchialTcpRequest(fileName);
+    
+    // the directory requires special handling, otherwise QFile tries to open
+    // <dirname>/<dirname> which does not exist
+    QString first = headers.takeFirst();
+    qDebug() << first.toAscii();
+    m_socket->write(first.toAscii());
+    foreach(QString header, headers)
+    {
+        QString path = dir.absoluteFilePath(header.section(':', 1, 1));
+        
+        if(header.section(':', 1, 1) == ".")
+        {
+            //qDebug() << header.toAscii() << header.size() << (int)header.toAscii()[8];
+            m_socket->write(header.toAscii());
+            qDebug() << "\n\n<< going back up" ;
+        }
+        else if(QFileInfo(path).isDir())
+        {
+            qDebug() << "\n\n>> Going down one level\n\n";
+            sendDir(path);
+            //qDebug() << "\n\n<< Back up\n\n";
+        }
+        else
+        {
+            m_offset = 0;
+            m_socket->write(header.toAscii());
+            sendFile(path, 0);
+        }
+    }
+}
+
+void FileSendProgressDialog::writeFile(QTcpSocket* sock, QFile* f)
 {
     while(!f->atEnd())
     {
-        QByteArray n = f->read(QOM_FILE_WRITE_SIZE);
-        qint64 written = sock->write(n);
-        while(written < n.size())
-        {
-            written += sock->write(n.right(n.size() - written));
-        }
+        writeBlock(f->read(QOM_FILE_WRITE_SIZE));
     }
+    f->close();
 }

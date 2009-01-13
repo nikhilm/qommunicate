@@ -190,7 +190,10 @@ void Messenger::receiveData()
                 break;
                 
             case QOM_SENDMSG:
-                emit msg_recvMsg(msg);
+                if(msg.command() & QOM_FILEATTACHOPT)
+                    emit msg_fileRecvRequest(msg);
+                else
+                    emit msg_recvMsg(msg);
                 break;
                 
             case QOM_RECVMSG:

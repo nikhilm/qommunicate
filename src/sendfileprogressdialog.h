@@ -1,5 +1,5 @@
-#ifndef QOM_TRANSFERDIALOGS
-#define QOM_TRANSFERDIALOGS
+#ifndef QOM_SEND_FILE_DIALOG
+#define QOM_SEND_FILE_DIALOG
 
 #include <QProgressDialog>
 #include <QTcpSocket>
@@ -16,9 +16,9 @@ public:
         QProgressDialog("", tr("&Cancel"), 0, 100, parent)
     {
         setAttribute(Qt::WA_DeleteOnClose);
+        setMinimumDuration(1000);
         setRange(0, 0);
         
-        m_currentFile = NULL;
         m_socket = sock;
         m_to = receiver();
         
@@ -29,19 +29,11 @@ public:
     ~FileSendProgressDialog()
     {
         qDebug() << "Destroying dialog";
-//         if(m_socket != NULL)
-//         {
-//             m_socket->close();
-//             delete m_socket;
-//             m_socket = NULL;
-//         }
-//         qDebug() << "Deleted socket";
-        if(m_currentFile != NULL)
+        if(m_socket != NULL)
         {
-            m_currentFile->close();
-            delete m_currentFile;
-            m_currentFile = NULL;
+            m_socket->close();
         }
+        qDebug() << "Deleted socket";
     };
     
 signals:
@@ -61,12 +53,15 @@ private:
     Member* m_to;
     QTcpSocket* m_socket;
     
-    QFile* m_currentFile;
+    int m_fileSize;
     int m_offset;
     int m_totalSent;
     
     void initialise();
-    void writeOut(QTcpSocket*, QFile*);
+    bool writeBlock(QByteArray);
+    void writeFile(QTcpSocket*, QFile*);
+    void sendFile(const QString&, int);
+    void sendDir(const QString&);
     
     Member* receiver()
     {
