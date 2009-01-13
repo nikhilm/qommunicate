@@ -27,7 +27,7 @@ public:
         
         m_socket = NULL;
         
-        informUser();
+        startReceiving();
     }
     
     ~RecvFileProgressDialog()
@@ -40,6 +40,7 @@ private slots:
     void error(QAbstractSocket::SocketState);
     void requestFiles();
     void informUser();
+    void readRequest();
     
 private:
     Message m_msg;

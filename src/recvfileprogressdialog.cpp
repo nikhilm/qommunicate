@@ -21,9 +21,10 @@ QList<RecvFileInfo> RecvFileProgressDialog::parsePayloadFileList(QByteArray payl
             continue;
         info.fileID = tokens[0].toInt();
         info.fileName = tokens[1];
-        info.size = tokens[2].toInt();
-        info.mtime = tokens[3].toInt();
-        info.type = tokens[4].toInt();
+        info.size = tokens[2].toInt(0, 16);
+        info.mtime = tokens[3].toInt(0, 16);
+        info.type = tokens[4].toInt(0, 16);
+        qDebug() << "Parsed ID:"<<info.fileID<<"name:"<<info.fileName<<"size:"<<info.size<<"mtime"<<info.mtime<<"type:"<<info.type;
         
         //NOTE: additional tokens can be parsed here if required
         
@@ -46,10 +47,10 @@ void RecvFileProgressDialog::startReceiving()
     m_socket->connectToHost(m_msg.sender()->addressString(), UDP_PORT);
     
     connect(m_socket, SIGNAL(readyRead()), this, SLOT(readRequest()));
-    connect(m_socket, SIGNAL(connected()), this, SLOT(requestFiles()));
+    connect(m_socket, SIGNAL(connected()), this, SLOT(informUser()));
     connect(m_socket, SIGNAL(disconnected()), this, SLOT(accept()));
     connect(m_socket, SIGNAL(disconnected()), m_socket, SLOT(deleteLater()));
-    connect(m_socket, SIGNAL(error(QAbstractSocket::SocketState)), this, SLOT(error(QAbstractSocket::SocketState)));
+    connect(m_socket, SIGNAL(socketError(QAbstractSocket::SocketState)), this, SLOT(error(QAbstractSocket::SocketState)));
 }
 
 void RecvFileProgressDialog::requestFiles()
@@ -59,7 +60,14 @@ void RecvFileProgressDialog::requestFiles()
         m_requestType = info.type;
         //TODO: fix offset call
         if(m_requestType == QOM_FILE_REGULAR)
-            writeBlock(QByteArray::number(m_msg.packetNo()).append(':').append(info.fileName).append(":0"));
+        {
+            QByteArray payload = QByteArray::number(m_msg.packetNo(), 16);
+            payload += ":";
+            payload += QByteArray::number(info.fileID, 16);
+            payload += ":0";
+            writeBlock(messenger()->makeMessage(QOM_GETFILEDATA, payload).toAscii());
+            break;
+        }
     }
 }
 
@@ -87,7 +95,9 @@ void RecvFileProgressDialog::informUser()
         reject();
     else
         m_saveDir = QFileDialog::getExistingDirectory(this, tr("Save To"));
-    qDebug() << "Base save dir" << m_saveDir;
+    
+    if(!m_saveDir.isEmpty())
+        requestFiles();
 }
 
 // TODO: share with sending dialog?
@@ -104,4 +114,10 @@ bool RecvFileProgressDialog::writeBlock(QByteArray b)
         bytesToWrite -= bytesWritten;
     } while(bytesToWrite > 0);
     return true;
+}
+
+void RecvFileProgressDialog::readRequest()
+{
+    while(m_socket->bytesAvailable())
+        qDebug() << m_socket->read(1024);
 }

@@ -48,6 +48,7 @@ public:
         socket = NULL;        
     };
     
+    Message makeMessage(quint32, QByteArray);
     bool sendMessage(Message, Member*);
     bool sendMessage(quint32, QByteArray, Member*);
     
@@ -78,7 +79,6 @@ private:
     
     QStringList ips() const; // used for login and logout
     
-    Message makeMessage(quint32, QByteArray);
     
 private slots:
     void receiveData();
