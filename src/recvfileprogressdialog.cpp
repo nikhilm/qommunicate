@@ -11,10 +11,6 @@
  */
 QList<RecvFileInfo> RecvFileProgressDialog::parsePayloadFileList(QByteArray payload)
 {
-    // discard the message part, it's not for us to handle.
-    if(payload.contains('\0'))
-        payload = payload.split('\0')[1];
-    
     QList<RecvFileInfo> recvFiles;
     QList<QByteArray> headers = payload.split(QOM_FILELIST_SEPARATOR);
     foreach(QByteArray header, headers)
@@ -77,13 +73,12 @@ void RecvFileProgressDialog::informUser()
         message.append(info.fileName);
         message.append("\n");
     }
-    if(m_msg.payload().contains('\0'))
-    {
-        QString msg = m_msg.payload().split('\0')[0];
-        if(!msg.isEmpty())
-            message.append("Message: " + msg);
-    }
-    message.append(tr("\nDo you want to accept the files?"));
+    
+    QString msg = m_msg.payload().left(m_msg.payload().indexOf("\a"));
+    if(!msg.isEmpty())
+        message.append("\n\nMessage: " + msg);
+    
+    message.append(tr("\n\nDo you want to accept the files?"));
     if(QMessageBox::No == QMessageBox::question(NULL, 
                            tr("Receiving files"), 
                            message, 
