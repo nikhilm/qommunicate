@@ -49,6 +49,7 @@ private slots:
     void removeMember(Message msg);
     
     void fileSendRequested(QTcpSocket*);
+    void fileRecvRequested(Message);
 
 private:
     Ui::MainWindow ui;

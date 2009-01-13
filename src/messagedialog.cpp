@@ -3,7 +3,7 @@
 #include "qommunicate.h"
 #include "messenger.h"
 #include "constants.h"
-#include "transferdialogs.h"
+#include "sendfileprogressdialog.h"
 
 MessageDialog::MessageDialog(Member* receiver, QWidget *parent) : QDialog(parent)
 {

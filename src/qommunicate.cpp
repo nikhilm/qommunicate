@@ -33,6 +33,7 @@ Qommunicate::Qommunicate(QWidget *parent)
     connect(messenger(), SIGNAL(msg_entry(Message)), this, SLOT(addMemberAndAnswer(Message)));
     connect(messenger(), SIGNAL(msg_exit(Message)), this, SLOT(removeMember(Message)));
     connect(messenger(), SIGNAL(msg_recvMsg(Message)), this, SLOT(openDialog(Message)));
+    connect(messenger(), SIGNAL(msg_fileRecvRequest(Message)), this, SLOT(fileRecvRequested(Message)));
     connect(messenger(), SIGNAL(msg_getAbsenceInfo(Message)), this, SLOT(sendAbsenceInfo(Message)));
     
     
@@ -319,4 +320,9 @@ void Qommunicate::fileSendRequested(QTcpSocket* sock)
     qDebug() << "\n\nReceived new connection";
     new FileSendProgressDialog(sock);
 }
-        
+
+void Qommunicate::fileRecvRequested(Message msg)
+{
+    qDebug() << "\n\nRequest for file receiving";
+    new RecvFileProgressDialog(msg);
+}
