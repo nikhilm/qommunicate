@@ -6,6 +6,8 @@
 
 #include "messenger.h"
 
+class QFile;
+
 struct RecvFileInfo
 {
     QString fileName;
@@ -27,7 +29,11 @@ public:
         
         m_socket = NULL;
         
-        startReceiving();
+        m_fileHeaders = parsePayloadFileList(m_msg.payload());
+        m_waitingForData = 0;
+        informUser();
+        requestFiles();
+        //startReceiving();
     }
     
     ~RecvFileProgressDialog()
@@ -37,7 +43,7 @@ public:
     }
     
 private slots:
-    void error(QAbstractSocket::SocketState);
+    void error(QAbstractSocket::SocketError);
     void requestFiles();
     void informUser();
     void readRequest();
@@ -46,11 +52,18 @@ private:
     Message m_msg;
     QTcpSocket* m_socket;
     int m_requestType;
+    //NOTE: this is decremented as data is read, when it reaches 0, the next file request can be sent
+    int m_waitingForData;
     QString m_saveDir;
+    QFile* m_currentFile;
+    
+    QList<RecvFileInfo> m_fileHeaders;
     
     QList<RecvFileInfo> parsePayloadFileList(QByteArray);
     void startReceiving();
     bool writeBlock(QByteArray);
+    bool writeToFile(QByteArray&);
+    bool openFile(const QString&);
 };
 
 #endif

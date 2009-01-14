@@ -3,6 +3,7 @@
 #include <QStringList>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QTimer>
 
 #include "constants.h"
 
@@ -17,6 +18,7 @@ QList<RecvFileInfo> RecvFileProgressDialog::parsePayloadFileList(QByteArray payl
     {
         RecvFileInfo info;
         QList<QByteArray> tokens = header.split(':');
+        qDebug() << "Tokens:" << tokens;
         if(tokens.size() < 5)
             continue;
         info.fileID = tokens[0].toInt();
@@ -30,11 +32,10 @@ QList<RecvFileInfo> RecvFileProgressDialog::parsePayloadFileList(QByteArray payl
         
         recvFiles << info ;
     }
-    
     return recvFiles;
 }
 
-void RecvFileProgressDialog::error(QAbstractSocket::SocketState e)
+void RecvFileProgressDialog::error(QAbstractSocket::SocketError e)
 {
     qDebug() << "Socket error:" << e << m_socket->errorString();
     reject();
@@ -47,26 +48,39 @@ void RecvFileProgressDialog::startReceiving()
     m_socket->connectToHost(m_msg.sender()->addressString(), UDP_PORT);
     
     connect(m_socket, SIGNAL(readyRead()), this, SLOT(readRequest()));
-    connect(m_socket, SIGNAL(connected()), this, SLOT(informUser()));
+    connect(m_socket, SIGNAL(connected()), this, SLOT(requestFiles()));
     connect(m_socket, SIGNAL(disconnected()), this, SLOT(accept()));
     connect(m_socket, SIGNAL(disconnected()), m_socket, SLOT(deleteLater()));
-    connect(m_socket, SIGNAL(socketError(QAbstractSocket::SocketState)), this, SLOT(error(QAbstractSocket::SocketState)));
+    connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(error(QAbstractSocket::SocketError)));
 }
 
 void RecvFileProgressDialog::requestFiles()
 {
-    foreach(RecvFileInfo info, parsePayloadFileList(m_msg.payload()))
+    while(!m_fileHeaders.isEmpty())
     {
+        if(m_waitingForData > 0)
+        {
+            qDebug() << "Waiting for"<< m_waitingForData;
+            QTimer::singleShot(1000, this, SLOT(requestFiles()));
+            break;
+        }
+        startReceiving();
+        RecvFileInfo info = m_fileHeaders.takeFirst();
         m_requestType = info.type;
+        
+        QByteArray payload = QByteArray::number(m_msg.packetNo(), 16);
+        payload += ":";
+        payload += QByteArray::number(info.fileID, 16);
+        qDebug() << "Writing request for file data"<<info.fileName << "id" << info.fileID;
+        
         //TODO: fix offset call
         if(m_requestType == QOM_FILE_REGULAR)
         {
-            QByteArray payload = QByteArray::number(m_msg.packetNo(), 16);
-            payload += ":";
-            payload += QByteArray::number(info.fileID, 16);
+            m_waitingForData = info.size;
+            if(!openFile(m_saveDir + QDir::separator() + info.fileName))
+                continue;
             payload += ":0";
             writeBlock(messenger()->makeMessage(QOM_GETFILEDATA, payload).toAscii());
-            break;
         }
     }
 }
@@ -76,7 +90,7 @@ void RecvFileProgressDialog::informUser()
     QString message(m_msg.sender()->name());
     message.append(tr(" has sent the following files\n"));
     
-    foreach(RecvFileInfo info, parsePayloadFileList(m_msg.payload()))
+    foreach(RecvFileInfo info, m_fileHeaders)
     {
         message.append(info.fileName);
         message.append("\n");
@@ -97,7 +111,9 @@ void RecvFileProgressDialog::informUser()
         m_saveDir = QFileDialog::getExistingDirectory(this, tr("Save To"));
     
     if(!m_saveDir.isEmpty())
-        requestFiles();
+    {
+        qDebug() << m_saveDir;
+    }
 }
 
 // TODO: share with sending dialog?
@@ -107,6 +123,7 @@ bool RecvFileProgressDialog::writeBlock(QByteArray b)
     int bytesWritten = 0;
     do
     {
+        qDebug() << "Writing" << b << "to socket";
         bytesWritten = m_socket->write(b);
         if(bytesWritten == -1)
             return false;
@@ -118,6 +135,63 @@ bool RecvFileProgressDialog::writeBlock(QByteArray b)
 
 void RecvFileProgressDialog::readRequest()
 {
+    QByteArray data;
     while(m_socket->bytesAvailable())
-        qDebug() << m_socket->read(1024);
+    {
+        data += m_socket->read(1024);
+        //qDebug() << "Reading";
+    }
+    //qDebug() << "In read request: " << m_requestType;
+    if(m_requestType == QOM_FILE_REGULAR)
+        writeToFile(data);
+}
+
+bool RecvFileProgressDialog::openFile(const QString& fileName)
+{    
+    m_currentFile = new QFile(fileName);
+    if(m_currentFile->exists())
+    {
+        if(QMessageBox::No == QMessageBox::question(this, tr("Replace file"), tr("File %1 exists, overwrite?").arg(fileName),
+                               QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes))
+        {
+            m_waitingForData = 0;
+            return false;
+        }
+    }
+    if(!m_currentFile->open(QIODevice::Truncate | QIODevice::WriteOnly))
+    {
+        qWarning() << "Cannot open" << fileName << "for writing";
+        m_currentFile->close();
+        m_waitingForData = 0;
+        return false;
+    }
+    qDebug() << fileName << "Opened with truncate";
+    return true;
+}
+
+bool RecvFileProgressDialog::writeToFile(QByteArray& b)
+{
+    if(m_currentFile == NULL)
+        return false;
+    while(b.size() > 0)
+    {
+        int written = m_currentFile->write(b);
+        //qDebug() << "Wrote" << written << "bytes to" << m_currentFile->fileName();
+        if(written == -1)
+        {
+            qWarning() << "Write error" << m_currentFile->errorString();
+            m_currentFile->close();
+            return false;
+        }
+        m_waitingForData -= written;
+        b.remove(0, written);
+    }
+    if(m_waitingForData <= 0)
+    {
+        qDebug() << "Finished writing" << m_currentFile->fileName();
+        qDebug() << "Files left" << m_fileHeaders.size();
+        m_currentFile->close();
+        m_requestType = 0;
+    }
+    return true;
 }
