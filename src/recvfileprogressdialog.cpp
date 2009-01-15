@@ -73,14 +73,22 @@ void RecvFileProgressDialog::requestFiles()
         payload += QByteArray::number(info.fileID, 16);
         qDebug() << "Writing request for file data"<<info.fileName << "id" << info.fileID;
         
+        QString path = m_saveDir + QDir::separator() + info.fileName;
+        
         //TODO: fix offset call
         if(m_requestType == QOM_FILE_REGULAR)
         {
+            m_currentSize = info.size;
             m_waitingForData = info.size;
-            if(!openFile(m_saveDir + QDir::separator() + info.fileName))
+            if(!openFile(path))
                 continue;
+            setLabelText(path);
             payload += ":0";
             writeBlock(messenger()->makeMessage(QOM_GETFILEDATA, payload).toAscii());
+        }
+        else if(m_requestType == QOM_FILE_DIR)
+        {
+            writeBlock(messenger()->makeMessage(QOM_GETDIRFILES, payload).toAscii());
         }
     }
 }
@@ -88,12 +96,41 @@ void RecvFileProgressDialog::requestFiles()
 void RecvFileProgressDialog::informUser()
 {
     QString message(m_msg.sender()->name());
-    message.append(tr(" has sent the following files\n"));
+    message.append(tr(" has sent the following files\n\n"));
+    
+    qint64 totalSize = 0;
     
     foreach(RecvFileInfo info, m_fileHeaders)
     {
         message.append(info.fileName);
-        message.append("\n");
+        message.append(" (");
+        if(info.type == QOM_FILE_REGULAR)
+        {
+            message.append(QString::number(info.size));
+            totalSize += info.size;
+            message.append(" bytes)\n");
+        }
+        else if(info.type == QOM_FILE_DIR)
+        {
+            message.append(" (Directory, unknown size)");
+        }
+    }
+    
+    message.append(tr("\nTotal Size: "));
+    if(totalSize > 1024*1024)
+    {
+        message.append(QString::number(totalSize / (1024*1024) ));
+        message.append("Mb");
+    }
+    else if( totalSize > 1024 )
+    {
+        message.append(QString::number(totalSize / 1024));
+        message.append("Kb");
+    }
+    else
+    {
+        message.append(QString::number(totalSize));
+        message.append("bytes");
     }
     
     QString msg = m_msg.payload().left(m_msg.payload().indexOf("\a"));
@@ -144,6 +181,8 @@ void RecvFileProgressDialog::readRequest()
     //qDebug() << "In read request: " << m_requestType;
     if(m_requestType == QOM_FILE_REGULAR)
         writeToFile(data);
+    else if(m_requestType == QOM_FILE_DIR)
+        writeToDirectory(data);
 }
 
 bool RecvFileProgressDialog::openFile(const QString& fileName)
@@ -186,12 +225,126 @@ bool RecvFileProgressDialog::writeToFile(QByteArray& b)
         m_waitingForData -= written;
         b.remove(0, written);
     }
+    setValue((float)(m_currentSize-m_waitingForData)/m_currentSize * 100.0);
     if(m_waitingForData <= 0)
     {
         qDebug() << "Finished writing" << m_currentFile->fileName();
-        qDebug() << "Files left" << m_fileHeaders.size();
         m_currentFile->close();
         m_requestType = 0;
     }
     return true;
+}
+
+bool RecvFileProgressDialog::makeDirectory(const QString& path)
+{
+    qDebug() << "makeDirectory" << path;
+    if(m_dir != NULL)
+    {
+        delete m_dir;
+        m_dir = NULL;
+    }
+    m_dir = new QDir(path);
+    if(!m_dir->exists() && !m_dir->mkdir(path))
+    {
+        // TODO: convert to QMessageBox
+        qWarning() << "Could not create directory" << m_dir->absolutePath() ;
+        return false;
+    }
+    return true;
+}
+
+bool RecvFileProgressDialog::writeToDirectory(QByteArray& b)
+{
+    //qDebug() << "Write to directory recvd" << b;
+    if(m_inHeader)
+    {
+        m_header += b;
+        qDebug() << "m_header"<<m_header;
+        QByteArray leftover;
+        RecvFileInfo info = parseDirectoryHeader(m_header, &leftover);
+        if(info.fileID < 0)
+        {
+            qDebug() << "Could not parse headers";
+            m_inHeader = false;
+            return false;
+        }
+        if(info.type == QOM_FILE_REGULAR)
+        {
+            qDebug() << "Creating file" << info.fileName;
+            if(!openFile(m_dir->absoluteFilePath(info.fileName)))
+                return false;
+            if(!writeToFile(leftover))
+                return false;
+            m_inHeader = false;
+        }
+        else if(info.type == QOM_FILE_DIR)
+        {
+            qDebug() << "Writing dir" << info.fileName;
+            if(!makeDirectory(m_dir->absoluteFilePath(info.fileName)))
+                return false;
+            m_header.clear();
+        }
+        else if(info.type == QOM_FILE_RETPARENT)
+        {
+            qDebug() << "Going up";
+            m_dir->cdUp();
+        }
+        m_header = leftover;
+    }
+    
+    if(!m_inHeader)
+    {
+        qDebug() << "Writing to file";
+        writeToFile(b);
+        if(m_waitingForData == 0)
+        {
+            m_inHeader = true;
+        }
+    }
+    return true;
+}
+
+/**
+ * Tries to parse a header if it can
+ * if it can, fills in RecvFileInfo correctly
+ * Otherwise sets RecvFileInfo.fileID to -1, other fields are kept default
+ * If any data is left over after parsing header, it is stored in remainder.
+ */
+RecvFileInfo RecvFileProgressDialog::parseDirectoryHeader(const QByteArray& a, QByteArray* remainder)
+{
+    bool bad = false;
+    RecvFileInfo ret;
+    
+    if(a.contains(":"))
+    {
+        QList<QByteArray> tokens = a.split(':');
+        int headerSize = tokens[0].toInt(0, 16);
+        qDebug() << "Header size:"<<headerSize;
+        if(a.size() < (headerSize-tokens[0].size()))
+        {
+            qDebug() << "not enough data";
+            bad = true;
+        }
+        else
+        {
+            ret.fileName = tokens[1];
+            ret.size = tokens[2].toInt(0, 16);
+            ret.type = tokens[3].toInt(0, 16);
+            
+            qDebug() << "Parsed" << ret.fileName << ret.size << ret.type;
+            
+            *remainder = a.right(a.size() - headerSize);
+            qDebug() << "leftovers" << *remainder;
+            qDebug() << "\n";
+        }
+    }
+    else
+        bad = true;
+    
+    if(bad)
+    {
+        ret.fileID = -1;
+    }
+    
+    return ret;
 }

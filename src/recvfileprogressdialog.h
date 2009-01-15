@@ -3,6 +3,7 @@
 
 #include <QProgressDialog>
 #include <QTcpSocket>
+#include <QDir>
 
 #include "messenger.h"
 
@@ -28,9 +29,12 @@ public:
         setAttribute(Qt::WA_DeleteOnClose);
         
         m_socket = NULL;
+        m_dir = NULL;
         
         m_fileHeaders = parsePayloadFileList(m_msg.payload());
         m_waitingForData = 0;
+        m_inHeader = true;
+        
         informUser();
         requestFiles();
         //startReceiving();
@@ -52,10 +56,22 @@ private:
     Message m_msg;
     QTcpSocket* m_socket;
     int m_requestType;
+    QString m_saveDir;
+    
+    /*
+     * Used for file writing
+     */
     //NOTE: this is decremented as data is read, when it reaches 0, the next file request can be sent
     int m_waitingForData;
-    QString m_saveDir;
+    int m_currentSize;
     QFile* m_currentFile;
+    
+    /*
+     * Used for directories
+     */
+    bool m_inHeader;
+    QDir* m_dir;
+    QByteArray m_header;
     
     QList<RecvFileInfo> m_fileHeaders;
     
@@ -64,6 +80,9 @@ private:
     bool writeBlock(QByteArray);
     bool writeToFile(QByteArray&);
     bool openFile(const QString&);
+    bool makeDirectory(const QString&);
+    bool writeToDirectory(QByteArray&);
+    RecvFileInfo parseDirectoryHeader(const QByteArray&, QByteArray*);
 };
 
 #endif
