@@ -292,7 +292,7 @@ void Qommunicate::openDialog(Message msg)
     QSettings s;
     if(s.value(tr("no_receive")).toBool())
     {
-        qWarning() << "Ignoring message" << msg.payload() << "from" << msg.sender()->name();
+        trayIcon->showMessage(tr("Ignored message"), tr("%1 ignored").arg(msg.sender()->name()));
         if(msg.command() & QOM_SENDCHECKOPT)
             messenger()->sendMessage(QOM_RECVMSG, QByteArray::number(msg.packetNo()), msg.sender());
         return;
