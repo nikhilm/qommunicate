@@ -27,8 +27,10 @@ public:
         QProgressDialog("", tr("&Cancel"), 0, 100, parent), m_msg(msg)
     {
         setAttribute(Qt::WA_DeleteOnClose);
+        setMinimumDuration(1000);
         
         m_socket = NULL;
+        m_currentFile = NULL;
         m_dir = NULL;
         
         m_fileHeaders = parsePayloadFileList(m_msg.payload());
@@ -44,6 +46,7 @@ public:
     {
         if(m_socket != NULL)
             m_socket->close();
+        qDebug() << "RecvFileProgressDialog destroyed";
     }
     
 private slots:
@@ -78,7 +81,7 @@ private:
     QList<RecvFileInfo> parsePayloadFileList(QByteArray);
     void startReceiving();
     bool writeBlock(QByteArray);
-    bool writeToFile(QByteArray&);
+    bool writeToFile(QByteArray&, QByteArray* remainder=NULL);
     bool openFile(const QString&);
     bool makeDirectory(const QString&);
     bool writeToDirectory(QByteArray&);
