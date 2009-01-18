@@ -49,6 +49,9 @@ public:
         qDebug() << "RecvFileProgressDialog destroyed";
     }
     
+public slots:
+    void accept();
+    
 private slots:
     void error(QAbstractSocket::SocketError);
     void requestFiles();
@@ -86,6 +89,8 @@ private:
     bool makeDirectory(const QString&);
     bool writeToDirectory(QByteArray&);
     RecvFileInfo parseDirectoryHeader(const QByteArray&, QByteArray*);
+    void requestWriteToFile();
+    void requestWriteToDirectory();
 };
 
 #endif

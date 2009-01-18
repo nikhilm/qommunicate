@@ -12,7 +12,6 @@
  */
 QList<RecvFileInfo> RecvFileProgressDialog::parsePayloadFileList(QByteArray payload)
 {
-    qDebug() << ":: parsePayload called";
     QList<RecvFileInfo> recvFiles;
     QList<QByteArray> headers = payload.split(QOM_FILELIST_SEPARATOR);
     foreach(QByteArray header, headers)
@@ -33,7 +32,6 @@ QList<RecvFileInfo> RecvFileProgressDialog::parsePayloadFileList(QByteArray payl
         
         recvFiles << info ;
     }
-    qDebug() << ":: parsePayload returning";
     return recvFiles;
 }
 
@@ -41,6 +39,12 @@ void RecvFileProgressDialog::error(QAbstractSocket::SocketError e)
 {
     qDebug() << "Socket error:" << e << m_socket->errorString();
     reject();
+}
+
+void RecvFileProgressDialog::accept()
+{
+    qDebug() << "$$$$$ Socket disconnected";
+    QProgressDialog::accept();
 }
 
 void RecvFileProgressDialog::startReceiving()
@@ -58,10 +62,8 @@ void RecvFileProgressDialog::startReceiving()
 
 void RecvFileProgressDialog::requestFiles()
 {
-    qDebug() << ":: requestFiles begun";
     while(!m_fileHeaders.isEmpty())
     {
-        qDebug() << "%% in m_fileHeaders loop";
         if(m_waitingForData > 0)
         {
             qDebug() << "Waiting for"<< m_waitingForData;
@@ -94,14 +96,11 @@ void RecvFileProgressDialog::requestFiles()
         {
             writeBlock(messenger()->makeMessage(QOM_GETDIRFILES, payload).toAscii());
         }
-        qDebug() << "@@@@Files left" << m_fileHeaders.size();;
     }
-    qDebug() << "=============== Done receiving =================";
 }
 
 void RecvFileProgressDialog::informUser()
 {
-    qDebug() << ":: informUser begun";
     QString message(m_msg.sender()->name());
     message.append(tr(" has sent the following files\n\n"));
     
@@ -119,7 +118,7 @@ void RecvFileProgressDialog::informUser()
         }
         else if(info.type == QOM_FILE_DIR)
         {
-            message.append(" (Directory, unknown size)");
+            message.append(" (Directory, unknown size)\n");
         }
     }
     
@@ -158,7 +157,6 @@ void RecvFileProgressDialog::informUser()
     {
         qDebug() << m_saveDir;
     }
-    qDebug() << ":: informUser End";
 }
 
 // TODO: share with sending dialog?
@@ -178,26 +176,104 @@ bool RecvFileProgressDialog::writeBlock(QByteArray b)
     return true;
 }
 
+/**
+* Instead of actually reading the data
+* it notifies seperate functions depending
+* on what we are reading, which read as required
+*/
 void RecvFileProgressDialog::readRequest()
 {
-    QByteArray data;
+//     QByteArray data;
+//     while(m_socket->bytesAvailable())
+//     {
+//         data += m_socket->read(1024);
+//         //qDebug() << "Reading";
+//     }
+//     qDebug() << ":: readRequest data size" << data.size();
+//     qDebug() << data << "\n\n";
+    if(m_requestType == QOM_FILE_REGULAR)
+        requestWriteToFile();
+    else if(m_requestType == QOM_FILE_DIR)
+        requestWriteToDirectory();
+}
+
+void RecvFileProgressDialog::requestWriteToFile()
+{
+    QByteArray data = m_socket->readAll();
+    writeToFile(data);
+}
+
+/**
+ * Attempts to read headers individually
+ * and then read the file as required
+ */
+void RecvFileProgressDialog::requestWriteToDirectory()
+{
+    qDebug() << "requestWriteToDirectory called";
     while(m_socket->bytesAvailable())
     {
-        qDebug() << "^^ in read loop";
-        data += m_socket->read(1024);
-        //qDebug() << "Reading";
+        if(m_inHeader)
+        {
+            m_header += m_socket->read(1);
+            //qDebug() << m_header;
+            QByteArray drop; // TODO: ideally not required
+            RecvFileInfo info = parseDirectoryHeader(m_header, &drop);
+            
+            if(info.fileID >= 0)
+            {
+                qDebug() << "# Header parsed successfully";
+                // we got a valid header, process it
+                m_inHeader = false;
+                m_header.clear();
+                
+                if(info.type == QOM_FILE_REGULAR)
+                {
+                    qDebug() << "Now writing new file" << info.fileName;
+                    if(!openFile(m_dir->absoluteFilePath(info.fileName)))
+                        return ;
+                    m_waitingForData = info.size;
+                    m_currentSize = info.size;
+                }
+                else if(info.type == QOM_FILE_DIR)
+                {
+                    qDebug() << "Creating directory" << info.fileName;
+                    bool made = false;
+                    if(m_dir == NULL)
+                        made = makeDirectory(m_saveDir + QDir::separator() + info.fileName);
+                    else
+                        made = makeDirectory(m_dir->absoluteFilePath(info.fileName));
+                    if(!made)
+                        return;
+                    m_inHeader = true;
+                    continue;
+                }
+                else if(info.type == QOM_FILE_RETPARENT)
+                {
+                    qDebug() << "Going up";
+                    m_dir->cdUp();
+                    if(m_dir->absolutePath() == m_saveDir)
+                        accept();
+                    m_inHeader = true;
+                    continue;
+                }
+            }
+        }
+        // write to file whatever we get
+        if(!m_inHeader)
+        {            
+            QByteArray fileData = m_socket->read(m_waitingForData);
+            writeToFile(fileData);
+            if(m_waitingForData == 0)
+            {
+                m_inHeader = true;
+            }
+        }
     }
-    //qDebug() << ":: readRequest data size" << data.size() << m_requestType;
-    if(m_requestType == QOM_FILE_REGULAR)
-        writeToFile(data);
-    else if(m_requestType == QOM_FILE_DIR)
-        writeToDirectory(data);
-    qDebug() << "Returning from readRequest";
+                    
 }
 
 bool RecvFileProgressDialog::openFile(const QString& fileName)
-{   
-    qDebug() << ":: openFile begun";
+{
     m_currentFile = new QFile(fileName);
     if(m_currentFile->exists())
     {
@@ -224,12 +300,10 @@ bool RecvFileProgressDialog::openFile(const QString& fileName)
  */
 bool RecvFileProgressDialog::writeToFile(QByteArray& b, QByteArray* remainder)
 {
-    qDebug() << ":: writeToFile begun";
     if(m_currentFile == NULL)
         return false;
     while(b.size() > 0)
     {
-        qDebug() << "(( in b.size loop";
         if(m_waitingForData < b.size())
         {
             qDebug() << "Excess data, setting remainder";
@@ -257,7 +331,6 @@ bool RecvFileProgressDialog::writeToFile(QByteArray& b, QByteArray* remainder)
         qDebug() << "Finished writing" << m_currentFile->fileName();
         m_currentFile->close();
     }
-    qDebug() << ":: writeToFile done";
     return true;
 }
 
@@ -285,6 +358,11 @@ bool RecvFileProgressDialog::writeToDirectory(QByteArray& b)
     //qDebug() << "At the beginning of writeToDirectory" << m_header;
     QByteArray leftover;
     RecvFileInfo info = parseDirectoryHeader(m_header, &leftover);
+    if(m_waitingForData != 0 && m_header.isEmpty())
+    {
+        qDebug() << "Need to flush";
+        exit(5);
+    }
     
     //info is filled, only leftover is valuable
     if(info.fileID >= 0)
@@ -347,7 +425,7 @@ bool RecvFileProgressDialog::writeToDirectory(QByteArray& b)
         qDebug() << "> In file";
         QByteArray leftover;
         writeToFile(m_header, &leftover);
-        qDebug() << "line 337:" << m_waitingForData << m_header;
+        qDebug() << "line 337:" << m_waitingForData ;
         if(m_waitingForData == 0)
         {
             m_header = leftover;
@@ -378,12 +456,12 @@ RecvFileInfo RecvFileProgressDialog::parseDirectoryHeader(const QByteArray& a, Q
     {
         QList<QByteArray> tokens = a.split(':');
         int headerSize = tokens[0].toInt(0, 16);
-        qDebug() << "Header size:"<<headerSize;
+        //qDebug() << "Header size:"<<headerSize;
         if( headerSize == 0 ) //bad data, perhaps binary
             bad = true;
-        else if(a.size() < (headerSize-tokens[0].size()) || tokens.size() < 4)
+        else if(a.size() < headerSize || tokens.size() < 4)
         {
-            qDebug() << "not enough data";
+            //qDebug() << "not enough data" << tokens << "expected" << tokens[0].size();
             bad = true;
         }
         else
