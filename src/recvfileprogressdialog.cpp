@@ -209,7 +209,6 @@ void RecvFileProgressDialog::requestWriteToFile()
  */
 void RecvFileProgressDialog::requestWriteToDirectory()
 {
-    qDebug() << "requestWriteToDirectory called";
     while(m_socket->bytesAvailable())
     {
         if(m_inHeader)
