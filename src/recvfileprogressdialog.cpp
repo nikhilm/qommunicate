@@ -88,7 +88,6 @@ void RecvFileProgressDialog::requestFiles()
             m_waitingForData = info.size;
             if(!openFile(path))
                 continue;
-            setLabelText(path);
             payload += ":0";
             writeBlock(messenger()->makeMessage(QOM_GETFILEDATA, payload).toAscii());
         }
@@ -118,7 +117,7 @@ void RecvFileProgressDialog::informUser()
         }
         else if(info.type == QOM_FILE_DIR)
         {
-            message.append(" (Directory, unknown size)\n");
+            message.append("Directory, unknown size)\n");
         }
     }
     
@@ -221,6 +220,7 @@ void RecvFileProgressDialog::requestWriteToDirectory()
             if(info.fileID >= 0)
             {
                 qDebug() << "# Header parsed successfully";
+                qDebug() << info.fileName << info.size << info.type;
                 // we got a valid header, process it
                 m_inHeader = false;
                 m_header.clear();
@@ -254,6 +254,11 @@ void RecvFileProgressDialog::requestWriteToDirectory()
                         accept();
                     m_inHeader = true;
                     continue;
+                }
+                else
+                {
+                    QMessageBox::critical(this, tr("Receive failed"), tr("Bad header! Could not understand file type %1").arg(info.type));
+                    reject();
                 }
             }
         }
@@ -324,6 +329,8 @@ bool RecvFileProgressDialog::writeToFile(QByteArray& b, QByteArray* remainder)
         qDebug() << "Wrote" << written << "bytes" << "Left" << m_waitingForData;
         b.remove(0, written);
     }
+    
+    setLabelText(tr("Receiving %1").arg(m_currentFile->fileName()));
     setValue((float)(m_currentSize-m_waitingForData)/m_currentSize * 100.0);
     if(m_waitingForData <= 0)
     {
@@ -465,17 +472,13 @@ RecvFileInfo RecvFileProgressDialog::parseDirectoryHeader(const QByteArray& a, Q
         }
         else
         {
-            qDebug() << "Header list" << tokens;
+            //qDebug() << "Header list" << tokens;
             ret.fileID = 0;
             ret.fileName = tokens[1];
-            ret.size = tokens[2].toInt(0, 16);
+            ret.size = tokens[2].toLongLong(0, 16);
             ret.type = tokens[3].toInt(0, 16);
             
-            qDebug() << "Parsed" << ret.fileName << ret.size << ret.type;
-            
             *remainder = a.right(a.size() - headerSize);
-            qDebug() << "leftovers" << *remainder;
-            qDebug() << "\n";
         }
     }
     else

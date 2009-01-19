@@ -27,7 +27,7 @@ public:
         QProgressDialog("", tr("&Cancel"), 0, 100, parent), m_msg(msg)
     {
         setAttribute(Qt::WA_DeleteOnClose);
-        setMinimumDuration(1000);
+        setMinimumDuration(0);
         
         m_socket = NULL;
         m_currentFile = NULL;
