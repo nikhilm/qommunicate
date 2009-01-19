@@ -23,7 +23,7 @@ QList<RecvFileInfo> RecvFileProgressDialog::parsePayloadFileList(QByteArray payl
             continue;
         info.fileID = tokens[0].toInt();
         info.fileName = tokens[1];
-        info.size = tokens[2].toInt(0, 16);
+        info.size = tokens[2].toLongLong(0, 16);
         info.mtime = tokens[3].toInt(0, 16);
         info.type = tokens[4].toInt(0, 16);
         qDebug() << "Parsed ID:"<<info.fileID<<"name:"<<info.fileName<<"size:"<<info.size<<"mtime"<<info.mtime<<"type:"<<info.type;
