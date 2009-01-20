@@ -38,7 +38,7 @@ public:
         m_inHeader = true;
         
         informUser();
-        requestFiles();
+        startReceiving();
         //startReceiving();
     }
     

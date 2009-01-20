@@ -49,31 +49,31 @@ void RecvFileProgressDialog::accept()
 
 void RecvFileProgressDialog::startReceiving()
 {
+    if(m_socket != NULL)
+    {
+        m_socket->close();
+        delete m_socket;
+        m_socket = NULL;
+    }
     m_socket = new QTcpSocket(this);
     m_socket->abort();
     m_socket->connectToHost(m_msg.sender()->addressString(), UDP_PORT);
     
     connect(m_socket, SIGNAL(readyRead()), this, SLOT(readRequest()));
     connect(m_socket, SIGNAL(connected()), this, SLOT(requestFiles()));
-    connect(m_socket, SIGNAL(disconnected()), this, SLOT(accept()));
+    //connect(m_socket, SIGNAL(disconnected()), this, SLOT(accept()));
     connect(m_socket, SIGNAL(disconnected()), m_socket, SLOT(deleteLater()));
     connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(error(QAbstractSocket::SocketError)));
 }
 
 void RecvFileProgressDialog::requestFiles()
 {
-    while(!m_fileHeaders.isEmpty())
+    if(!m_fileHeaders.isEmpty())
     {
-        if(m_waitingForData > 0)
-        {
-            qDebug() << "Waiting for"<< m_waitingForData;
-            QTimer::singleShot(1000, this, SLOT(requestFiles()));
-            break;
-        }
-        startReceiving();
         RecvFileInfo info = m_fileHeaders.takeFirst();
         m_requestType = info.type;
         
+        qDebug() << "startReceiving for " << info.fileName;
         QByteArray payload = QByteArray::number(m_msg.packetNo(), 16);
         payload += ":";
         payload += QByteArray::number(info.fileID, 16);
@@ -87,7 +87,7 @@ void RecvFileProgressDialog::requestFiles()
             m_currentSize = info.size;
             m_waitingForData = info.size;
             if(!openFile(path))
-                continue;
+                return;
             payload += ":0";
             writeBlock(messenger()->makeMessage(QOM_GETFILEDATA, payload).toAscii());
         }
@@ -95,6 +95,10 @@ void RecvFileProgressDialog::requestFiles()
         {
             writeBlock(messenger()->makeMessage(QOM_GETDIRFILES, payload).toAscii());
         }
+    }
+    else
+    {
+        accept();
     }
 }
 
@@ -188,7 +192,7 @@ void RecvFileProgressDialog::readRequest()
 //         data += m_socket->read(1024);
 //         //qDebug() << "Reading";
 //     }
-//     qDebug() << ":: readRequest data size" << data.size();
+    qDebug() << ":: readRequest";
 //     qDebug() << data << "\n\n";
     if(m_requestType == QOM_FILE_REGULAR)
         requestWriteToFile();
@@ -200,6 +204,10 @@ void RecvFileProgressDialog::requestWriteToFile()
 {
     QByteArray data = m_socket->readAll();
     writeToFile(data);
+    if(m_waitingForData == 0)
+    {
+        startReceiving();
+    }
 }
 
 /**
@@ -251,7 +259,10 @@ void RecvFileProgressDialog::requestWriteToDirectory()
                     qDebug() << "Going up";
                     m_dir->cdUp();
                     if(m_dir->absolutePath() == m_saveDir)
-                        accept();
+                    {
+                        startReceiving();
+                        //accept();
+                    }
                     m_inHeader = true;
                     continue;
                 }
@@ -334,7 +345,7 @@ bool RecvFileProgressDialog::writeToFile(QByteArray& b, QByteArray* remainder)
     setValue((float)(m_currentSize-m_waitingForData)/m_currentSize * 100.0);
     if(m_waitingForData <= 0)
     {
-        qDebug() << "Finished writing" << m_currentFile->fileName();
+        //qDebug() << "Finished writing" << m_currentFile->fileName();
         m_currentFile->close();
     }
     return true;
