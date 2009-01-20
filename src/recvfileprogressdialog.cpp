@@ -6,6 +6,7 @@
 #include <QTimer>
 
 #include "constants.h"
+#include "memberutils.h"
 
 /**
  * Returns a list of requested files
@@ -39,12 +40,6 @@ void RecvFileProgressDialog::error(QAbstractSocket::SocketError e)
 {
     qDebug() << "Socket error:" << e << m_socket->errorString();
     reject();
-}
-
-void RecvFileProgressDialog::accept()
-{
-    qDebug() << "$$$$$ Socket disconnected";
-    QProgressDialog::accept();
 }
 
 void RecvFileProgressDialog::startReceiving()
@@ -98,6 +93,7 @@ void RecvFileProgressDialog::requestFiles()
     }
     else
     {
+        emit allDownloadsDone(tr("Successfully received files from %1").arg(MemberUtils::get("members_list", m_msg.sender()->addressString())->name()));
         accept();
     }
 }
@@ -206,6 +202,7 @@ void RecvFileProgressDialog::requestWriteToFile()
     writeToFile(data);
     if(m_waitingForData == 0)
     {
+        emit downloadDone(tr("%1 downloaded").arg(m_currentFile->fileName()));
         startReceiving();
     }
 }

@@ -50,6 +50,7 @@ private slots:
     
     void fileSendRequested(QTcpSocket*);
     void fileRecvRequested(Message);
+    void fileRecvDone(QString);
 
 private:
     Ui::MainWindow ui;

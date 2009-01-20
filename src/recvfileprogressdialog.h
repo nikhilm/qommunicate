@@ -49,8 +49,9 @@ public:
         qDebug() << "RecvFileProgressDialog destroyed";
     }
     
-public slots:
-    void accept();
+signals:
+    void downloadDone(QString);
+    void allDownloadsDone(QString);
     
 private slots:
     void error(QAbstractSocket::SocketError);

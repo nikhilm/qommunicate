@@ -326,5 +326,12 @@ void Qommunicate::fileRecvRequested(Message msg)
     qDebug() << "\n\nRequest for file receiving";
     if(msg.command() & QOM_SENDCHECKOPT)
         messenger()->sendMessage(QOM_RECVMSG, QByteArray::number(msg.packetNo()), msg.sender());
-    new RecvFileProgressDialog(msg);
+    RecvFileProgressDialog* dlg = new RecvFileProgressDialog(msg);
+    connect(dlg, SIGNAL(downloadDone(QString)), this, SLOT(fileRecvDone(QString)));
+    connect(dlg, SIGNAL(allDownloadsDone(QString)), this, SLOT(fileRecvDone(QString)));    
+}
+
+void Qommunicate::fileRecvDone(QString message)
+{
+    trayIcon->showMessage(tr("Download done"), message);
 }
