@@ -1,0 +1,32 @@
+Qommunicate
+===========
+
+Qommunicate is an IP messenger ( http://www.ipmsg.org ) clone which is cross platform and features
+a more modern and intuitive user interface.
+
+* Installation
+==============
+
+1) From source on UNIX systems
+   Install the Qt development package ( http://www.trolltech.com ) for your respective platform.
+   Then download the Qommunicate source package and extract it to a suitable location. Execute the following commands:
+
+    $ cd /path/to/qommunicate
+    $ cd src
+    $ qmake
+    $ make
+    $ su -c 'make install'
+    $ ./qommunicate
+
+   If the build fails at any step, please send any of the AUTHORS an email. Qommunicate is not yet widely tested,
+   but should work without a hitch on most systems.
+
+2) From source on Windows
+   Install the Qt Open Source version ( http://www.trolltech.com ). Then run the Qt development console.
+   This will start a command prompt setup for compilation. Now perform the exact steps in (1) except for the
+   make install part.
+
+* Licensing
+===========
+
+Qommunicate is Open Source software under the GNU General Public License. See LICENSE for details.
