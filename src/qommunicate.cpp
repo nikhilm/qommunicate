@@ -182,7 +182,7 @@ void Qommunicate::on_statusCombo_currentIndexChanged(const QString& text)
 
 void Qommunicate::keyPressEvent(QKeyEvent *event)
 {
-    if(event->key() == Qt::Key_Return) {
+    if(event->key() == Qt::Key_Return && ui.memberTree->hasFocus()) {
         event->accept();
         on_memberTree_doubleClicked(QModelIndex());
         return;
