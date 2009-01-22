@@ -15,11 +15,13 @@ class MemberModel : public QStandardItemModel
 public:
     MemberModel(QObject *);
     Qt::ItemFlags flags(const QModelIndex&) const;
+    QStringList mimeTypes() const ;
+    Qt::DropActions supportedDropActions() const;
     
     bool dropMimeData(const QMimeData*, Qt::DropAction, int, int, const QModelIndex&);
     
 private slots:
-    void updateGroupCount(QStandardItem *);
+    void updateGroupCount(const QModelIndex&);
     
 private:
     

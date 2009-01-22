@@ -8,13 +8,28 @@
 
 
 MemberModel::MemberModel(QObject *parent=0) : QStandardItemModel(parent) {
+    connect(this, SIGNAL(rowsInserted(const QModelIndex &, int, int)), this, SLOT(updateGroupCount(const QModelIndex&)));
+    connect(this, SIGNAL(rowsRemoved(const QModelIndex &, int, int)), this, SLOT(updateGroupCount(const QModelIndex&)));
 }
 
 MemberFilter::MemberFilter(QObject *parent=0) : QSortFilterProxyModel(parent) {}
 
 Qt::ItemFlags MemberModel::flags(const QModelIndex& index) const
 {
-    return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDropEnabled ;
+    if(index.isValid())
+        return Qt::ItemIsDropEnabled | Qt::ItemIsEnabled;
+    return Qt::ItemIsDropEnabled ;
+}
+
+QStringList MemberModel::mimeTypes() const
+{
+    qDebug() << "CAlled";
+    return QStringList("*/*");
+}
+
+Qt::DropActions MemberModel::supportedDropActions() const
+{
+    return Qt::CopyAction | Qt::MoveAction ;
 }
 
 void MemberModel::setGroupCount(QStandardItem* group)
@@ -22,23 +37,23 @@ void MemberModel::setGroupCount(QStandardItem* group)
     group->setData(tr("Members: %1").arg(group->rowCount()), Qt::ToolTipRole);
 }
 
-void MemberModel::updateGroupCount(QStandardItem *item)
+void MemberModel::updateGroupCount(const QModelIndex& parent)
 {
-    if(item->parent())
-    {
-        setGroupCount(item->parent());
-    }
+    if(parent.isValid() && itemFromIndex(parent)->type() == TYPE_GROUP)
+        setGroupCount(itemFromIndex(parent));
 }
 
 bool MemberModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent)
 {
+    qDebug() << "Drop recd";
     QStringList files;
     foreach(QUrl url, data->urls())
     {
         files << url.toLocalFile();
     }
     
-    //fileUtils()->SendFilesRequest(files, (Member*)itemFromIndex(parent.child(row, column)), "");
+    fileUtils()->sendFilesUdpRequest(files, (Member*)itemFromIndex(parent.child(row, column)), "");
+    return true;
 }
 
 bool MemberFilter::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
