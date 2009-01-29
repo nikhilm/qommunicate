@@ -22,6 +22,9 @@ Qommunicate::Qommunicate(QWidget *parent)
         
     createTrayIcon();
     
+    memberCountLabel.setText("0");
+    statusBar()->addPermanentWidget(&memberCountLabel);
+    
     MemberUtils::init();
     populateTree();    
     firstRun();
@@ -246,6 +249,8 @@ void Qommunicate::addMember(Message msg)
     }
     
     MemberUtils::insert("members_list", msg.sender());
+    memberCountLabel.setText(QString::number(memberCountLabel.text().toInt() + 1));
+    statusBar()->showMessage(tr("%1 came online").arg(msg.sender()->name()), 2000);
     ui.memberTree->expandAll();
 }
 
@@ -281,6 +286,8 @@ void Qommunicate::removeMember(Message msg)
         }        
     }
     MemberUtils::remove("members_list", msg.sender()->addressString());
+    memberCountLabel.setText(QString::number(memberCountLabel.text().toInt() + 1));
+    statusBar()->showMessage(tr("%1 went offline").arg(msg.sender()->name()), 2000);
 }
 
 void Qommunicate::openDialog(Message msg)

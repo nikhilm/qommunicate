@@ -56,6 +56,7 @@ private:
     Ui::MainWindow ui;
     
     QSystemTrayIcon *trayIcon;
+    QLabel memberCountLabel;
     
     MemberModel *model;
     MemberFilter *filterModel;
