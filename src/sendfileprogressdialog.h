@@ -4,6 +4,7 @@
 #include <QProgressDialog>
 #include <QTcpSocket>
 #include <QFile>
+#include <QQueue>
 
 #include "fileutils.h"
 #include "memberutils.h"
@@ -21,6 +22,8 @@ public:
         
         m_socket = sock;
         m_to = receiver();
+        m_totalSent = m_fileSize = 0;
+        m_writingData = false;
         
         initialise();
         exec();
@@ -41,7 +44,6 @@ signals:
     
 public slots:
     void accept();
-    void acceptFilePath(QString);
     
 private slots:
     void error(QAbstractSocket::SocketError);
@@ -53,15 +55,18 @@ private:
     Member* m_to;
     QTcpSocket* m_socket;
     
+    bool m_writingData;
+    QList<FileInfo> m_fileList;
+    
     int m_fileSize;
-    int m_offset;
     int m_totalSent;
     
     void initialise();
     bool writeBlock(QByteArray);
     void writeFile(QTcpSocket*, QFile*);
-    void sendFile(const QString&, int);
-    void sendDir(const QString&);
+    void sendFile(const FileInfo&);
+    void sendDir(const FileInfo&);
+    FileInfo parseIncomingFileRequest(const QByteArray&);
     
     Member* receiver()
     {

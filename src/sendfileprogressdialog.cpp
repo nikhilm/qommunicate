@@ -7,11 +7,11 @@ void FileSendProgressDialog::initialise()
 {
     connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(error(QAbstractSocket::SocketError)));
     connect(m_socket, SIGNAL(bytesWritten(qint64)), this, SLOT(updateStatus(qint64)));
+    //connect(m_socket, SIGNAL(connected()), this, SLOT(sendFiles()));
     connect(m_socket, SIGNAL(readyRead()), this, SLOT(nextFileRequested()));
     connect(m_socket, SIGNAL(disconnected()), this, SLOT(accept()));
     connect(m_socket, SIGNAL(disconnected()), m_socket, SLOT(deleteLater()));
-    connect(this, SIGNAL(requestFilePath(int)), fileUtils(), SLOT(resolveFilePath(int)));
-    connect(fileUtils(), SIGNAL(filePath(QString)), this, SLOT(acceptFilePath(QString)));
+    connect(this, SIGNAL(attemptSend()), this, SLOT(sendFiles()));
 }
 
 void FileSendProgressDialog::error(QAbstractSocket::SocketError e)
@@ -31,128 +31,121 @@ void FileSendProgressDialog::accept()
 
 void FileSendProgressDialog::updateStatus(qint64 bytes)
 {
-    //qDebug() << "\n@@ Wrote to socket file?"<<(m_currentFile == NULL ? "NULL":m_currentFile->fileName());
-    qDebug() << "bytes written";
     m_totalSent += bytes;
-    
-    setValue((float)m_totalSent/m_fileSize * 100.0);
-    
-    if(m_totalSent == m_fileSize)
+    setValue( (m_totalSent * 100.0)/ m_fileSize );
+    if(m_totalSent == m_fileSize);
     {
-        qDebug() << "File sent";
-        return;
+        // we can now start a new transfer
+        m_writingData = false;
+        nextFileRequested();
     }
+}
+
+/*
+ * FileInfo.type = -1 if there was an error parsing the header
+ */
+FileInfo FileSendProgressDialog::parseIncomingFileRequest(const QByteArray& b)
+{
+    FileInfo info;
     
+    QList<QByteArray> tokens = b.split(':');
+    if(tokens.size() < 8)
+    {
+        qDebug() << "Bad header" << b;
+        info.type = -1;
+    }
+    else
+    {
+        int command = tokens[4].toInt();
+        info.fileID = tokens[6].toInt(0, 16);
+        
+        // for now we just store the file name, later we'll resolve the path
+        info.fileName = QFileInfo(fileUtils()->resolveFilePath(info.fileID)).fileName();
+        
+        if(command == QOM_GETDIRFILES)
+            info.type = QOM_FILE_DIR;
+        else if(command == QOM_GETFILEDATA)
+        {
+            info.type = QOM_FILE_REGULAR;
+            info.offset = tokens[7].toInt();
+        }
+    }
+    return info;
 }
 
 void FileSendProgressDialog::nextFileRequested()
 {
-    qDebug() << "next file requested from" << receiver()->name();
-    m_offset = 0;
-    m_totalSent = 0;
-    
-    qint64 offset;
-    QList<QByteArray> metadata = m_socket->readAll().split(':');
-    qDebug() << "Meta data recd" << metadata;
-    // this 8 thing is because the last token in metadata is blank
-    if(metadata.size() < 8)
+    if(m_socket->bytesAvailable())
     {
-        qWarning() << "Error: Bad request from receiver" ;
-        return;
+        FileInfo next = parseIncomingFileRequest(m_socket->readAll());
+        if(next.fileID != -1)
+            m_fileList << next;
     }
     
-    int command = metadata[4].toInt();
-    switch(command)
+    if(!m_fileList.empty())
+    {   
+        if(m_writingData)
+            return;
+        
+        FileInfo first = m_fileList.takeFirst();
+        qDebug() << first.fileName << first.type;
+        if(first.type == QOM_FILE_REGULAR)
+            sendFile(first);
+        else if(first.type == QOM_FILE_DIR)
+            sendDir(first);
+        else if(first.type == QOM_FILE_RETPARENT)
+        {
+            qDebug() << fileUtils()->formatFileHeader(first).toAscii();
+            writeBlock(fileUtils()->formatFileHeader(first).toAscii());
+        }
+    }
+    else
     {
-        case QOM_GETFILEDATA:
-            m_offset = ( metadata[7].isEmpty() ? 0 : metadata[7].toInt() );
-            // NOTE: The fallthrough is important here
-            
-        case QOM_GETDIRFILES:
-            emit requestFilePath(metadata[6].toInt());            
-            break;
+        qDebug() << "We're done sending";
+        accept();
     }
 }
 
-bool FileSendProgressDialog::writeBlock(QByteArray b)
+void FileSendProgressDialog::sendFile(const FileInfo& info)
 {
-    int bytesToWrite = b.size();
-    int bytesWritten = 0;
-    do
-    {
-        bytesWritten = m_socket->write(b);
-        if(bytesWritten == -1)
-            return false;
-        b.remove(0, bytesWritten);
-        bytesToWrite -= bytesWritten;
-    } while(bytesToWrite > 0);
-    return true;
-}
-
-void FileSendProgressDialog::acceptFilePath(QString fileName)
-{
-    //qDebug() << " acceptFilePath: preparing to send" << fileName;    
-    
-    if(QFileInfo(fileName).isDir())
-    {
-        sendDir(fileName);
-        return;
-    }
-    
-    sendFile(fileName, m_offset);
-}
-
-void FileSendProgressDialog::sendFile(const QString& fileName, int offset)
-{
-    QFile f(fileName);
+    QFile f( info.fileID == -1 ? info.fileName : fileUtils()->resolveFilePath(info.fileID) );
     if(!f.open(QIODevice::ReadOnly))
     {
         qWarning() << "Could not open file for reading" << f.fileName()<<f.errorString();
         return;
     }
     m_fileSize = f.size();
-    f.seek(offset);
-    m_totalSent = offset;
+    f.seek(info.offset);
     setRange(0, 100);
     setLabelText(tr("Sending %1").arg(f.fileName()));
-    qDebug() << "Now sending " << f.fileName();
+    
+    // we do the whole splitting thing, since when sending the header
+    // we don't want the whole path
+    FileInfo copy = info;
+    if(info.fileID == -1)
+        copy.fileName = info.fileName.split(QDir::separator()).last();
+    
+    qDebug() << fileUtils()->formatFileHeader(copy).toAscii();
+    writeBlock(fileUtils()->formatFileHeader(copy).toAscii());
+    m_writingData = true;
     writeFile(m_socket, &f);
 }
 
-void FileSendProgressDialog::sendDir(const QString& fileName)
+void FileSendProgressDialog::sendDir(const FileInfo& info)
 {
-    qDebug() << "Writing dir data";
-    QDir dir(fileName);
-    QStringList headers = fileUtils()->formatHeirarchialTcpRequest(fileName);
+    QList<FileInfo> headers = fileUtils()->directoryInfoList(
+                            info.fileID == -1 ? info.fileName : fileUtils()->resolveFilePath(info.fileID));
+    qDebug() << fileUtils()->formatFileHeader(headers.takeFirst()).toAscii();
     
-    // the directory requires special handling, otherwise QFile tries to open
-    // <dirname>/<dirname> which does not exist
-    QString first = headers.takeFirst();
-    qDebug() << first.toAscii();
-    m_socket->write(first.toAscii());
-    foreach(QString header, headers)
-    {
-        QString path = dir.absoluteFilePath(header.section(':', 1, 1));
-        
-        if(header.section(':', 1, 1) == ".")
-        {
-            //qDebug() << header.toAscii() << header.size() << (int)header.toAscii()[8];
-            m_socket->write(header.toAscii());
-            qDebug() << "\n\n<< going back up" ;
-        }
-        else if(QFileInfo(path).isDir())
-        {
-            qDebug() << "\n\n>> Going down one level\n\n";
-            sendDir(path);
-            //qDebug() << "\n\n<< Back up\n\n";
-        }
-        else
-        {
-            m_offset = 0;
-            m_socket->write(header.toAscii());
-            sendFile(path, 0);
-        }
-    }
+    FileInfo copy = info;
+    if(info.fileID == -1)
+        copy.fileName = info.fileName.split(QDir::separator()).last();
+    writeBlock(fileUtils()->formatFileHeader(copy).toAscii());
+    
+    // this swap is to prepend the new sub directory entries
+    // so that they follow the directory name
+    headers += m_fileList;
+    m_fileList = headers;
 }
 
 void FileSendProgressDialog::writeFile(QTcpSocket* sock, QFile* f)
@@ -163,3 +156,137 @@ void FileSendProgressDialog::writeFile(QTcpSocket* sock, QFile* f)
     }
     f->close();
 }
+
+bool FileSendProgressDialog::writeBlock(QByteArray b)
+{
+    //qDebug() << "Trying to write: " << b ;
+    int bytesToWrite = b.size();
+    int bytesWritten = 0;
+    do
+    {
+        bytesWritten = m_socket->write(b);
+        //qDebug() << "writeBlock: wrote = " << bytesWritten;
+        if(bytesWritten == -1)
+            return false;
+        b.remove(0, bytesWritten);
+        bytesToWrite -= bytesWritten;
+    } while(bytesToWrite > 0);
+    return true;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/************* FORGET THIS ***************/
+// void FileSendProgressDialog::updateStatus(qint64 bytes)
+// {
+//     //qDebug() << "\n@@ Wrote to socket file?"<<(m_currentFile == NULL ? "NULL":m_currentFile->fileName());
+//     qDebug() << "bytes written";
+//     m_totalSent += bytes;
+//     
+//     setValue((float)m_totalSent/m_fileSize * 100.0);
+//     
+//     if(m_totalSent == m_fileSize)
+//     {
+//         qDebug() << "File sent";
+//         m_writingData = false;
+//         return;
+//     }
+//     
+// }
+// 
+// void FileSendProgressDialog::nextFileRequested()
+// {
+//     qDebug() << "next file requested from" << receiver()->name();
+//     
+//     qint64 offset;
+//     QList<QByteArray> metadata = m_socket->readAll().split(':');
+//     qDebug() << "Meta data recd" << metadata;
+//     // this 8 thing is because the last token in metadata is blank
+//     if(metadata.size() < 8)
+//     {
+//         qWarning() << "Error: Bad request from receiver" ;
+//         return;
+//     }
+//     
+//     int command = metadata[4].toInt();
+//     switch(command)
+//     {
+//         case QOM_GETFILEDATA:
+//             m_fileInfo.offset = ( metadata[7].isEmpty() ? 0 : metadata[7].toInt() );
+//             // NOTE: The fallthrough is important here
+//             
+//         case QOM_GETDIRFILES:
+//             //emit requestFilePath(metadata[6].toInt());
+//             m_fileInfo.fileID = metadata[6];
+//             m_fileInfo.fileName = fileUtils()->resolveFilePath(m_fileInfo.fileID);
+//             QFileInfo info(m_fileInfo.fileName);
+//             m_fileInfo.size = info.size();
+//             m_fileInfo.type = info.isDir() ? QOM_FILE_DIR : QOM_FILE_REGULAR ;
+//             break;
+//     }
+//     
+//     if(m_fileInfo.type == QOM_FILE_DIR)
+//         initSendDir();
+//     else
+//         sendFile();
+// }
+// 
+
+// 
+// 
+// void FileSendProgressDialog::initSendDir()
+// {
+//     QDir dir(m_fileInfo.fileName);
+//     m_headers = fileUtils()->formatHeirarchialTcpRequest(m_fileInfo.fileName);
+//     
+//     // the directory requires special handling, otherwise QFile tries to open
+//     // <dirname>/<dirname> which does not exist
+//     m_socket->write(m_headers.takeFirst().toAscii());
+//     sendDir();
+// }
+// 
+// void FileSendProgressDialog::sendDir()
+// {
+//     if(!m_headers.empty())
+//     {
+//         QByteArray header = m_headers.takeFirst().toAscii();
+//         QString path = dir.absoluteFilePath(header.section(':', 1, 1));
+//         
+//         if(header.section(':', 1, 1) == ".")
+//         {
+//             //qDebug() << header.toAscii() << header.size() << (int)header.toAscii()[8];
+//             m_socket->write(header.toAscii());
+//             //qDebug() << "\n\n<< going back up" ;
+//         }
+//         else if(QFileInfo(path).isDir())
+//         {
+//             //qDebug() << "\n\n>> Going down one level\n\n";
+//             sendDir(path);
+//             //qDebug() << "\n\n<< Back up\n\n";
+//         }
+//         else
+//         {
+//             m_offset = 0;
+//             qDebug() << header.toAscii();
+//             m_socket->write(header.toAscii());
+//             sendFile(path, 0);
+//         }
+//     }
+// }
+// 
