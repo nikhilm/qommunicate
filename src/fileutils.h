@@ -7,6 +7,17 @@
 #include "messenger.h"
 #include "ipobjects.h"
 
+struct FileInfo
+{
+    QString fileName;
+    int fileID;
+    qint64 size;
+    uint mtime;
+    qint64 offset;
+    QHash<QString,QString> xattrs;
+    int type;
+};
+
 class FileTcpServer : public QTcpServer
 {
     Q_OBJECT
@@ -42,8 +53,8 @@ public:
     // TCP
     //void sendFiles(QStringList);
     //void sendDirectory(QString);
-    QStringList formatHeirarchialTcpRequest(const QString&);
-    QString formatFileHeader(const QString&);
+    QList<FileInfo> directoryInfoList(const QString&);
+    QString formatFileHeader(const FileInfo&);
     
     void sendFilesUdpRequest(QStringList, Member*, QString);
 signals:
@@ -57,7 +68,7 @@ signals:
     void newFileSendSocket(QTcpSocket*);
     
 public slots:
-    void resolveFilePath(int);
+    QString resolveFilePath(int);
     
 private:
     int m_id;

@@ -56,38 +56,48 @@ Returns header-size:filename:file-size:fileattr[:extend-attr=val1
     [,val2...][:extend-attr2=...]]: for each file.
     Caller should tack on content-data
 */
-QStringList FileUtils::formatHeirarchialTcpRequest(const QString& dirName)
+
+QList<FileInfo> FileUtils::directoryInfoList(const QString& dirName)
 {
-    QStringList headers;
+    QList<FileInfo> headers;
     QDir dir(dirName);
+    
     QStringList entries = dir.entryList(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::NoSymLinks);
     entries.prepend(dirName);
-    QString fileName;
-    foreach(fileName, entries)
+    
+    foreach(QString entry, entries)
     {
-        headers << formatFileHeader(dir.absoluteFilePath(fileName)); 
+        FileInfo header;
+        QFileInfo info(dir.filePath(entry));
+        header.fileID = -1; // we didn't receive this over the wire
+        header.fileName = dir.filePath(entry);
+        header.size = info.isDir() ? 0 : info.size();
+        header.type = info.isDir() ? QOM_FILE_DIR : QOM_FILE_REGULAR ;
+        header.mtime = info.lastModified().toTime_t();
+        headers << header;
     }
     
-    headers << formatFileHeader(".");
+    //fix the directory's path which is doubled. eg articles becomes articles/articles
+    headers[0].fileName = headers[0].fileName.split(QDir::separator()).last();
+    
+    FileInfo ret;
+    ret.fileName = ".";
+    ret.size = 0;
+    ret.type = QOM_FILE_RETPARENT;
+    
+    headers << ret;
+    
     return headers;
 }
 
-QString FileUtils::formatFileHeader(const QString& path) 
+QString FileUtils::formatFileHeader(const FileInfo& info)
 {    
-    QFileInfo info(path);
-    
     QStringList header;
     header << ""; //get in the colon right after the header size
-    header << info.fileName();
-    header << QString::number((info.isDir() ? 0 : info.size()), 16);
+    header << info.fileName;
+    header << QString::number(info.size, 16);
     
-    int attr = QOM_FILE_REGULAR;
-    if(info.fileName() == ".")
-        attr = QOM_FILE_RETPARENT;
-    else if(info.isDir())
-        attr = QOM_FILE_DIR;
-    
-    header << QString::number(attr, 16);
+    header << QString::number(info.type, 16);
     header << ""; //end colon
     
     QString headerString = header.join(":");
@@ -109,10 +119,10 @@ QString FileUtils::formatFileHeader(const QString& path)
 //     }
 // }
 
-void FileUtils::resolveFilePath(int id)
+QString FileUtils::resolveFilePath(int id)
 {
     qDebug() << "resolveFilePath: requested"<<id<<"which is"<<m_fileIdHash[id];
-    emit filePath(m_fileIdHash[id]);
+    return m_fileIdHash[id];
 }
 
 void FileUtils::sendFilesUdpRequest(QStringList files, Member* to, QString msg="")
