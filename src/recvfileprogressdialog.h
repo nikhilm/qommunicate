@@ -6,18 +6,9 @@
 #include <QDir>
 
 #include "messenger.h"
+#include "fileutils.h"
 
 class QFile;
-
-struct RecvFileInfo
-{
-    QString fileName;
-    int fileID;
-    qint64 size;
-    uint mtime;
-    QHash<QString,QString> xattrs;
-    int type;
-};
 
 class RecvFileProgressDialog : public QProgressDialog
 {
@@ -80,16 +71,16 @@ private:
     QDir* m_dir;
     QByteArray m_header;
     
-    QList<RecvFileInfo> m_fileHeaders;
+    QList<FileInfo> m_fileHeaders;
     
-    QList<RecvFileInfo> parsePayloadFileList(QByteArray);
+    QList<FileInfo> parsePayloadFileList(QByteArray);
     void startReceiving();
     bool writeBlock(QByteArray);
     bool writeToFile(QByteArray&, QByteArray* remainder=NULL);
     bool openFile(const QString&);
     bool makeDirectory(const QString&);
     bool writeToDirectory(QByteArray&);
-    RecvFileInfo parseDirectoryHeader(const QByteArray&, QByteArray*);
+    FileInfo parseDirectoryHeader(const QByteArray&, QByteArray*);
     void requestWriteToFile();
     void requestWriteToDirectory();
 };

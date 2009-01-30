@@ -11,13 +11,13 @@
 /**
  * Returns a list of requested files
  */
-QList<RecvFileInfo> RecvFileProgressDialog::parsePayloadFileList(QByteArray payload)
+QList<FileInfo> RecvFileProgressDialog::parsePayloadFileList(QByteArray payload)
 {
-    QList<RecvFileInfo> recvFiles;
+    QList<FileInfo> recvFiles;
     QList<QByteArray> headers = payload.split(QOM_FILELIST_SEPARATOR);
     foreach(QByteArray header, headers)
     {
-        RecvFileInfo info;
+        FileInfo info;
         QList<QByteArray> tokens = header.split(':');
         qDebug() << "Tokens:" << tokens;
         if(tokens.size() < 5)
@@ -65,7 +65,7 @@ void RecvFileProgressDialog::requestFiles()
 {
     if(!m_fileHeaders.isEmpty())
     {
-        RecvFileInfo info = m_fileHeaders.takeFirst();
+        FileInfo info = m_fileHeaders.takeFirst();
         m_requestType = info.type;
         
         qDebug() << "startReceiving for " << info.fileName;
@@ -105,7 +105,7 @@ void RecvFileProgressDialog::informUser()
     
     qint64 totalSize = 0;
     
-    foreach(RecvFileInfo info, m_fileHeaders)
+    foreach(FileInfo info, m_fileHeaders)
     {
         message.append(info.fileName);
         message.append(" (");
@@ -220,7 +220,7 @@ void RecvFileProgressDialog::requestWriteToDirectory()
             m_header += m_socket->read(1);
             //qDebug() << m_header;
             QByteArray drop; // TODO: ideally not required
-            RecvFileInfo info = parseDirectoryHeader(m_header, &drop);
+            FileInfo info = parseDirectoryHeader(m_header, &drop);
             
             if(info.fileID >= 0)
             {
@@ -371,7 +371,7 @@ bool RecvFileProgressDialog::writeToDirectory(QByteArray& b)
     m_header += b;
     //qDebug() << "At the beginning of writeToDirectory" << m_header;
     QByteArray leftover;
-    RecvFileInfo info = parseDirectoryHeader(m_header, &leftover);
+    FileInfo info = parseDirectoryHeader(m_header, &leftover);
     if(m_waitingForData != 0 && m_header.isEmpty())
     {
         qDebug() << "Need to flush";
@@ -457,14 +457,14 @@ bool RecvFileProgressDialog::writeToDirectory(QByteArray& b)
 
 /**
  * Tries to parse a header if it can
- * if it can, fills in RecvFileInfo correctly
- * Otherwise sets RecvFileInfo.fileID to -1, other fields are kept default
+ * if it can, fills in FileInfo correctly
+ * Otherwise sets FileInfo.fileID to -1, other fields are kept default
  * If any data is left over after parsing header, it is stored in remainder.
  */
-RecvFileInfo RecvFileProgressDialog::parseDirectoryHeader(const QByteArray& a, QByteArray* remainder)
+FileInfo RecvFileProgressDialog::parseDirectoryHeader(const QByteArray& a, QByteArray* remainder)
 {
     bool bad = false;
-    RecvFileInfo ret;
+    FileInfo ret;
     
     if(a.contains(":"))
     {
