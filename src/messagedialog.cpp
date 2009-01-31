@@ -38,16 +38,10 @@ MessageDialog::MessageDialog(QWidget *parent) : QDialog(parent)
     setWindowTitle(tr("Multicast message"));
 }
 
-void MessageDialog::closeEvent(QCloseEvent *evt)
+void MessageDialog::reject()
 {
     if(receivers.size() == 1)
         ((Qommunicate*) parent())->dialogClosed(receivers[0]);
-    evt->accept();
-}
-
-void MessageDialog::reject()
-{
-    ((Qommunicate*) parent())->dialogClosed(receivers[0]);
     QDialog::reject();
 }
 

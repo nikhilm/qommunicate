@@ -8,6 +8,7 @@ int main(int argc, char *argv[])
     app.setApplicationName(QT_TR_NOOP("qommunicate"));
     app.setApplicationVersion(QT_TR_NOOP("1.0"));
 
+    app.setQuitOnLastWindowClosed(false);
     Qommunicate *qom = new Qommunicate;
     qom->show();
 

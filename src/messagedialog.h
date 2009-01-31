@@ -30,9 +30,6 @@ public:
     
     void dropEvent(QDropEvent *);
     
-protected:
-    void closeEvent(QCloseEvent*);
-    
 public slots:
     void incomingMessage(Message);
     void messageRecvConfirm();
