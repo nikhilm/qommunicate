@@ -118,7 +118,7 @@ Message Messenger::makeMessage(quint32 command, QByteArray payload)
 {
     Message msg(packetNo(), &member_me, command, payload);
     // NOTE: This is an IMPORTANT step. that's why sniffing the data will give you big command numbers
-    msg.setCommand(msg.command() /*| QOM_ENCRYPTOPT*/ | QOM_FILEATTACHOPT | QOM_ABSENCEOPT );
+    msg.setCommand(msg.command());
     
     return msg;
 }
