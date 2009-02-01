@@ -59,6 +59,7 @@ void RecvFileProgressDialog::startReceiving()
     //connect(m_socket, SIGNAL(disconnected()), this, SLOT(accept()));
     connect(m_socket, SIGNAL(disconnected()), m_socket, SLOT(deleteLater()));
     connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(error(QAbstractSocket::SocketError)));
+    connect(this, SIGNAL(canceled()), this, SLOT(reject()));
 }
 
 void RecvFileProgressDialog::requestFiles()
@@ -188,7 +189,7 @@ void RecvFileProgressDialog::readRequest()
 //         data += m_socket->read(1024);
 //         //qDebug() << "Reading";
 //     }
-    qDebug() << ":: readRequest";
+    //qDebug() << ":: readRequest";
 //     qDebug() << data << "\n\n";
     if(m_requestType == QOM_FILE_REGULAR)
         requestWriteToFile();
@@ -334,7 +335,7 @@ bool RecvFileProgressDialog::writeToFile(QByteArray& b, QByteArray* remainder)
             return false;
         }
         m_waitingForData -= written;
-        qDebug() << "Wrote" << written << "bytes" << "Left" << m_waitingForData;
+        //qDebug() << "Wrote" << written << "bytes" << "Left" << m_waitingForData;
         b.remove(0, written);
     }
     
