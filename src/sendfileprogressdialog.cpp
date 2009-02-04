@@ -50,9 +50,9 @@ FileInfo FileSendProgressDialog::parseIncomingFileRequest(const QByteArray& b)
     FileInfo info;
     
     QList<QByteArray> tokens = b.split(':');
-    if(tokens.size() < 8)
+    if(tokens.size() < 7)
     {
-        qDebug() << "Bad header" << b;
+        qDebug() << "Bad header" << tokens;
         info.type = -1;
     }
     else
@@ -63,9 +63,9 @@ FileInfo FileSendProgressDialog::parseIncomingFileRequest(const QByteArray& b)
         // for now we just store the file name, later we'll resolve the path
         info.fileName = QFileInfo(fileUtils()->resolveFilePath(info.fileID)).fileName();
         
-        if(command == QOM_GETDIRFILES)
+        if((command & QOM_COMMAND_MASK) == QOM_GETDIRFILES)
             info.type = QOM_FILE_DIR;
-        else if(command == QOM_GETFILEDATA)
+        else if((command & QOM_COMMAND_MASK) == QOM_GETFILEDATA)
         {
             info.type = QOM_FILE_REGULAR;
             info.offset = tokens[7].toInt();
@@ -124,10 +124,11 @@ void FileSendProgressDialog::sendFile(const FileInfo& info)
     // we don't want the whole path
     FileInfo copy = info;
     if(info.fileID == -1)
+    {
         copy.fileName = info.fileName.split(QDir::separator()).last();
-    
-    qDebug() << fileUtils()->formatFileHeader(copy).toAscii();
-    writeBlock(fileUtils()->formatFileHeader(copy).toAscii());
+        // write header only if inside directory
+        writeBlock(fileUtils()->formatFileHeader(copy).toAscii());
+    }
     m_writingData = true;
     writeFile(m_socket, &f);
 }
@@ -136,11 +137,9 @@ void FileSendProgressDialog::sendDir(const FileInfo& info)
 {
     QList<FileInfo> headers = fileUtils()->directoryInfoList(
                             info.fileID == -1 ? info.fileName : fileUtils()->resolveFilePath(info.fileID));
-    qDebug() << fileUtils()->formatFileHeader(headers.takeFirst()).toAscii();
     
-    FileInfo copy = info;
-    if(info.fileID == -1)
-        copy.fileName = info.fileName.split(QDir::separator()).last();
+    FileInfo copy = headers.takeFirst();
+    qDebug() << "sendDir: " << fileUtils()->formatFileHeader(copy).toAscii();
     writeBlock(fileUtils()->formatFileHeader(copy).toAscii());
     
     // this swap is to prepend the new sub directory entries
