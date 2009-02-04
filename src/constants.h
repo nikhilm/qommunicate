@@ -112,4 +112,5 @@ const char QOM_HOSTLIST_DUMMY=	'\b';
 
 const int QOM_TIMEOUT = 10000;
 const int QOM_FILE_WRITE_SIZE = 1024;
+const int QOM_COMMAND_MASK = 255;
 #endif
