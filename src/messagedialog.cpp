@@ -50,7 +50,7 @@ void MessageDialog::incomingMessage(Message msg)
     if(msg.sender()->addressString() != receivers[0]->addressString())
         return;
     
-    QString text = QString("<b style=\"color:blue;\">&lt;%1&gt;</b> ")
+    QString text = QString("<b style=\"color:blue;\">%1 : </b> ")
                         .arg(Qt::escape(receivers[0]->name()));
     text += Qt::escape(msg.payload().replace('\a', "").trimmed());
     ui.messageEdit->append(text);
@@ -115,7 +115,7 @@ void MessageDialog::messageTimeout()
 void MessageDialog::messageRecvConfirm()
 {
     if(! ui.messageInput->text().trimmed().isEmpty())
-        ui.messageEdit->append(QString("<b style=\"color:red;\">&lt;%1&gt;</b> %2")
+        ui.messageEdit->append(QString("<b style=\"color:red;\">%1 : </b> %2")
                             .arg(Qt::escape(me().name()))
                             .arg(Qt::escape(ui.messageInput->text())));
     
