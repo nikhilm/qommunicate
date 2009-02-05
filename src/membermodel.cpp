@@ -58,19 +58,25 @@ bool MemberModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int
 
 bool MemberFilter::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
 {
-    if( sourceParent.isValid() && sourceModel()->data(sourceParent).toString().contains(filterRegExp()) ) return true;
-    
-    QString data = sourceModel()->data(sourceModel()->index(sourceRow, 0, sourceParent)).toString();
-    
-    bool ret = data.contains(filterRegExp());
-    
     QModelIndex subIndex = sourceModel()->index(sourceRow, 0, sourceParent);
-    if( subIndex.isValid() )
+    QStandardItem* it = ((MemberModel*)sourceModel())->itemFromIndex(subIndex);
+    if(it->type() == TYPE_MEMBER)
     {
-        for(int i = 0; i < sourceModel()->rowCount(subIndex); ++i)
+        // if our group matches, show ourselves too
+        if(it->parent() && it->parent()->data(Qt::DisplayRole).toString().contains(filterRegExp()))
+            return true;
+        return it->data(Qt::DisplayRole).toString().contains(filterRegExp());
+    }
+    else if(it->type() == TYPE_GROUP)
+    {
+        if(it->data(Qt::DisplayRole).toString().contains(filterRegExp()))
+            return true;
+        //if our children match, show ourselves too
+        for(int i = 0; i < it->rowCount(); ++i)
         {
-            ret = ret || filterAcceptsRow(i, subIndex);
+            if(it->child(i)->data(Qt::DisplayRole).toString().contains(filterRegExp()))
+                return true;
         }
     }
-    return ret;
+    return false;
 }
