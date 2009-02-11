@@ -32,7 +32,9 @@ public:
     
 public slots:
     void incomingMessage(Message);
-    void messageRecvConfirm();
+    void messageRecvConfirm(Message);
+    void userOffline(Message);
+    void userOnline(Message);
     void reject();
 
 private:
@@ -41,6 +43,8 @@ private:
     QList<Member*> receivers;
     
     QTimer* messageTimer;
+    
+    bool m_online;
     
 private slots:
     void messageTimeout();

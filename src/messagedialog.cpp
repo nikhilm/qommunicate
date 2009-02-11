@@ -8,12 +8,16 @@
 MessageDialog::MessageDialog(Member* receiver, QWidget *parent) : QDialog(parent)
 {
     receivers << receiver;
-    
+    qDebug() << "In constructor" << &(receivers[0]->address());
     ui.setupUi(this);
     messageTimer = NULL;
+    
+    m_online = true;
     setWindowTitle(tr("Conversation: %1").arg(receiver->name()));
     connect(messenger(), SIGNAL(msg_recvMsg(Message)), this, SLOT(incomingMessage(Message)));
-    connect(messenger(), SIGNAL(msg_recvConfirmMsg(Message)), this, SLOT(messageRecvConfirm()));
+    connect(messenger(), SIGNAL(msg_recvConfirmMsg(Message)), this, SLOT(messageRecvConfirm(Message)));
+    connect(messenger(), SIGNAL(msg_exit(Message)), this, SLOT(userOffline(Message)));
+    connect(messenger(), SIGNAL(msg_entry(Message)), this, SLOT(userOnline(Message)));
     
     ((Qommunicate*)parent)->dialogOpened(receiver);
     
@@ -93,7 +97,6 @@ void MessageDialog::on_sendButton_clicked()
     }
     else
     {
-        messageRecvConfirm();
         QTimer::singleShot(500, this, SLOT(accept()));
     }
         
@@ -112,8 +115,11 @@ void MessageDialog::messageTimeout()
         ui.messageInput->setEnabled(true);
 }
 
-void MessageDialog::messageRecvConfirm()
+void MessageDialog::messageRecvConfirm(Message msg)
 {
+    if(msg.sender()->addressString() != receivers[0]->addressString())
+        return;
+    
     if(! ui.messageInput->text().trimmed().isEmpty())
         ui.messageEdit->append(QString("<b style=\"color:red;\">%1 : </b> %2")
                             .arg(Qt::escape(me().name()))
@@ -126,6 +132,27 @@ void MessageDialog::messageRecvConfirm()
         messageTimer->stop();
     
     ui.messageInput->setFocus();
+}
+
+void MessageDialog::userOffline(Message msg)
+{
+    if(!m_online || msg.sender()->addressString() != receivers[0]->addressString())
+        return;
+    
+    ui.messageEdit->append(QString("<b style=\"color:magenta\">%1 went offline</b>").arg(Qt::escape(msg.sender()->name())));
+    ui.messageInput->setEnabled(false);
+    m_online = false;
+}
+
+void MessageDialog::userOnline(Message msg)
+{
+    if(m_online || msg.sender()->addressString() != receivers[0]->addressString())
+        return;
+    
+    ui.messageEdit->append(QString("<b style=\"color:orange\">%1 came online</b>").arg(Qt::escape(msg.sender()->name())));
+    
+    ui.messageInput->setEnabled(true);
+    m_online = true;
 }
 
 void MessageDialog::dropEvent(QDropEvent *evt)

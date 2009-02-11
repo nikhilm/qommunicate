@@ -169,7 +169,7 @@ void Qommunicate::on_memberTree_doubleClicked(const QModelIndex& proxyIndex)
     if(toDialog.size() == 1)
     {
         if(!MemberUtils::contains("open_conversations", toDialog[0]))
-            dlg = new MessageDialog( toDialog[0], this );
+            dlg = new MessageDialog( new Member(*toDialog[0]), this );
     }
     else
         dlg = new MessageDialog( toDialog, this );
@@ -225,32 +225,34 @@ void Qommunicate::addMember(Message msg)
     QList<QByteArray> tokens = msg.payload().split('\a');
     msg.sender()->setName(tokens[0]);
     
+    Member* sender = new Member(*msg.sender());
+    
     QString groupName;
     if(tokens.size() > 1)
         groupName = tokens[1];
     
     if(groupName.isEmpty())
     {
-        model->appendRow(msg.sender());
+        model->appendRow(sender);
     }
     else
     {
         QList<QStandardItem*> matches = model->findItems(groupName);
         if(!matches.isEmpty() && matches[0]->type() == TYPE_GROUP)
         {
-            matches[0]->appendRow(msg.sender());
+            matches[0]->appendRow(sender);
         }
         else
         {
             Group * group = new Group(groupName);
-            group->appendRow(msg.sender());
+            group->appendRow(sender);
             model->appendRow(group);
         }
     }
     
-    MemberUtils::insert("members_list", msg.sender());
+    MemberUtils::insert("members_list", sender);
     memberCountLabel.setText(QString::number(memberCountLabel.text().toInt() + 1));
-    statusBar()->showMessage(tr("%1 came online").arg(msg.sender()->name()), 2000);
+    statusBar()->showMessage(tr("%1 came online").arg(sender->name()), 2000);
     ui.memberTree->expandAll();
 }
 
@@ -262,30 +264,41 @@ void Qommunicate::addMemberAndAnswer(Message msg)
 
 void Qommunicate::removeMember(Message msg)
 {
+    qDebug() << "removeMember: called with" << msg.sender()->name();
     QList<QByteArray> tokens = msg.payload().split('\a');
     QString groupName;
     if(tokens.size() > 1)
         groupName = tokens[1];
     
+    Member* sender = new Member(*msg.sender());
+    
     for(int i = 0; i < model->rowCount(); i++)
     {
         QStandardItem* it = model->item(i, 0);
-        if(it->type() == TYPE_MEMBER && ((Member*)it)->name() == msg.sender()->addressString())
+        if(it->type() == TYPE_MEMBER && ((Member*)it)->name() == sender->addressString())
         {
+            qDebug() << "removeMember: Deleting" << ((Member*)it->row())->name();
             model->removeRow(it->row());
         }
         else
         {
             for(int j = 0; j < it->rowCount(); j++)
             {
-                if(((Member*)it->child(j))->addressString() == msg.sender()->addressString())
+                if(((Member*)it->child(j))->addressString() == sender->addressString())
+                {
+                    qDebug() << "removeMember: Deleting" << ((Member*)it->child(j))->name();
                     it->removeRow(j);
+                }
             }
+            //remove empty group
             if(it->rowCount() == 0)
+            {
                 model->removeRow(it->row());
+            }
         }        
     }
-    MemberUtils::remove("members_list", msg.sender()->addressString());
+    qDebug() << "Now deleting" << sender->name() << "from members_list";
+    MemberUtils::remove("members_list", sender->addressString());
     memberCountLabel.setText(QString::number(memberCountLabel.text().toInt() + 1));
     statusBar()->showMessage(tr("%1 went offline").arg(msg.sender()->name()), 2000);
 }
@@ -308,7 +321,7 @@ void Qommunicate::openDialog(Message msg)
     Member* with = MemberUtils::get("members_list", msg.sender());
     if(!with->isValid())
         with = msg.sender();
-    MessageDialog *dlg = new MessageDialog(with);
+    MessageDialog *dlg = new MessageDialog(new Member(*with));
     dlg->setModal(false);
     dlg->show();
     dlg->incomingMessage(msg);
