@@ -299,7 +299,7 @@ void Qommunicate::removeMember(Message msg)
     }
     qDebug() << "Now deleting" << sender->name() << "from members_list";
     MemberUtils::remove("members_list", sender->addressString());
-    memberCountLabel.setText(QString::number(memberCountLabel.text().toInt() + 1));
+    memberCountLabel.setText(QString::number(memberCountLabel.text().toInt() - 1));
     statusBar()->showMessage(tr("%1 went offline").arg(msg.sender()->name()), 2000);
 }
 
