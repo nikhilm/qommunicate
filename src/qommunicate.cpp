@@ -252,7 +252,6 @@ void Qommunicate::addMember(Message msg)
     
     MemberUtils::insert("members_list", sender);
     memberCountLabel.setText(QString::number(memberCountLabel.text().toInt() + 1));
-    statusBar()->showMessage(tr("%1 came online").arg(sender->name()), 2000);
     ui.memberTree->expandAll();
 }
 
@@ -300,7 +299,6 @@ void Qommunicate::removeMember(Message msg)
     qDebug() << "Now deleting" << sender->name() << "from members_list";
     MemberUtils::remove("members_list", sender->addressString());
     memberCountLabel.setText(QString::number(memberCountLabel.text().toInt() - 1));
-    statusBar()->showMessage(tr("%1 went offline").arg(msg.sender()->name()), 2000);
 }
 
 void Qommunicate::openDialog(Message msg)
@@ -312,7 +310,7 @@ void Qommunicate::openDialog(Message msg)
     QSettings s;
     if(s.value(tr("no_receive")).toBool())
     {
-        trayIcon->showMessage(tr("Ignored message"), tr("%1 ignored").arg(msg.sender()->name()));
+        notify(tr("Ignored message"), tr("%1 ignored").arg(MemberUtils::get("members_list", msg.sender())->name()));
         if(msg.command() & QOM_SENDCHECKOPT)
             messenger()->sendMessage(QOM_RECVMSG, QByteArray::number(msg.packetNo()), msg.sender());
         return;
@@ -353,5 +351,15 @@ void Qommunicate::fileRecvRequested(Message msg)
 
 void Qommunicate::fileRecvDone(QString message)
 {
-    trayIcon->showMessage(tr("Download done"), message);
+    notify(tr("Download done"), message, true);
+}
+
+void Qommunicate::notify(const QString& title, const QString& message, bool dialog)
+{
+    if(trayIcon->supportsMessages())
+        trayIcon->showMessage(title, message);
+    statusBar()->showMessage(message, 10000);
+    
+    if(dialog)
+        QMessageBox::information(this, title, message);
 }

@@ -67,6 +67,8 @@ private:
     
     void keyPressEvent(QKeyEvent *);
     bool createGroupMemberList(QStandardItem*, QSet<Member*>&);
+    
+    void notify(const QString&, const QString&, bool dialog=false);
 };
 
 #endif
