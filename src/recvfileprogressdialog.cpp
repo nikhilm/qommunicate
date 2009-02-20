@@ -292,7 +292,7 @@ bool RecvFileProgressDialog::openFile(const QString& fileName)
     m_currentFile = new QFile(fileName);
     if(m_currentFile->exists())
     {
-        if(QMessageBox::No == QMessageBox::question(this, tr("Replace file"), tr("File %1 exists, overwrite?").arg(fileName),
+        if(QMessageBox::No == QMessageBox::question(this, tr("Replace file"), tr("File %1 exists, overwrite?").arg(m_currentFile->fileName()),
                                QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes))
         {
             m_waitingForData = 0;
