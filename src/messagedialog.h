@@ -22,7 +22,9 @@ public:
     
     void dragEnterEvent(QDragEnterEvent *evt)
     {
-        if(evt->mimeData()->hasUrls())
+        if(!m_online)
+            evt->ignore();
+        else if(evt->mimeData()->hasUrls())
         {
             evt->acceptProposedAction();
         }
