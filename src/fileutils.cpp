@@ -95,15 +95,15 @@ QString FileUtils::formatFileHeader(const FileInfo& info)
     QStringList header;
     header << ""; //get in the colon right after the header size
     header << info.fileName;
-    header << QString::number(info.size, 16);
+    header << QString("%1").arg(info.size, 8, 16, QChar('0'));
     
     header << QString::number(info.type, 16);
     header << ""; //end colon
     
     QString headerString = header.join(":");
-    int headerSize = headerString.length();
-    headerSize += QString::number(headerSize, 16).length();
-    return QString::number(headerSize, 16) + headerString ;
+    headerString = QString("%1").arg(headerString.length()+4, 4, 16, QChar('0')) + headerString;
+    qDebug() << "### " << headerString << headerString.length();
+    return headerString ;
 }
 // FileSendThread* FileUtils::startSendFile()
 // {
@@ -121,7 +121,7 @@ QString FileUtils::formatFileHeader(const FileInfo& info)
 
 QString FileUtils::resolveFilePath(int id)
 {
-    qDebug() << "resolveFilePath: requested"<<id<<"which is"<<m_fileIdHash[id];
+    //qDebug() << "resolveFilePath: requested"<<id<<"which is"<<m_fileIdHash[id];
     return m_fileIdHash[id];
 }
 

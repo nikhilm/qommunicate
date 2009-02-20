@@ -61,6 +61,8 @@ private:
     int m_fileSize;
     int m_totalSent;
     
+    QByteArray m_sendBuffer;
+    
     void initialise();
     bool writeBlock(QByteArray);
     void writeFile(QTcpSocket*, QFile*);

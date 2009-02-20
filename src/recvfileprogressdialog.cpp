@@ -226,6 +226,7 @@ void RecvFileProgressDialog::requestWriteToDirectory()
             if(info.fileID >= 0)
             {
                 qDebug() << "# Header parsed successfully";
+                qDebug() << m_header;
                 qDebug() << info.fileName << info.size << info.type;
                 // we got a valid header, process it
                 m_inHeader = false;
@@ -266,6 +267,7 @@ void RecvFileProgressDialog::requestWriteToDirectory()
                 }
                 else
                 {
+                    qDebug() << "Bad header : " << info.type;
                     QMessageBox::critical(this, tr("Receive failed"), tr("Bad header! Could not understand file type %1").arg(info.type));
                     reject();
                 }
