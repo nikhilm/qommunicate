@@ -92,13 +92,6 @@
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QCheckBox" name="sealCB" >
-         <property name="text" >
-          <string>S&amp;eal</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </item>
     </layout>
