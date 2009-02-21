@@ -47,6 +47,7 @@ private slots:
     void openDialog(Message);
     void sendAbsenceInfo(Message);
     void removeMember(Message msg);
+    void confirmRead(Message);
     
     void fileSendRequested(QTcpSocket*);
     void fileRecvRequested(Message);

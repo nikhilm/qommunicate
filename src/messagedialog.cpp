@@ -81,7 +81,7 @@ void MessageDialog::on_sendButton_clicked()
         return;
     }
     
-    int flags = QOM_SENDMSG |
+    int flags = QOM_SENDMSG | QOM_SENDCHECKOPT |
                 (receivers.size() > 1 ? QOM_BROADCASTOPT : 0) |
                 (ui.notifyReadCB->isChecked() ? QOM_READCHECKOPT | QOM_SECRETOPT : 0);
     

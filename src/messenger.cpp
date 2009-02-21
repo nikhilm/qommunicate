@@ -200,6 +200,10 @@ void Messenger::receiveData()
                 emit msg_recvConfirmMsg(msg);
                 break;
                 
+            case QOM_READMSG:
+                emit msg_readConfirmMsg(msg);
+                break;
+                
             case QOM_GETABSENCEINFO:
                 emit msg_getAbsenceInfo(msg);
         }

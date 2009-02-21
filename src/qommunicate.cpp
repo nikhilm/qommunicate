@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QMenu>
 #include <QTreeWidget>
+#include <QDateTime>
 
 #include "about.h"
 #include "settings.h"
@@ -36,6 +37,7 @@ Qommunicate::Qommunicate(QWidget *parent)
     connect(messenger(), SIGNAL(msg_entry(Message)), this, SLOT(addMemberAndAnswer(Message)));
     connect(messenger(), SIGNAL(msg_exit(Message)), this, SLOT(removeMember(Message)));
     connect(messenger(), SIGNAL(msg_recvMsg(Message)), this, SLOT(openDialog(Message)));
+    connect(messenger(), SIGNAL(msg_readConfirmMsg(Message)), this, SLOT(confirmRead(Message)));
     connect(messenger(), SIGNAL(msg_fileRecvRequest(Message)), this, SLOT(fileRecvRequested(Message)));
     connect(messenger(), SIGNAL(msg_getAbsenceInfo(Message)), this, SLOT(sendAbsenceInfo(Message)));
     
@@ -362,4 +364,14 @@ void Qommunicate::notify(const QString& title, const QString& message, bool dial
     
     if(dialog)
         QMessageBox::information(this, title, message);
+}
+
+void Qommunicate::confirmRead(Message msg)
+{
+    QString time = QDateTime::currentDateTime().toString("h:mm:ss");
+    
+    QString message = QString("%1\n%2 read message").arg(time).arg(MemberUtils::get("members_list", msg.sender())->name());
+    
+    messenger()->sendMessage(QOM_ANSREADMSG, QByteArray::number(msg.packetNo()), msg.sender());
+    notify(tr("Message Read"), message, true);
 }
