@@ -8,7 +8,6 @@
 MessageDialog::MessageDialog(Member* receiver, QWidget *parent) : QDialog(parent)
 {
     receivers << receiver;
-    qDebug() << "In constructor" << &(receivers[0]->address());
     ui.setupUi(this);
     messageTimer = NULL;
     
@@ -40,6 +39,9 @@ MessageDialog::MessageDialog(QWidget *parent) : QDialog(parent)
 {
     ui.setupUi(this);
     setWindowTitle(tr("Multicast message"));
+    // no notifications for multicast
+    // TODO: is that the right choice?
+    ui.notifyReadCB->setEnabled(false);
 }
 
 void MessageDialog::reject()
@@ -61,7 +63,10 @@ void MessageDialog::incomingMessage(Message msg)
     QApplication::alert(this, 0);
     
     if(msg.command() & QOM_SENDCHECKOPT)
-        messenger()->sendMessage(QOM_RECVMSG, QByteArray::number(msg.packetNo()), receivers[0]);
+        messenger()->sendMessage(QOM_RECVMSG, QByteArray::number(msg.packetNo()), msg.sender());
+    
+    if(msg.command() & QOM_READCHECKOPT)
+        messenger()->sendMessage(QOM_READMSG|(msg.command() & QOM_READCHECKOPT), QByteArray::number(msg.packetNo()), msg.sender());
 }
 
 void MessageDialog::on_sendButton_clicked()
@@ -76,13 +81,13 @@ void MessageDialog::on_sendButton_clicked()
         return;
     }
     
+    int flags = QOM_SENDMSG |
+                (receivers.size() > 1 ? QOM_BROADCASTOPT : 0) |
+                (ui.notifyReadCB->isChecked() ? QOM_READCHECKOPT | QOM_SECRETOPT : 0);
+    
     foreach(Member* m, receivers)
     {
-        messenger()->sendMessage(
-            QOM_SENDMSG|QOM_SENDCHECKOPT |
-            ( ui.notifyReadCB->isChecked() ? QOM_SECRETOPT | QOM_READCHECKOPT : 0 ),
-            //( ui.sealCB->isChecked() ? QOM_SECRETOPT : 0 ) ,
-            ui.messageInput->text().toAscii(), m);
+        messenger()->sendMessage( flags, ui.messageInput->text().toAscii(), m);
     }
     if(receivers.size() == 1)
     {
