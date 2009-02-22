@@ -89,7 +89,7 @@
         <string>Ignore any messages unless &lt;b>you&lt;/b> have begun the conversation</string>
        </property>
        <property name="text" >
-        <string>&amp;Ignore received messages</string>
+        <string>&amp;Ignore multicasts</string>
        </property>
       </widget>
      </item>
