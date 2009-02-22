@@ -76,13 +76,13 @@ void MessageDialog::on_sendButton_clicked()
     
     if(receivers.isEmpty())
     {
-        messenger()->multicast(QOM_SENDMSG|QOM_BROADCASTOPT, ui.messageInput->text().toAscii());
+        messenger()->multicast(QOM_SENDMSG|QOM_MULTICASTOPT, ui.messageInput->text().toAscii());
         QTimer::singleShot(500, this, SLOT(accept()));
         return;
     }
     
     int flags = QOM_SENDMSG | QOM_SENDCHECKOPT |
-                (receivers.size() > 1 ? QOM_BROADCASTOPT : 0) |
+                (receivers.size() > 1 ? QOM_MULTICASTOPT : 0) |
                 (ui.notifyReadCB->isChecked() ? QOM_READCHECKOPT | QOM_SECRETOPT : 0);
     
     foreach(Member* m, receivers)

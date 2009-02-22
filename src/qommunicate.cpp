@@ -310,9 +310,9 @@ void Qommunicate::openDialog(Message msg)
     
     // if set to ignore received messages
     QSettings s;
-    if(s.value(tr("no_receive")).toBool())
+    if(s.value(tr("no_receive")).toBool() && (msg.command() & QOM_MULTICASTOPT))
     {
-        notify(tr("Ignored message"), tr("%1 ignored").arg(MemberUtils::get("members_list", msg.sender())->name()));
+        notify(tr("Multicast"), tr("Multicast from %1 ignored").arg(MemberUtils::get("members_list", msg.sender())->name()));
         if(msg.command() & QOM_SENDCHECKOPT)
             messenger()->sendMessage(QOM_RECVMSG, QByteArray::number(msg.packetNo()), msg.sender());
         return;
