@@ -37,6 +37,7 @@ void SettingsDialog::on_buttonBox_accepted()
     //settings->setValue(tr("play_sound"), ui.playSoundCB->isChecked());
     settings->setValue(tr("no_receive"), ui.noReceiveCB->isChecked());
     settings->sync();
+    emit settingsChanged();
 }
 
 void SettingsDialog::on_customGrpButton_clicked()

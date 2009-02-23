@@ -54,8 +54,12 @@ public:
     
     bool multicast(quint32, QByteArray);
     
+public slots:
     bool login();
     bool logout();
+    bool nickChanged();
+    
+    bool refreshSettings();
     void reset();
     
 signals:

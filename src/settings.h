@@ -42,6 +42,11 @@ private:
     QSettings *settings;
     
     void loadSettings();
+    
+signals:
+    // custom signal because if the listener listens to accept()
+    // it might happen that our changes aren't synced yet
+    void settingsChanged();
 };
 
 #endif

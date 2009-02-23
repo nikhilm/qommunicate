@@ -58,7 +58,9 @@ void Qommunicate::on_action_About_triggered()
 
 void Qommunicate::on_action_Settings_triggered()
 {
-    SettingsDialog(this).exec();
+    SettingsDialog sd(this);
+    connect(&sd, SIGNAL(settingsChanged()), messenger(), SLOT(nickChanged()));
+    sd.exec();
 }
 
 void Qommunicate::on_actionMulticast_triggered()

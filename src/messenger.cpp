@@ -107,10 +107,7 @@ void Messenger::reset()
         exit(1);
     }
     
-    QSettings s;
-    member_me.setName(s.value(tr("nick")).toString());
-    group_me.setName(s.value(tr("group")).toString());
-    
+    refreshSettings();
     connect(socket, SIGNAL(readyRead()), this, SLOT(receiveData()));
 }
 
@@ -234,4 +231,17 @@ bool Messenger::login()
 bool Messenger::logout()
 {
     multicast(QOM_BR_EXIT, member_me.name().toAscii()+'\0'+group_me.name().toAscii());
+}
+
+bool Messenger::nickChanged()
+{
+    refreshSettings();
+    multicast(QOM_BR_ABSENCE, member_me.name().toAscii()+'\0'+group_me.name().toAscii());
+}
+
+bool Messenger::refreshSettings()
+{   
+    QSettings s;
+    member_me.setName(s.value(tr("nick")).toString());
+    group_me.setName(s.value(tr("group")).toString());
 }
