@@ -74,6 +74,7 @@ signals:
     void msg_fileRecvRequest(Message);
     void msg_getAbsenceInfo(Message);
     void msg_exit(Message);
+    void msg_absence(Message);
     
 private:
     

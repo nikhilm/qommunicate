@@ -71,6 +71,7 @@ Message Message::fromAscii(QByteArray arr)
     Member* m = new Member;
     m->setName(QString(tokens[2])); // default name, this will be replaced when BR_ENTRY is received
     m->setHost(QString(tokens[3]));
+    m->setStatus("Available");
     
     quint32 cmd = tokens[4].toInt();
     QByteArray py = tokens[5];
@@ -203,6 +204,9 @@ void Messenger::receiveData()
                 
             case QOM_GETABSENCEINFO:
                 emit msg_getAbsenceInfo(msg);
+                
+            case QOM_BR_ABSENCE:
+                emit msg_absence(msg);
         }
     }
 }

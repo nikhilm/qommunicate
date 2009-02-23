@@ -40,6 +40,7 @@ Qommunicate::Qommunicate(QWidget *parent)
     connect(messenger(), SIGNAL(msg_readConfirmMsg(Message)), this, SLOT(confirmRead(Message)));
     connect(messenger(), SIGNAL(msg_fileRecvRequest(Message)), this, SLOT(fileRecvRequested(Message)));
     connect(messenger(), SIGNAL(msg_getAbsenceInfo(Message)), this, SLOT(sendAbsenceInfo(Message)));
+    connect(messenger(), SIGNAL(msg_absence(Message)), this, SLOT(absenceChanged(Message)));
     
     
     connect(fileUtils(), SIGNAL(newFileSendSocket(QTcpSocket*)), this, SLOT(fileSendRequested(QTcpSocket*)));
@@ -376,4 +377,12 @@ void Qommunicate::confirmRead(Message msg)
     
     messenger()->sendMessage(QOM_ANSREADMSG, QByteArray::number(msg.packetNo()), msg.sender());
     notify(tr("Message Read"), message, true);
+}
+
+void Qommunicate::absenceChanged(Message msg)
+{
+//     QString name = MemberUtils::get("members_list", msg.sender())->name();
+//     qDebug() << "absenceChanged "<<name;
+//     QString status = msg.payload().mid(name.length());
+//     MemberUtils::get("members_list", msg.sender())->setStatus(status);
 }
