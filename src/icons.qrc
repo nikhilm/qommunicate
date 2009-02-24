@@ -1,0 +1,10 @@
+<RCC>
+  <qresource prefix="newPrefix" >
+    <file>icons/logo_small.png</file>
+    <file>icons/help-about.png</file>
+    <file>icons/edit-find.png</file>
+    <file>icons/broadcast.png</file>
+    <file>icons/configure.png</file>
+    <file>icons/application-exit.png</file>
+  </qresource>
+</RCC>
