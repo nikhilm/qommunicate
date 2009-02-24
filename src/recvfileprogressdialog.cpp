@@ -44,11 +44,16 @@ QList<FileInfo> RecvFileProgressDialog::parsePayloadFileList(QByteArray payload)
 void RecvFileProgressDialog::error(QAbstractSocket::SocketError e)
 {
     qDebug() << "Socket error:" << e << m_socket->errorString();
-    reject();
+    if(e == QAbstractSocket::RemoteHostClosedError)
+    {
+        m_fileHeaders.clear();
+    }
+    else
+        reject();
 }
 
 void RecvFileProgressDialog::startReceiving()
-{
+{    
     if(m_socket != NULL)
     {
         m_socket->close();
@@ -61,10 +66,9 @@ void RecvFileProgressDialog::startReceiving()
     
     connect(m_socket, SIGNAL(readyRead()), this, SLOT(readRequest()));
     connect(m_socket, SIGNAL(connected()), this, SLOT(requestFiles()));
-    //connect(m_socket, SIGNAL(disconnected()), this, SLOT(accept()));
-    connect(m_socket, SIGNAL(disconnected()), m_socket, SLOT(deleteLater()));
+    connect(m_socket, SIGNAL(disconnected()), this, SLOT(accept()));
+    //connect(m_socket, SIGNAL(disconnected()), m_socket, SLOT(deleteLater()));
     connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(error(QAbstractSocket::SocketError)));
-    connect(this, SIGNAL(canceled()), this, SLOT(reject()));
 }
 
 void RecvFileProgressDialog::requestFiles()
@@ -209,7 +213,8 @@ void RecvFileProgressDialog::requestWriteToFile()
     if(m_waitingForData == 0)
     {
         emit downloadDone(tr("%1 downloaded").arg(m_currentFile->fileName()));
-        startReceiving();
+        if(!m_fileHeaders.empty())
+            startReceiving();
     }
 }
 
@@ -264,7 +269,8 @@ void RecvFileProgressDialog::requestWriteToDirectory()
                     m_dir->cdUp();
                     if(m_dir->absolutePath() == m_saveDir)
                     {
-                        startReceiving();
+                        if(!m_fileHeaders.empty())
+                            startReceiving();
                         //accept();
                     }
                     m_inHeader = true;

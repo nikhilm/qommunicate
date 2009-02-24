@@ -42,6 +42,11 @@ public:
     {
         if(m_socket != NULL)
             m_socket->close();
+        m_socket->deleteLater();
+        m_currentFile->deleteLater();
+        delete m_dir;
+        m_dir = NULL;
+        
         qDebug() << "RecvFileProgressDialog destroyed";
     }
     
