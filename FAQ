@@ -1,0 +1,45 @@
+Qommunicate FAQ
+===============
+
+For Users
+---------
+
+1) What features does Qommunicate have that IPMsg doesn't?
+* Qommunicate has a better* interface. It also allows filtering by groups and usernames as well as a multicast option.
+  Chat takes place as a two way conversation rather than one discrete reply after the other. It allows you to ignore all multicast messages ( and perhaps have block lists in the future ).
+
+            * better according to the author
+
+2) What features does IPMsg have that Qommunicate doesn't?
+* IPMsg currently implements file sending and receiving in a better way from the point of view of not freezing the interface. It is also capable of sending really large files. I'll attempt to fix both these problems in the next version of Qommunicate.
+
+3) What about encryption?
+* This is a feature I do not use or require right now, and so it isn't implemented. If you really need it, you are welcome to implement it since Qommunicate is open source.
+
+4) What about ipmsg.reg?
+* ipmsg.reg is a small file containing the list of IP addresses on your network. Qommunicate can handle these files too. Start Qommunicate -> Open the settings dialog -> Drag and drop the ipmsg.reg file onto the settings dialog. Then restart Qommunicate.
+
+5) Why does Qommunicate crash once in a while?
+* Although I've tested Qommunicate significantly, it is software which works via the network, which means it depends on a lot of different things to work properly. The comings and goings of people and files are highly random events and so there are always certain cases which are untested. This might cause it to crash.
+
+6) What do I do in case it crashes?
+* If you want to help improve Qommunicate, please try to reproduce the error. Try and do exactly what you did when the crash occurred. If it crashes again, you know the cause of the crash. Even if you don't know the cause of the crash, just drop me a mail at <nsm.nikhil@gmail.com>. Please list your operating system (Windows/Linux etc.), the version of Qommunicate you are using and what you were doing when the crash happened.
+
+
+For Developers
+--------------
+
+1) Is Qommunicate open source?
+* Yes it is. It's licensed under the GNU General Public License. If you steal the code and create your own proprietary version, shame on you. You are of course always welcome to hack on it, bug me if you need help and submit your patches.
+
+2) What is Qommunicate written in?
+* Qommunicate is written in C++. It uses Qt for most of the interface and networking stuff. Qt rocks! It was compiled with g++ on Linux, but should compile on all platforms. See the README for details.
+
+3) How is Qommunicate designed/ what is the architecture?
+* Unfortunately the answer is too long, I'll release a document later explaining it. Meanwhile you can always contact me personally.
+
+4) Some of your code is ugly/badly designed?
+* I know it is. Although I've tried to keep the design as good as I know, there are certain places which are a bit 'hacked'. Foremost, I wanted a cleaner seperation of the protocol from the interface, and a more responsive interface in certain areas. I'm going to try to address these needs in future versions.
+
+5) Haven't you heard of commenting code?
+* For the most part, my code is self documenting and the file names are pretty revealing too. Particularly convoluted sections of code have comments as required. The IP messenger protocol can be found in the original IP messenger sources at http://www.ipmsg.org. Take a look at it to see how it works.
