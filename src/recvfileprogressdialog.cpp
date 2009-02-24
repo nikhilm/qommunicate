@@ -1,3 +1,8 @@
+/*
+ * (C) 2009 Nikhil Marathe <nsm.nikhil@gmail.com>
+ * Licensed under the GNU General Public License.
+ * See LICENSE for details
+ */
 #include "recvfileprogressdialog.h"
 
 #include <QStringList>
