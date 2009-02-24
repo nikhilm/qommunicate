@@ -371,6 +371,11 @@ void Qommunicate::notify(const QString& title, const QString& message, bool dial
 
 void Qommunicate::confirmRead(Message msg)
 {
+    //if ignoring multicasts, then we aren't gonna reply to the sealed message
+    QSettings s;
+    if(s.value("no_receive").toBool())
+        return;
+    
     QString time = QDateTime::currentDateTime().toString("h:mm:ss");
     
     QString message = QString("%1\n%2 read message").arg(time).arg(MemberUtils::get("members_list", msg.sender())->name());
