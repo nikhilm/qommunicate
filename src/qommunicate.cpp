@@ -36,6 +36,9 @@ Qommunicate::Qommunicate(QWidget *parent)
     firstRun();
     messenger()->login();
     
+    //TODO:remove this when status implemented
+    ui.statusCombo->setVisible(false);
+    
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanup()));
     
     connect(messenger(), SIGNAL(msg_ansEntry(Message)), this, SLOT(addMember(Message)));
@@ -44,7 +47,7 @@ Qommunicate::Qommunicate(QWidget *parent)
     connect(messenger(), SIGNAL(msg_recvMsg(Message)), this, SLOT(openDialog(Message)));
     connect(messenger(), SIGNAL(msg_readConfirmMsg(Message)), this, SLOT(confirmRead(Message)));
     connect(messenger(), SIGNAL(msg_fileRecvRequest(Message)), this, SLOT(fileRecvRequested(Message)));
-    connect(messenger(), SIGNAL(msg_getAbsenceInfo(Message)), this, SLOT(sendAbsenceInfo(Message)));
+    //connect(messenger(), SIGNAL(msg_getAbsenceInfo(Message)), this, SLOT(sendAbsenceInfo(Message)));
     connect(messenger(), SIGNAL(msg_absence(Message)), this, SLOT(absenceChanged(Message)));
     
     
@@ -188,10 +191,10 @@ void Qommunicate::on_memberTree_doubleClicked(const QModelIndex& proxyIndex)
     dlg->show();
 }
 
-void Qommunicate::on_statusCombo_currentIndexChanged(const QString& text)
+/*void Qommunicate::on_statusCombo_currentIndexChanged(const QString& text)
 {
     messenger()->multicast(QOM_BR_ABSENCE, me().name().toAscii()+'\0'+myGroup().name().toAscii());
-}
+}*/
 
 void Qommunicate::keyPressEvent(QKeyEvent *event)
 {
@@ -335,13 +338,13 @@ void Qommunicate::openDialog(Message msg)
     dlg->incomingMessage(msg);
 }
 
-void Qommunicate::sendAbsenceInfo(Message msg)
+/*void Qommunicate::sendAbsenceInfo(Message msg)
 {
     QString payload = ui.statusCombo->currentText();
     if(payload == tr("Available"))
         payload = "Not absence mode";
     messenger()->multicast(QOM_SENDABSENCEINFO, payload.toAscii());
-}
+}*/
 
 void Qommunicate::fileSendRequested(QTcpSocket* sock)
 {

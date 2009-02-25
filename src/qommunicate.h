@@ -40,7 +40,7 @@ private slots:
     void on_actionQuit_triggered();
     
     void on_memberTree_doubleClicked(const QModelIndex&);
-    void on_statusCombo_currentIndexChanged(const QString&);
+    //void on_statusCombo_currentIndexChanged(const QString&);
     
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
     
@@ -51,7 +51,7 @@ private slots:
     void addMember(Message);
     void addMemberAndAnswer(Message);
     void openDialog(Message);
-    void sendAbsenceInfo(Message);
+    // void sendAbsenceInfo(Message);
     void removeMember(Message);
     void absenceChanged(Message);
     void confirmRead(Message);
