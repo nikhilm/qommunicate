@@ -105,7 +105,7 @@ void RecvFileProgressDialog::requestFiles()
     }
 }
 
-void RecvFileProgressDialog::informUser()
+bool RecvFileProgressDialog::informUser()
 {
     QString message(m_msg.sender()->name());
     message.append(tr(" has sent the following files\n\n"));
@@ -155,14 +155,11 @@ void RecvFileProgressDialog::informUser()
                            message, 
                            QMessageBox::Yes | QMessageBox::No,
                            QMessageBox::Yes)) // last is default button
-        reject();
+        return false;
     else
         m_saveDir = QFileDialog::getExistingDirectory(this, tr("Save To"));
     
-    if(!m_saveDir.isEmpty())
-    {
-        qDebug() << m_saveDir;
-    }
+    return true;
 }
 
 // TODO: share with sending dialog?

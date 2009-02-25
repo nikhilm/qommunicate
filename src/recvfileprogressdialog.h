@@ -33,23 +33,30 @@ public:
         m_waitingForData = 0;
         m_inHeader = true;
         
-        informUser();
-        startReceiving();
-        //startReceiving();
+        if(informUser())
+            startReceiving();
+        else
+            reject();
     }
     
     ~RecvFileProgressDialog()
     {
         if(m_socket != NULL)
+        {
             m_socket->close();
-        m_socket->deleteLater();
-        m_currentFile->close();
-        delete m_currentFile;
-        m_currentFile = NULL;
-        delete m_dir;
-        m_dir = NULL;
-        
-        qDebug() << "RecvFileProgressDialog destroyed";
+            m_socket->deleteLater();
+        }
+        if(m_currentFile != NULL)
+        {
+            m_currentFile->close();
+            delete m_currentFile;
+            m_currentFile = NULL;
+        }
+        if(m_dir != NULL)
+        {
+            delete m_dir;
+            m_dir = NULL;
+        }
     }
     
 signals:
@@ -59,7 +66,7 @@ signals:
 private slots:
     void error(QAbstractSocket::SocketError);
     void requestFiles();
-    void informUser();
+    bool informUser();
     void readRequest();
     
 private:
