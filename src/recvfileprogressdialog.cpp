@@ -46,7 +46,7 @@ void RecvFileProgressDialog::error(QAbstractSocket::SocketError e)
     qDebug() << "Socket error:" << e << m_socket->errorString();
     if(e == QAbstractSocket::RemoteHostClosedError)
     {
-        m_fileHeaders.clear();
+        
     }
     else
         reject();
@@ -63,11 +63,9 @@ void RecvFileProgressDialog::startReceiving()
     m_socket = new QTcpSocket(this);
     m_socket->abort();
     m_socket->connectToHost(m_msg.sender()->addressString(), UDP_PORT);
-    
+    qDebug() << "Connected to host";
     connect(m_socket, SIGNAL(readyRead()), this, SLOT(readRequest()));
     connect(m_socket, SIGNAL(connected()), this, SLOT(requestFiles()));
-    connect(m_socket, SIGNAL(disconnected()), this, SLOT(accept()));
-    //connect(m_socket, SIGNAL(disconnected()), m_socket, SLOT(deleteLater()));
     connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(error(QAbstractSocket::SocketError)));
 }
 
@@ -78,7 +76,6 @@ void RecvFileProgressDialog::requestFiles()
         FileInfo info = m_fileHeaders.takeFirst();
         m_requestType = info.type;
         
-        qDebug() << "startReceiving for " << info.fileName;
         QByteArray payload = QByteArray::number(m_msg.packetNo(), 16);
         payload += ":";
         payload += QByteArray::number(info.fileID, 16);
@@ -213,8 +210,7 @@ void RecvFileProgressDialog::requestWriteToFile()
     if(m_waitingForData == 0)
     {
         emit downloadDone(tr("%1 downloaded").arg(m_currentFile->fileName()));
-        if(!m_fileHeaders.empty())
-            startReceiving();
+        startReceiving();
     }
 }
 
@@ -245,7 +241,7 @@ void RecvFileProgressDialog::requestWriteToDirectory()
                 if(info.type == QOM_FILE_REGULAR)
                 {
                     qDebug() << "Now writing new file" << info.fileName;
-                    if(!openFile(m_dir->absoluteFilePath(info.fileName)))
+                    if(!openFile(m_dir->absoluteFilePath(info.fileName), false))
                         return ;
                     m_waitingForData = info.size;
                     m_currentSize = info.size;
@@ -269,8 +265,7 @@ void RecvFileProgressDialog::requestWriteToDirectory()
                     m_dir->cdUp();
                     if(m_dir->absolutePath() == m_saveDir)
                     {
-                        if(!m_fileHeaders.empty())
-                            startReceiving();
+                        startReceiving();
                         //accept();
                     }
                     m_inHeader = true;
@@ -298,10 +293,10 @@ void RecvFileProgressDialog::requestWriteToDirectory()
                     
 }
 
-bool RecvFileProgressDialog::openFile(const QString& fileName)
+bool RecvFileProgressDialog::openFile(const QString& fileName, bool askOverwrite)
 {
     m_currentFile = new QFile(fileName);
-    if(m_currentFile->exists())
+    if(m_currentFile->exists() && askOverwrite)
     {
         if(QMessageBox::No == QMessageBox::question(this, tr("Replace file"), tr("File %1 exists, overwrite?").arg(m_currentFile->fileName()),
                                QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes))
@@ -371,6 +366,7 @@ bool RecvFileProgressDialog::makeDirectory(const QString& path)
         m_dir = NULL;
     }
     m_dir = new QDir(path);
+    
     if(!m_dir->exists() && !m_dir->mkdir(path))
     {
         // TODO: convert to QMessageBox
@@ -479,7 +475,6 @@ FileInfo RecvFileProgressDialog::parseDirectoryHeader(const QByteArray& a, QByte
 {
     bool bad = false;
     FileInfo ret;
-    
     if(a.contains(":"))
     {
         QList<QByteArray> tokens = a.split(':');

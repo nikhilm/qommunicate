@@ -128,30 +128,32 @@ void FileSendProgressDialog::nextFileRequested()
 
 void FileSendProgressDialog::sendFile(const FileInfo& info)
 {
-    //qDebug() << "sendFile : entered" << m_writingData;
-    QFile f( info.fileID == -1 ? info.fileName : fileUtils()->resolveFilePath(info.fileID) );
+    QFile f( info.fileID == -1 ? QDir::toNativeSeparators(info.fileName) : fileUtils()->resolveFilePath(info.fileID) );
     if(!f.open(QIODevice::ReadOnly))
     {
-        qWarning() << "Could not open file for reading" << f.fileName()<<f.errorString();
+        qDebug() << "Could not open file for reading" << f.fileName()<<f.errorString();
+        reject();
         return;
     }
     m_fileSize = f.size();
     f.seek(info.offset);
     setRange(0, 100);
-    setLabelText(tr("Sending %1").arg(f.fileName()));
+    qDebug()<<"sendFile:"<<f.fileName();
     
     // we do the whole splitting thing, since when sending the header
     // we don't want the whole path
     FileInfo copy = info;
     if(info.fileID == -1)
     {
-        copy.fileName = info.fileName.split(QDir::separator()).last();
+        copy.fileName = info.fileName.split('/').last();
+        qDebug() << "sendFile: " << copy.fileName;
         writeBlock(fileUtils()->formatFileHeader(copy).toAscii());
     }
     //qDebug() << fileUtils()->formatFileHeader(copy).toAscii();
     //if(copy.fileName.contains("elf.h"))
     //    qDebug() << "Elf " << fileUtils()->formatFileHeader(copy).toAscii();
     m_writingData = true;
+    qDebug() << "sendFile: Calling writeFile";
     writeFile(m_socket, &f);
     //nextFileRequested();
 }
@@ -162,6 +164,8 @@ void FileSendProgressDialog::sendDir(const FileInfo& info)
                             info.fileID == -1 ? info.fileName : fileUtils()->resolveFilePath(info.fileID));
     
     FileInfo copy = headers.takeFirst();
+    copy.fileName = copy.fileName.split('/').last();
+    qDebug() << copy.fileName;
     //qDebug() << "sendDir: " << fileUtils()->formatFileHeader(copy).toAscii() << m_writingData;
     writeBlock(fileUtils()->formatFileHeader(copy).toAscii());
     
@@ -175,7 +179,7 @@ void FileSendProgressDialog::sendDir(const FileInfo& info)
 
 void FileSendProgressDialog::writeFile(QTcpSocket* sock, QFile* f)
 {
-    //qDebug() << "writeFile : entered " <<f->fileName() <<m_writingData;
+    qDebug() << "writeFile : entered " <<f->fileName() <<f->exists()<<f->atEnd();
     while(!f->atEnd())
     {
         QByteArray b = f->read(QOM_FILE_WRITE_SIZE);
@@ -188,11 +192,9 @@ void FileSendProgressDialog::writeFile(QTcpSocket* sock, QFile* f)
 bool FileSendProgressDialog::writeBlock(QByteArray b)
 {
     //qDebug() << "writeBlock : entered"<<m_writingData;
-    if(b.contains("elf.h"))
-        qDebug() << "%% Have to write " << m_sendBuffer;
     m_sendBuffer += b;
     int bytesToWrite = m_sendBuffer.size();
-    //qDebug() << bytesToWrite << m_sendBuffer;
+    qDebug() << "writeBlock:"<<bytesToWrite;
     int bytesWritten = 0;
     do
     {

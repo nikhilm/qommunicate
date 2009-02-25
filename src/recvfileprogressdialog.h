@@ -43,7 +43,9 @@ public:
         if(m_socket != NULL)
             m_socket->close();
         m_socket->deleteLater();
-        m_currentFile->deleteLater();
+        m_currentFile->close();
+        delete m_currentFile;
+        m_currentFile = NULL;
         delete m_dir;
         m_dir = NULL;
         
@@ -87,7 +89,7 @@ private:
     void startReceiving();
     bool writeBlock(QByteArray);
     bool writeToFile(QByteArray&, QByteArray* remainder=NULL);
-    bool openFile(const QString&);
+    bool openFile(const QString&, bool askOverwrite=true);
     bool makeDirectory(const QString&);
     bool writeToDirectory(QByteArray&);
     FileInfo parseDirectoryHeader(const QByteArray&, QByteArray*);

@@ -79,11 +79,12 @@ QList<FileInfo> FileUtils::directoryInfoList(const QString& dirName)
         header.size = info.isDir() ? 0 : info.size();
         header.type = info.isDir() ? QOM_FILE_DIR : QOM_FILE_REGULAR ;
         header.mtime = info.lastModified().toTime_t();
+        header.offset = 0;
         headers << header;
     }
     
     //fix the directory's path which is doubled. eg articles becomes articles/articles
-    headers[0].fileName = headers[0].fileName.split(QDir::separator()).last();
+    headers[0].fileName = headers[0].fileName.split('/').last();
     
     FileInfo ret;
     ret.fileName = ".";
