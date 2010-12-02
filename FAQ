@@ -1,6 +1,8 @@
 Qommunicate FAQ
 ===============
 
+NOTE: If you get an error about port 2425 being in use, you already have IP Messenger running. Quit IP Messenger. You can't run both at once.
+
 For Users
 ---------
 
