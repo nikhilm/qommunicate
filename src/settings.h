@@ -41,7 +41,7 @@ private slots:
     void on_buttonBox_accepted();
     
     void on_customGrpButton_clicked();
-    
+
 private:
     Ui::SettingsDialog ui;
     QSettings *settings;

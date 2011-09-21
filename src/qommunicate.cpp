@@ -331,7 +331,9 @@ void Qommunicate::openDialog(Message msg)
     QSettings s;
     if(s.value(tr("no_receive")).toBool() && (msg.command() & QOM_MULTICASTOPT))
     {
-        notify(tr("Multicast"), tr("Multicast from %1 ignored").arg(MemberUtils::get("members_list", msg.sender())->name()));
+        if (s.value(tr("showMulticastPopup")).toBool()) {
+            notify(tr("Multicast"), tr("Multicast from %1 ignored").arg(MemberUtils::get("members_list", msg.sender())->name()));
+        }
         if(msg.command() & QOM_SENDCHECKOPT)
             messenger()->sendMessage(QOM_RECVMSG, QByteArray::number(msg.packetNo()), msg.sender());
         return;

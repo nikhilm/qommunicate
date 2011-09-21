@@ -28,10 +28,13 @@ void SettingsDialog::loadSettings()
     //Qt::CheckState popupState = settings->value(tr("popup_messages")).toBool() ? Qt::Checked : Qt::Unchecked ;
     //Qt::CheckState soundState = settings->value(tr("play_sound")).toBool() ? Qt::Checked : Qt::Unchecked ;
     Qt::CheckState receiveState = settings->value(tr("no_receive")).toBool() ? Qt::Checked : Qt::Unchecked ;
+    Qt::CheckState showMulticastPopup = settings->value(tr("showMulticastPopup")).toBool() ? Qt::Checked : Qt::Unchecked;
     
     //ui.popupCB->setCheckState(popupState);
     //ui.playSoundCB->setCheckState(soundState);
     ui.noReceiveCB->setCheckState(receiveState);
+    ui.multicastPopupCB->setCheckState(showMulticastPopup);
+    ui.multicastPopupCB->setEnabled(receiveState);
 }
 
 void SettingsDialog::on_buttonBox_accepted()
@@ -41,6 +44,7 @@ void SettingsDialog::on_buttonBox_accepted()
     //settings->setValue(tr("popup_messages"), ui.popupCB->isChecked());
     //settings->setValue(tr("play_sound"), ui.playSoundCB->isChecked());
     settings->setValue(tr("no_receive"), ui.noReceiveCB->isChecked());
+    settings->setValue(tr("showMulticastPopup"), ui.multicastPopupCB->isChecked());
     settings->sync();
     emit settingsChanged();
 }
