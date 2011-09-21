@@ -78,6 +78,14 @@ void Qommunicate::on_actionMulticast_triggered()
     dlg.exec();
 }
 
+void Qommunicate::on_actionRefresh_triggered()
+{
+    MemberUtils::clear();
+    model->clear();
+    memberCountLabel.setText("0");
+    messenger()->login();
+}
+
 void Qommunicate::on_actionQuit_triggered()
 {
     qApp->quit();

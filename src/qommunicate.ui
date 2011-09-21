@@ -1,55 +1,56 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow" >
-  <property name="geometry" >
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>217</width>
+    <width>240</width>
     <height>425</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Qommunicate</string>
   </property>
-  <property name="windowIcon" >
-   <iconset resource="icons.qrc" >
+  <property name="windowIcon">
+   <iconset resource="icons.qrc">
     <normaloff>:/newPrefix/icons/logo_small.png</normaloff>:/newPrefix/icons/logo_small.png</iconset>
   </property>
-  <widget class="QWidget" name="centralwidget" >
-   <layout class="QVBoxLayout" name="verticalLayout_2" >
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout" >
-      <property name="sizeConstraint" >
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="sizeConstraint">
        <enum>QLayout::SetNoConstraint</enum>
       </property>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout" >
+       <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QLabel" name="memberSearchLabel" >
-          <property name="text" >
+         <widget class="QLabel" name="memberSearchLabel">
+          <property name="text">
            <string>S&amp;earch:</string>
           </property>
-          <property name="textFormat" >
+          <property name="textFormat">
            <enum>Qt::AutoText</enum>
           </property>
-          <property name="scaledContents" >
+          <property name="scaledContents">
            <bool>false</bool>
           </property>
-          <property name="buddy" >
+          <property name="buddy">
            <cstring>searchEdit</cstring>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="searchEdit" >
-          <property name="inputMask" >
+         <widget class="QLineEdit" name="searchEdit">
+          <property name="inputMask">
            <string/>
           </property>
-          <property name="text" >
+          <property name="text">
            <string/>
           </property>
-          <property name="maxLength" >
+          <property name="maxLength">
            <number>32767</number>
           </property>
          </widget>
@@ -57,26 +58,26 @@
        </layout>
       </item>
       <item>
-       <widget class="QTreeView" name="memberTree" />
+       <widget class="QTreeView" name="memberTree"/>
       </item>
       <item>
-       <widget class="QComboBox" name="statusCombo" >
-        <property name="toolTip" >
+       <widget class="QComboBox" name="statusCombo">
+        <property name="toolTip">
          <string>Set Status</string>
         </property>
-        <property name="editable" >
+        <property name="editable">
          <bool>true</bool>
         </property>
-        <property name="duplicatesEnabled" >
+        <property name="duplicatesEnabled">
          <bool>true</bool>
         </property>
         <item>
-         <property name="text" >
+         <property name="text">
           <string>Available</string>
          </property>
         </item>
         <item>
-         <property name="text" >
+         <property name="text">
           <string>Stepped out</string>
          </property>
         </item>
@@ -86,89 +87,105 @@
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusbar" />
-  <widget class="QToolBar" name="toolBar" >
-   <property name="windowTitle" >
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
     <string>toolBar</string>
    </property>
-   <property name="iconSize" >
+   <property name="iconSize">
     <size>
      <width>32</width>
      <height>32</height>
     </size>
    </property>
-   <attribute name="toolBarArea" >
+   <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
-   <attribute name="toolBarBreak" >
+   <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionMulticast" />
-   <addaction name="separator" />
-   <addaction name="action_Settings" />
-   <addaction name="action_About" />
-   <addaction name="actionQuit" />
+   <addaction name="actionMulticast"/>
+   <addaction name="separator"/>
+   <addaction name="action_Settings"/>
+   <addaction name="actionRefresh"/>
+   <addaction name="action_About"/>
+   <addaction name="actionQuit"/>
   </widget>
-  <action name="action_Settings" >
-   <property name="icon" >
-    <iconset resource="icons.qrc" >
+  <action name="action_Settings">
+   <property name="icon">
+    <iconset resource="icons.qrc">
      <normaloff>:/newPrefix/icons/configure.png</normaloff>:/newPrefix/icons/configure.png</iconset>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>&amp;Settings</string>
    </property>
-   <property name="shortcut" >
+   <property name="shortcut">
     <string>Ctrl+S</string>
    </property>
-   <property name="menuRole" >
+   <property name="menuRole">
     <enum>QAction::PreferencesRole</enum>
    </property>
   </action>
-  <action name="actionMulticast" >
-   <property name="icon" >
-    <iconset resource="icons.qrc" >
+  <action name="actionMulticast">
+   <property name="icon">
+    <iconset resource="icons.qrc">
      <normaloff>:/newPrefix/icons/broadcast.png</normaloff>:/newPrefix/icons/broadcast.png</iconset>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>&amp;Multicast</string>
    </property>
-   <property name="toolTip" >
+   <property name="toolTip">
     <string>Multicast message</string>
    </property>
-   <property name="shortcut" >
+   <property name="shortcut">
     <string>Ctrl+M</string>
    </property>
   </action>
-  <action name="actionQuit" >
-   <property name="icon" >
-    <iconset resource="icons.qrc" >
+  <action name="actionQuit">
+   <property name="icon">
+    <iconset resource="icons.qrc">
      <normaloff>:/newPrefix/icons/application-exit.png</normaloff>:/newPrefix/icons/application-exit.png</iconset>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>&amp;Quit</string>
    </property>
-   <property name="shortcut" >
+   <property name="shortcut">
     <string>Ctrl+Q</string>
    </property>
-   <property name="menuRole" >
+   <property name="menuRole">
     <enum>QAction::QuitRole</enum>
    </property>
   </action>
-  <action name="action_About" >
-   <property name="icon" >
-    <iconset resource="icons.qrc" >
+  <action name="action_About">
+   <property name="icon">
+    <iconset resource="icons.qrc">
      <normaloff>:/newPrefix/icons/help-about.png</normaloff>:/newPrefix/icons/help-about.png</iconset>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>&amp;About</string>
    </property>
-   <property name="menuRole" >
+   <property name="menuRole">
     <enum>QAction::AboutRole</enum>
+   </property>
+  </action>
+  <action name="actionRefresh">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/newPrefix/icons/view-reload.png</normaloff>:/newPrefix/icons/view-reload.png</iconset>
+   </property>
+   <property name="text">
+    <string>Refresh</string>
+   </property>
+   <property name="toolTip">
+    <string>Refresh Peers</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
    </property>
   </action>
  </widget>
  <resources>
-  <include location="icons.qrc" />
+  <include location="icons.qrc"/>
  </resources>
  <connections/>
  <slots>

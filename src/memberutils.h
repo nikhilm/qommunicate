@@ -29,6 +29,8 @@ public:
     inline static void remove(const char* c, Member* m) { return remove(QString(c), m); } ;
     static void remove(QString, QString);
     inline static void remove(const char* c, QString ip) { return remove(QString(c), ip); } ;
+
+    inline static void clear() { m_hash.clear(); } ;
     
 private:
     static QHash<QString, QHash<QString, Member*> > m_hash;
