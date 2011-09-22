@@ -112,6 +112,8 @@ void Qommunicate::createTrayIcon()
     
     QMenu *menu = new QMenu;
     menu->addAction(ui.actionMulticast);
+    menu->addAction(ui.action_Settings);
+    menu->addSeparator();
     menu->addAction(ui.actionQuit);
     trayIcon->setContextMenu(menu);
     
