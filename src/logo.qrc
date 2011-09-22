@@ -1,5 +1,5 @@
 <RCC>
   <qresource prefix="newPrefix" >
-    <file>icons/logo_large.png</file>
+    <file>icons/128x128/qommunicate.png</file>
   </qresource>
 </RCC>

@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="icons.qrc">
-    <normaloff>:/newPrefix/icons/logo_small.png</normaloff>:/newPrefix/icons/logo_small.png</iconset>
+    <normaloff>:/newPrefix/icons/48x48/qommunicate.png</normaloff>:/newPrefix/icons/48x48/qommunicate.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -105,9 +105,9 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionMulticast"/>
+   <addaction name="actionRefresh"/>
    <addaction name="separator"/>
    <addaction name="action_Settings"/>
-   <addaction name="actionRefresh"/>
    <addaction name="action_About"/>
    <addaction name="actionQuit"/>
   </widget>
