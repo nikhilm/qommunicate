@@ -270,12 +270,23 @@ void Qommunicate::addMember(Message msg)
             Group * group = new Group(groupName);
             group->appendRow(sender);
             model->appendRow(group);
+            saveGroupSettings(groupName);
         }
     }
     
     MemberUtils::insert("members_list", sender);
     memberCountLabel.setText(QString::number(memberCountLabel.text().toInt() + 1));
     ui.memberTree->expandAll();
+}
+
+void Qommunicate::saveGroupSettings(QString groupName)
+{
+    QSettings s;
+    QStringList groups = s.value(tr("groups")).toStringList();
+    if (!groups.contains(groupName)) {
+        groups << groupName;
+        s.setValue(tr("groups"), groups);
+    }
 }
 
 void Qommunicate::addMemberAndAnswer(Message msg)
@@ -393,7 +404,7 @@ void Qommunicate::confirmRead(Message msg)
 {
     //if ignoring multicasts, then we aren't gonna reply to the sealed message
     QSettings s;
-    if(s.value("no_receive").toBool())
+    if(s.value(tr("no_receive")).toBool())
         return;
     
     QString time = QDateTime::currentDateTime().toString("h:mm:ss");

@@ -22,8 +22,9 @@ void SettingsDialog::loadSettings()
     settings = new QSettings;
     
     ui.nickEdit->setText( settings->value(tr("nick"), QDir::home().dirName()).toString() );
-    ui.groupBox->insertItem(0, settings->value(tr("group"), "").toString() );
-    ui.groupBox->setCurrentIndex(0);
+    QString group = settings->value(tr("group"),"").toString();
+    ui.groupBox->addItems( settings->value(tr("groups"), QVariantList()).toStringList() );
+    ui.groupBox->setCurrentIndex( ui.groupBox->findText(group) );
     
     //Qt::CheckState popupState = settings->value(tr("popup_messages")).toBool() ? Qt::Checked : Qt::Unchecked ;
     //Qt::CheckState soundState = settings->value(tr("play_sound")).toBool() ? Qt::Checked : Qt::Unchecked ;
@@ -41,6 +42,13 @@ void SettingsDialog::on_buttonBox_accepted()
 {
     settings->setValue(tr("nick"), ui.nickEdit->text());
     settings->setValue(tr("group"), ui.groupBox->currentText());
+
+    QStringList groups;
+    for (int i=0; i<ui.groupBox->count(); i++) {
+        groups << ui.groupBox->itemText(i);
+    }
+    settings->setValue(tr("groups"), groups);
+
     //settings->setValue(tr("popup_messages"), ui.popupCB->isChecked());
     //settings->setValue(tr("play_sound"), ui.playSoundCB->isChecked());
     settings->setValue(tr("no_receive"), ui.noReceiveCB->isChecked());
