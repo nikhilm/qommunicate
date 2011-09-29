@@ -68,17 +68,7 @@
        <item row="1" column="1">
         <widget class="QComboBox" name="groupBox">
          <property name="editable">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="2">
-        <widget class="QToolButton" name="customGrpButton">
-         <property name="toolTip">
-          <string>Custom group</string>
-         </property>
-         <property name="text">
-          <string>...</string>
+          <bool>true</bool>
          </property>
         </widget>
        </item>

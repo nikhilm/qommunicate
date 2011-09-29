@@ -33,7 +33,6 @@ Qommunicate::Qommunicate(QWidget *parent)
     
     MemberUtils::init();
     populateTree();    
-    firstRun();
     messenger()->login();
     
     //TODO:remove this when status implemented
@@ -49,7 +48,6 @@ Qommunicate::Qommunicate(QWidget *parent)
     connect(messenger(), SIGNAL(msg_fileRecvRequest(Message)), this, SLOT(fileRecvRequested(Message)));
     //connect(messenger(), SIGNAL(msg_getAbsenceInfo(Message)), this, SLOT(sendAbsenceInfo(Message)));
     connect(messenger(), SIGNAL(msg_absence(Message)), this, SLOT(absenceChanged(Message)));
-    
     
     connect(fileUtils(), SIGNAL(newFileSendSocket(QTcpSocket*)), this, SLOT(fileSendRequested(QTcpSocket*)));
 }

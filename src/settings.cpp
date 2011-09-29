@@ -41,6 +41,12 @@ void SettingsDialog::loadSettings()
 void SettingsDialog::on_buttonBox_accepted()
 {
     settings->setValue(tr("nick"), ui.nickEdit->text());
+
+    QString group = ui.groupBox->lineEdit()->text();
+    if (ui.groupBox->findText(group) < 0) {
+        ui.groupBox->insertItem(0, group);
+        ui.groupBox->setCurrentIndex(0);
+    }
     settings->setValue(tr("group"), ui.groupBox->currentText());
 
     QStringList groups;
@@ -55,18 +61,6 @@ void SettingsDialog::on_buttonBox_accepted()
     settings->setValue(tr("showMulticastPopup"), ui.multicastPopupCB->isChecked());
     settings->sync();
     emit settingsChanged();
-}
-
-void SettingsDialog::on_customGrpButton_clicked()
-{
-    bool ok;
-    QString grp = QInputDialog::getText(this, tr("New Group"), tr("Enter name of the new group"), QLineEdit::Normal, "", &ok);
-    
-    if(ok && !grp.isEmpty())
-    {
-        ui.groupBox->addItem(grp);
-        ui.groupBox->setCurrentIndex(ui.groupBox->count()-1);
-    }
 }
 
 void SettingsDialog::dropEvent(QDropEvent *evt)
