@@ -10,7 +10,7 @@
 #include "constants.h"
 #include "sendfileprogressdialog.h"
 
-MessageDialog::MessageDialog(Member* receiver, QWidget *parent) : QDialog(parent)
+MessageDialog::MessageDialog(Member* receiver, QWidget *parent) : QDialog(0)
 {
     receivers << receiver;
     ui.setupUi(this);
