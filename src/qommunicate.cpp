@@ -26,6 +26,9 @@ Qommunicate::Qommunicate(QWidget *parent)
 {
     ui.setupUi(this);
         
+    QSettings s;
+    m_geometry = s.value(tr("geometry"), QByteArray()).toByteArray();
+    restoreGeometry (m_geometry);
     createTrayIcon();
     
     memberCountLabel.setText("0");
@@ -86,19 +89,29 @@ void Qommunicate::on_actionRefresh_triggered()
 
 void Qommunicate::on_actionQuit_triggered()
 {
+    QSettings s;
+    s.setValue(tr("geometry"), saveGeometry());
     qApp->quit();
 }
 
 void Qommunicate::closeEvent(QCloseEvent * event)
 {
+    m_geometry = saveGeometry();
     setVisible(false);
     event->ignore();
 }
 
 void Qommunicate::iconActivated(QSystemTrayIcon::ActivationReason reason)
 {
-    if( reason == QSystemTrayIcon::Trigger )
-        setVisible(!isVisible());
+    if( reason == QSystemTrayIcon::Trigger ) {
+        if (isVisible()) {
+            m_geometry = saveGeometry();
+            setVisible(false);
+        } else {
+            restoreGeometry(m_geometry);
+            setVisible(true);
+        }
+    }
 }
 
 void Qommunicate::createTrayIcon()

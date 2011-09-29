@@ -10,6 +10,7 @@
 #include <QSystemTrayIcon>
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
+#include <QByteArray>
 
 #include "membermodel.h"
 #include "messenger.h"
@@ -66,6 +67,7 @@ private:
     
     QSystemTrayIcon *trayIcon;
     QLabel memberCountLabel;
+    QByteArray m_geometry;
     
     MemberModel *model;
     MemberFilter *filterModel;
