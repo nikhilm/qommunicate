@@ -47,6 +47,9 @@ void SettingsDialog::on_buttonBox_accepted()
         ui.groupBox->insertItem(0, group);
         ui.groupBox->setCurrentIndex(0);
     }
+    else {
+        ui.groupBox->setCurrentIndex ( ui.groupBox->findText(group) );
+    }
     settings->setValue(tr("group"), ui.groupBox->currentText());
 
     QStringList groups;
