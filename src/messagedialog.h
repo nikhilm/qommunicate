@@ -56,6 +56,7 @@ private:
 private slots:
     void messageTimeout();
     void on_sendButton_clicked();
+    void on_attachButton_clicked();
 };
 
 #endif

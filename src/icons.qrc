@@ -7,5 +7,6 @@
         <file>icons/configure.png</file>
         <file>icons/application-exit.png</file>
         <file>icons/view-reload.png</file>
+        <file>icons/document-open.png</file>
     </qresource>
 </RCC>

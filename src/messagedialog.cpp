@@ -5,6 +5,7 @@
  */
 #include "messagedialog.h"
 
+#include <QFileDialog>
 #include "qommunicate.h"
 #include "messenger.h"
 #include "constants.h"
@@ -173,6 +174,17 @@ void MessageDialog::dropEvent(QDropEvent *evt)
         files << url.toLocalFile();
     }
     
+    foreach(Member* to, receivers)
+    {
+        //new FileSendProgressDialog(files, to, ui.messageInput->text());
+        fileUtils()->sendFilesUdpRequest(files, to, ui.messageInput->text());
+    }
+}
+
+void MessageDialog::on_attachButton_clicked()
+{
+    QStringList files = QFileDialog::getOpenFileNames(this, "Select files to attach", QDir::homePath());
+
     foreach(Member* to, receivers)
     {
         //new FileSendProgressDialog(files, to, ui.messageInput->text());

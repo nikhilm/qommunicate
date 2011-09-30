@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>MessageDialog</class>
- <widget class="QDialog" name="MessageDialog" >
-  <property name="geometry" >
+ <widget class="QDialog" name="MessageDialog">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,58 +10,67 @@
     <height>312</height>
    </rect>
   </property>
-  <property name="sizePolicy" >
-   <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="acceptDrops" >
+  <property name="acceptDrops">
    <bool>true</bool>
   </property>
-  <property name="sizeGripEnabled" >
+  <property name="sizeGripEnabled">
    <bool>false</bool>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2" >
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout" >
-     <property name="sizeConstraint" >
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="sizeConstraint">
       <enum>QLayout::SetMaximumSize</enum>
      </property>
      <item>
-      <widget class="QTextEdit" name="messageEdit" >
-       <property name="sizePolicy" >
-        <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+      <widget class="QTextEdit" name="messageEdit">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="focusPolicy" >
+       <property name="focusPolicy">
         <enum>Qt::NoFocus</enum>
        </property>
-       <property name="textInteractionFlags" >
+       <property name="textInteractionFlags">
         <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
        </property>
       </widget>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_2" >
-       <property name="sizeConstraint" >
+      <layout class="QGridLayout" name="gridLayout">
+       <property name="sizeConstraint">
         <enum>QLayout::SetMinimumSize</enum>
        </property>
-       <item>
-        <widget class="QLineEdit" name="messageInput" >
-         <property name="toolTip" >
+       <item row="0" column="0" rowspan="2">
+        <widget class="QLineEdit" name="messageInput">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="toolTip">
           <string>Type message here</string>
          </property>
-         <property name="maxLength" >
+         <property name="maxLength">
           <number>200</number>
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QPushButton" name="sendButton" >
-         <property name="text" >
+       <item row="0" column="1" rowspan="2">
+        <widget class="QPushButton" name="sendButton">
+         <property name="toolTip">
+          <string>Send the message</string>
+         </property>
+         <property name="text">
           <string>&amp;Send</string>
          </property>
         </widget>
@@ -68,16 +78,27 @@
       </layout>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout" >
+      <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <spacer name="horizontalSpacer" >
-         <property name="orientation" >
+        <widget class="QPushButton" name="attachButton">
+         <property name="text">
+          <string>Attach...</string>
+         </property>
+         <property name="icon">
+          <iconset resource="icons.qrc">
+           <normaloff>:/newPrefix/icons/document-open.png</normaloff>:/newPrefix/icons/document-open.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeType" >
+         <property name="sizeType">
           <enum>QSizePolicy::Expanding</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>40</width>
            <height>20</height>
@@ -86,8 +107,11 @@
         </spacer>
        </item>
        <item>
-        <widget class="QCheckBox" name="notifyReadCB" >
-         <property name="text" >
+        <widget class="QCheckBox" name="notifyReadCB">
+         <property name="toolTip">
+          <string>Notify me when user reads the message</string>
+         </property>
+         <property name="text">
           <string>&amp;Notify Read</string>
          </property>
         </widget>
@@ -103,6 +127,8 @@
   <tabstop>sendButton</tabstop>
   <tabstop>messageEdit</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="icons.qrc"/>
+ </resources>
  <connections/>
 </ui>
