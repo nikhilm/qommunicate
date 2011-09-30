@@ -75,8 +75,9 @@ void Qommunicate::on_action_Settings_triggered()
 
 void Qommunicate::on_actionMulticast_triggered()
 {
-    MessageDialog dlg(this);
-    dlg.exec();
+    MessageDialog *dlg =  new MessageDialog(this);
+    dlg->setModal(false);
+    dlg->show();
 }
 
 void Qommunicate::on_actionRefresh_triggered()
@@ -199,7 +200,7 @@ void Qommunicate::on_memberTree_doubleClicked(const QModelIndex& proxyIndex)
     QList<Member*> toDialog = receivers.toList();
     if(toDialog.size() == 1 && MemberUtils::contains("open_conversations", toDialog[0]))
         return;
-    
+
     if(toDialog.size() == 1)
     {
         if(!MemberUtils::contains("open_conversations", toDialog[0]))
