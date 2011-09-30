@@ -8,5 +8,7 @@
         <file>icons/application-exit.png</file>
         <file>icons/view-reload.png</file>
         <file>icons/document-open.png</file>
+        <file>icons/folder-documents.png</file>
+        <file>icons/document-multiple.png</file>
     </qresource>
 </RCC>

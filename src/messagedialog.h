@@ -52,11 +52,14 @@ private:
     QTimer* messageTimer;
     
     bool m_online;
+
+    void setAttachMenu();
     
 private slots:
     void messageTimeout();
     void on_sendButton_clicked();
-    void on_attachButton_clicked();
+    void on_actionFiles_triggered();
+    void on_actionFolder_triggered();
 };
 
 #endif

@@ -6,6 +6,7 @@
 #include "messagedialog.h"
 
 #include <QFileDialog>
+#include <QMenu>
 #include "qommunicate.h"
 #include "messenger.h"
 #include "constants.h"
@@ -16,6 +17,8 @@ MessageDialog::MessageDialog(Member* receiver, QWidget *parent) : QDialog(0)
     receivers << receiver;
     ui.setupUi(this);
     messageTimer = NULL;
+
+    setAttachMenu();
     
     m_online = true;
     setWindowTitle(tr("Conversation: %1").arg(receiver->name()));
@@ -33,6 +36,7 @@ MessageDialog::MessageDialog(QList<Member*> receivers, QWidget *parent) : QDialo
     this->receivers = receivers;
     
     ui.setupUi(this);
+    setAttachMenu();
     
     QStringList titleRecvs;
     Member* t;
@@ -44,10 +48,19 @@ MessageDialog::MessageDialog(QList<Member*> receivers, QWidget *parent) : QDialo
 MessageDialog::MessageDialog(QWidget *parent) : QDialog(0)
 {
     ui.setupUi(this);
+    setAttachMenu();
     setWindowTitle(tr("Multicast message"));
     // no notifications for multicast
     // TODO: is that the right choice?
     ui.notifyReadCB->setEnabled(false);
+}
+
+void MessageDialog::setAttachMenu()
+{
+    QMenu *m = new QMenu();
+    m->addAction(ui.actionFiles);
+    m->addAction(ui.actionFolder);
+    ui.attachButton->setMenu(m);
 }
 
 void MessageDialog::reject()
@@ -173,7 +186,7 @@ void MessageDialog::dropEvent(QDropEvent *evt)
     {
         files << url.toLocalFile();
     }
-    
+
     foreach(Member* to, receivers)
     {
         //new FileSendProgressDialog(files, to, ui.messageInput->text());
@@ -181,9 +194,25 @@ void MessageDialog::dropEvent(QDropEvent *evt)
     }
 }
 
-void MessageDialog::on_attachButton_clicked()
+void MessageDialog::on_actionFiles_triggered()
 {
     QStringList files = QFileDialog::getOpenFileNames(this, "Select files to attach", QDir::homePath());
+    if (files.isEmpty())
+        return;
+
+    foreach(Member* to, receivers)
+    {
+        //new FileSendProgressDialog(files, to, ui.messageInput->text());
+        fileUtils()->sendFilesUdpRequest(files, to, ui.messageInput->text());
+    }
+}
+
+void MessageDialog::on_actionFolder_triggered()
+{
+    QStringList files;
+    files << QFileDialog::getExistingDirectory(this, "Select a folder to attach", QDir::homePath());
+    if (files.at(0).isEmpty())
+        return;
 
     foreach(Member* to, receivers)
     {

@@ -121,6 +121,24 @@
     </layout>
    </item>
   </layout>
+  <action name="actionFiles">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/newPrefix/icons/document-multiple.png</normaloff>:/newPrefix/icons/document-multiple.png</iconset>
+   </property>
+   <property name="text">
+    <string>Files</string>
+   </property>
+  </action>
+  <action name="actionFolder">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/newPrefix/icons/folder-documents.png</normaloff>:/newPrefix/icons/folder-documents.png</iconset>
+   </property>
+   <property name="text">
+    <string>Folder</string>
+   </property>
+  </action>
  </widget>
  <tabstops>
   <tabstop>messageInput</tabstop>
