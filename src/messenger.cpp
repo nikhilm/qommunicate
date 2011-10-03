@@ -251,6 +251,6 @@ bool Messenger::nickChanged()
 bool Messenger::refreshSettings()
 {   
     QSettings s;
-    member_me.setName(s.value(tr("nick"), QString(getenv("USER"))).toString());
-    group_me.setName(s.value(tr("group")).toString());
+    member_me.setName(s.value("nick", QString(getenv("USER"))).toString());
+    group_me.setName(s.value("group").toString());
 }

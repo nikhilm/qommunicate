@@ -27,7 +27,7 @@ Qommunicate::Qommunicate(QWidget *parent)
     ui.setupUi(this);
         
     QSettings s;
-    m_geometry = s.value(tr("geometry"), QByteArray()).toByteArray();
+    m_geometry = s.value("geometry", QByteArray()).toByteArray();
     restoreGeometry (m_geometry);
     createTrayIcon();
     
@@ -91,7 +91,7 @@ void Qommunicate::on_actionRefresh_triggered()
 void Qommunicate::on_actionQuit_triggered()
 {
     QSettings s;
-    s.setValue(tr("geometry"), saveGeometry());
+    s.setValue("geometry", saveGeometry());
     qApp->quit();
 }
 
@@ -294,10 +294,10 @@ void Qommunicate::addMember(Message msg)
 void Qommunicate::saveGroupSettings(QString groupName)
 {
     QSettings s;
-    QStringList groups = s.value(tr("groups")).toStringList();
+    QStringList groups = s.value("groups").toStringList();
     if (!groups.contains(groupName)) {
         groups << groupName;
-        s.setValue(tr("groups"), groups);
+        s.setValue("groups", groups);
     }
 }
 
@@ -354,9 +354,9 @@ void Qommunicate::openDialog(Message msg)
     
     // if set to ignore received messages
     QSettings s;
-    if(s.value(tr("no_receive")).toBool() && (msg.command() & QOM_MULTICASTOPT))
+    if(s.value("no_receive").toBool() && (msg.command() & QOM_MULTICASTOPT))
     {
-        if (s.value(tr("showMulticastPopup")).toBool()) {
+        if (s.value("showMulticastPopup").toBool()) {
             notify(tr("Multicast"), tr("Multicast from %1 ignored").arg(MemberUtils::get("members_list", msg.sender())->name()));
         }
         if(msg.command() & QOM_SENDCHECKOPT)
@@ -416,7 +416,7 @@ void Qommunicate::confirmRead(Message msg)
 {
     //if ignoring multicasts, then we aren't gonna reply to the sealed message
     QSettings s;
-    if(s.value(tr("no_receive")).toBool())
+    if(s.value("no_receive").toBool())
         return;
     
     QString time = QDateTime::currentDateTime().toString("h:mm:ss");
