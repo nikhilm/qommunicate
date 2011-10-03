@@ -69,6 +69,8 @@ void MessageDialog::reject()
 {
     if(receivers.size() == 1)
         ((Qommunicate*) parent())->dialogClosed(receivers[0]);
+    if (messageTimer != NULL)
+        messageTimer->stop();
     QDialog::reject();
 }
 
