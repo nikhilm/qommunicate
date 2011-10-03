@@ -7,6 +7,7 @@
 
 #include <QFileDialog>
 #include <QMenu>
+#include <QRegExp>
 #include "qommunicate.h"
 #include "messenger.h"
 #include "constants.h"
@@ -70,6 +71,23 @@ void MessageDialog::reject()
     QDialog::reject();
 }
 
+QString detectUrls(QString str)
+{
+    QRegExp rx("(http|https|ftp)://\\S+");
+    QStringList links;
+    int pos = 0;
+    while ( (pos=rx.indexIn(str, pos)) != -1 ) {
+        links << rx.cap(0);
+        pos += rx.matchedLength();
+    }
+
+    foreach (const QString link, links) {
+        str.replace(link, "<a href=\""+link+"\">"+link+"</a>");
+    }
+
+    return str;
+}
+
 void MessageDialog::incomingMessage(Message msg)
 {
     if(msg.sender()->addressString() != receivers[0]->addressString())
@@ -77,7 +95,7 @@ void MessageDialog::incomingMessage(Message msg)
     
     QString text = QString("<b style=\"color:blue;\">%1: </b> ")
                         .arg(Qt::escape(receivers[0]->name()));
-    text += Qt::escape(msg.payload().replace('\a', "").trimmed());
+    text += detectUrls(Qt::escape(msg.payload().replace('\a', "").trimmed()));
     ui.messageEdit->append(text);
     QApplication::alert(this, 0);
     
@@ -147,7 +165,7 @@ void MessageDialog::messageRecvConfirm(Message msg)
     if(! ui.messageInput->text().trimmed().isEmpty())
         ui.messageEdit->append(QString("<b style=\"color:red;\">%1: </b> %2")
                             .arg(Qt::escape(me().name()))
-                            .arg(Qt::escape(ui.messageInput->text())));
+                            .arg(detectUrls(Qt::escape(ui.messageInput->text()))));
     
     ui.messageInput->clear();
     ui.messageInput->setEnabled(true);
