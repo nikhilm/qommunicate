@@ -301,10 +301,9 @@ void Qommunicate::saveGroupSettings(QString groupName)
     if (!groups.contains(groupName)) {
         groups << groupName;
     }
-    QString myGrpName = myGroup().name();
-    if (groupName == myGrpName) {
+    if (groupName == myGroup().name()) {
         // move myGroup to top of the list
-        groups.swap(groups.indexOf(myGrpName), 0);
+        groups.swap(groups.indexOf(groupName), 0);
         s.setValue("groups", groups);
     }
 }
