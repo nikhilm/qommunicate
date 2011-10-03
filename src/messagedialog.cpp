@@ -246,3 +246,10 @@ void MessageDialog::on_messageEdit_anchorClicked(const QUrl &url)
 {
     QDesktopServices::openUrl(url);
 }
+
+void MessageDialog::on_messageEdit_customContextMenuRequested(const QPoint &pos)
+{
+    QMenu *menu = ui.messageEdit->createStandardContextMenu(pos);
+    menu->exec(ui.messageEdit->mapToGlobal(pos));
+    delete menu;
+}
