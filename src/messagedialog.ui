@@ -85,7 +85,7 @@
        <item>
         <widget class="QPushButton" name="attachButton">
          <property name="text">
-          <string>Attach...</string>
+          <string>&amp;Attach...</string>
          </property>
          <property name="icon">
           <iconset resource="icons.qrc">
@@ -130,7 +130,7 @@
      <normaloff>:/newPrefix/icons/document-multiple.png</normaloff>:/newPrefix/icons/document-multiple.png</iconset>
    </property>
    <property name="text">
-    <string>Files</string>
+    <string>F&amp;iles</string>
    </property>
   </action>
   <action name="actionFolder">
@@ -139,7 +139,7 @@
      <normaloff>:/newPrefix/icons/folder-documents.png</normaloff>:/newPrefix/icons/folder-documents.png</iconset>
    </property>
    <property name="text">
-    <string>Folder</string>
+    <string>F&amp;older</string>
    </property>
   </action>
  </widget>
