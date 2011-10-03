@@ -8,6 +8,7 @@
 #include <QFileDialog>
 #include <QMenu>
 #include <QRegExp>
+#include <QDesktopServices>
 #include "qommunicate.h"
 #include "messenger.h"
 #include "constants.h"
@@ -237,4 +238,9 @@ void MessageDialog::on_actionFolder_triggered()
         //new FileSendProgressDialog(files, to, ui.messageInput->text());
         fileUtils()->sendFilesUdpRequest(files, to, ui.messageInput->text());
     }
+}
+
+void MessageDialog::on_messageEdit_anchorClicked(const QUrl &url)
+{
+    QDesktopServices::openUrl(url);
 }

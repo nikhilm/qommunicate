@@ -60,6 +60,7 @@ private slots:
     void on_sendButton_clicked();
     void on_actionFiles_triggered();
     void on_actionFolder_triggered();
+    void on_messageEdit_anchorClicked(const QUrl &url);
 };
 
 #endif
