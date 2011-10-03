@@ -281,7 +281,10 @@ void Qommunicate::addMember(Message msg)
         {
             Group * group = new Group(groupName);
             group->appendRow(sender);
-            model->appendRow(group);
+            if (groupName == myGroup().name())
+                model->insertRow(0, group);
+            else
+                model->appendRow(group);
             saveGroupSettings(groupName);
         }
     }
@@ -297,6 +300,11 @@ void Qommunicate::saveGroupSettings(QString groupName)
     QStringList groups = s.value("groups").toStringList();
     if (!groups.contains(groupName)) {
         groups << groupName;
+    }
+    QString myGrpName = myGroup().name();
+    if (groupName == myGrpName) {
+        // move myGroup to top of the list
+        groups.swap(groups.indexOf(myGrpName), 0);
         s.setValue("groups", groups);
     }
 }
