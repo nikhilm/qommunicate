@@ -48,7 +48,7 @@ void SettingsDialog::on_buttonBox_accepted()
         ui.groupBox->setCurrentIndex(0);
     }
     else {
-        ui.groupBox->setCurrentIndex ( ui.groupBox->findText(group) );
+        ui.groupBox->setCurrentIndex( ui.groupBox->findText(group) );
     }
     settings->setValue("group", ui.groupBox->currentText());
 

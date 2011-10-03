@@ -66,10 +66,10 @@ private slots:
     void requestFiles();
     bool informUser();
     void readRequest();
-    void userInformed (QAbstractButton* btn);
+    void userInformed(QAbstractButton*);
     
 private:
-    QMessageBox *m_notifyDlg;
+    QMessageBox *m_notifyDialog;
     Message m_msg;
     QTcpSocket* m_socket;
     int m_requestType;

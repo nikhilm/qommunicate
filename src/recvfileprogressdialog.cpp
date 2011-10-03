@@ -152,24 +152,24 @@ bool RecvFileProgressDialog::informUser()
     
     message.append(tr("\n\nDo you want to accept the files?"));
 
-    m_notifyDlg = new QMessageBox(QMessageBox::Question,
+    m_notifyDialog = new QMessageBox(QMessageBox::Question,
                                 tr("Receiving files"),
                                 message,
                                 QMessageBox::Yes | QMessageBox::No);
-    m_notifyDlg->setDefaultButton(QMessageBox::Yes);
-    connect (m_notifyDlg, SIGNAL (buttonClicked(QAbstractButton*)),
-             this, SLOT (userInformed(QAbstractButton*)));
-    m_notifyDlg->setModal(false);
-    m_notifyDlg->show();
+    m_notifyDialog->setDefaultButton(QMessageBox::Yes);
+    connect(m_notifyDialog, SIGNAL(buttonClicked(QAbstractButton*)),
+            this, SLOT(userInformed(QAbstractButton*)));
+    m_notifyDialog->setModal(false);
+    m_notifyDialog->show();
     return true;
 }
 
-void RecvFileProgressDialog::userInformed (QAbstractButton *btn)
+void RecvFileProgressDialog::userInformed (QAbstractButton *userResponse)
 {
-    disconnect (m_notifyDlg, SIGNAL(buttonClicked(QAbstractButton*)),
-                this, SLOT(userInformed(QAbstractButton*)));
-    QMessageBox::StandardButton sBtn = m_notifyDlg->standardButton (btn);
-    if (sBtn == QMessageBox::Yes) {
+    disconnect(m_notifyDialog, SIGNAL(buttonClicked(QAbstractButton*)),
+               this, SLOT(userInformed(QAbstractButton*)));
+    QMessageBox::StandardButton userClicked = m_notifyDialog->standardButton(userResponse);
+    if (userClicked == QMessageBox::Yes) {
         while (true) {
             m_saveDir = QFileDialog::getExistingDirectory(this, tr("Save To"));
             if (m_saveDir.isEmpty()) { // browse cancelled
@@ -177,10 +177,10 @@ void RecvFileProgressDialog::userInformed (QAbstractButton *btn)
                 return;
             }
             else if ( !(QFile::permissions(m_saveDir) & QFile::WriteUser) ) { // no write permissions in destination
-                QMessageBox::StandardButton which = QMessageBox::critical (this, "Error saving files",
-                                                                           "You do not have permission to save files in "+m_saveDir,
-                                                                           QMessageBox::Retry | QMessageBox::Cancel,
-                                                                           QMessageBox::Retry);
+                QMessageBox::StandardButton which = QMessageBox::critical(this, "Error saving files",
+                                                                          "You do not have permission to save files in "+m_saveDir,
+                                                                          QMessageBox::Retry | QMessageBox::Cancel,
+                                                                          QMessageBox::Retry);
                 if (which == QMessageBox::Cancel) { // user does not want to enter another destination
                     reject();
                     return;
