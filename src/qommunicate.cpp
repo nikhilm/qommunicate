@@ -63,7 +63,8 @@ void Qommunicate::on_searchEdit_textChanged(const QString &text)
 
 void Qommunicate::on_action_About_triggered()
 {
-    AboutDialog(this).exec();
+    AboutDialog *dlg = new AboutDialog(this);
+    dlg->show();
 }
 
 void Qommunicate::on_action_Settings_triggered()

@@ -65,6 +65,9 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;(C) 2008 Nikhil Marathe&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;http://22bits.exofire.net/browse/code/qommunicate&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline; color:#0057ae;&quot;&gt;Qommunicate Homepage&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
+       <property name="openExternalLinks">
+        <bool>true</bool>
+       </property>
        <property name="textFormat">
         <enum>Qt::RichText</enum>
        </property>
