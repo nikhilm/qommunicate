@@ -26,6 +26,9 @@ Qommunicate::Qommunicate(QWidget *parent)
 {
     ui.setupUi(this);
         
+    QSettings s;
+    m_geometry = s.value("geometry", QByteArray()).toByteArray();
+    restoreGeometry (m_geometry);
     createTrayIcon();
     
     memberCountLabel.setText("0");
@@ -33,7 +36,6 @@ Qommunicate::Qommunicate(QWidget *parent)
     
     MemberUtils::init();
     populateTree();    
-    firstRun();
     messenger()->login();
     
     //TODO:remove this when status implemented
@@ -50,7 +52,6 @@ Qommunicate::Qommunicate(QWidget *parent)
     //connect(messenger(), SIGNAL(msg_getAbsenceInfo(Message)), this, SLOT(sendAbsenceInfo(Message)));
     connect(messenger(), SIGNAL(msg_absence(Message)), this, SLOT(absenceChanged(Message)));
     
-    
     connect(fileUtils(), SIGNAL(newFileSendSocket(QTcpSocket*)), this, SLOT(fileSendRequested(QTcpSocket*)));
 }
 
@@ -62,7 +63,8 @@ void Qommunicate::on_searchEdit_textChanged(const QString &text)
 
 void Qommunicate::on_action_About_triggered()
 {
-    AboutDialog(this).exec();
+    AboutDialog *dlg = new AboutDialog(this);
+    dlg->show();
 }
 
 void Qommunicate::on_action_Settings_triggered()
@@ -74,25 +76,44 @@ void Qommunicate::on_action_Settings_triggered()
 
 void Qommunicate::on_actionMulticast_triggered()
 {
-    MessageDialog dlg(this);
-    dlg.exec();
+    MessageDialog *dlg =  new MessageDialog(this);
+    dlg->setModal(false);
+    dlg->show();
+}
+
+void Qommunicate::on_actionRefresh_triggered()
+{
+    MemberUtils::clear();
+    model->clear();
+    memberCountLabel.setText("0");
+    messenger()->login();
 }
 
 void Qommunicate::on_actionQuit_triggered()
 {
+    QSettings s;
+    s.setValue("geometry", saveGeometry());
     qApp->quit();
 }
 
 void Qommunicate::closeEvent(QCloseEvent * event)
 {
+    m_geometry = saveGeometry();
     setVisible(false);
     event->ignore();
 }
 
 void Qommunicate::iconActivated(QSystemTrayIcon::ActivationReason reason)
 {
-    if( reason == QSystemTrayIcon::Trigger )
-        setVisible(!isVisible());
+    if( reason == QSystemTrayIcon::Trigger ) {
+        if (isVisible()) {
+            m_geometry = saveGeometry();
+            setVisible(false);
+        } else {
+            restoreGeometry(m_geometry);
+            setVisible(true);
+        }
+    }
 }
 
 void Qommunicate::createTrayIcon()
@@ -104,6 +125,8 @@ void Qommunicate::createTrayIcon()
     
     QMenu *menu = new QMenu;
     menu->addAction(ui.actionMulticast);
+    menu->addAction(ui.action_Settings);
+    menu->addSeparator();
     menu->addAction(ui.actionQuit);
     trayIcon->setContextMenu(menu);
     
@@ -178,7 +201,7 @@ void Qommunicate::on_memberTree_doubleClicked(const QModelIndex& proxyIndex)
     QList<Member*> toDialog = receivers.toList();
     if(toDialog.size() == 1 && MemberUtils::contains("open_conversations", toDialog[0]))
         return;
-    
+
     if(toDialog.size() == 1)
     {
         if(!MemberUtils::contains("open_conversations", toDialog[0]))
@@ -259,13 +282,31 @@ void Qommunicate::addMember(Message msg)
         {
             Group * group = new Group(groupName);
             group->appendRow(sender);
-            model->appendRow(group);
+            if (groupName == myGroup().name())
+                model->insertRow(0, group);
+            else
+                model->appendRow(group);
+            saveGroupSettings(groupName);
         }
     }
     
     MemberUtils::insert("members_list", sender);
     memberCountLabel.setText(QString::number(memberCountLabel.text().toInt() + 1));
     ui.memberTree->expandAll();
+}
+
+void Qommunicate::saveGroupSettings(QString groupName)
+{
+    QSettings s;
+    QStringList groups = s.value("groups").toStringList();
+    if (!groups.contains(groupName)) {
+        groups << groupName;
+    }
+    if (groupName == myGroup().name()) {
+        // move myGroup to top of the list
+        groups.swap(groups.indexOf(groupName), 0);
+        s.setValue("groups", groups);
+    }
 }
 
 void Qommunicate::addMemberAndAnswer(Message msg)
@@ -321,9 +362,11 @@ void Qommunicate::openDialog(Message msg)
     
     // if set to ignore received messages
     QSettings s;
-    if(s.value(tr("no_receive")).toBool() && (msg.command() & QOM_MULTICASTOPT))
+    if(s.value("no_receive").toBool() && (msg.command() & QOM_MULTICASTOPT))
     {
-        notify(tr("Multicast"), tr("Multicast from %1 ignored").arg(MemberUtils::get("members_list", msg.sender())->name()));
+        if (s.value("showMulticastPopup").toBool()) {
+            notify(tr("Multicast"), tr("Multicast from %1 ignored").arg(MemberUtils::get("members_list", msg.sender())->name()));
+        }
         if(msg.command() & QOM_SENDCHECKOPT)
             messenger()->sendMessage(QOM_RECVMSG, QByteArray::number(msg.packetNo()), msg.sender());
         return;
@@ -332,7 +375,7 @@ void Qommunicate::openDialog(Message msg)
     Member* with = MemberUtils::get("members_list", msg.sender());
     if(!with->isValid())
         with = msg.sender();
-    MessageDialog *dlg = new MessageDialog(new Member(*with));
+    MessageDialog *dlg = new MessageDialog(new Member(*with), this);
     dlg->setModal(false);
     dlg->show();
     dlg->incomingMessage(msg);

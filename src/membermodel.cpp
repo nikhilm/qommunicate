@@ -22,7 +22,7 @@ MemberFilter::MemberFilter(QObject *parent=0) : QSortFilterProxyModel(parent) {}
 Qt::ItemFlags MemberModel::flags(const QModelIndex& index) const
 {
     if(index.isValid())
-        return Qt::ItemIsDropEnabled | Qt::ItemIsEnabled;
+        return Qt::ItemIsDropEnabled | Qt::ItemIsEnabled | Qt::ItemIsSelectable;
     return Qt::ItemIsDropEnabled ;
 }
 

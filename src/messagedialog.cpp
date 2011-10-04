@@ -5,16 +5,22 @@
  */
 #include "messagedialog.h"
 
+#include <QFileDialog>
+#include <QMenu>
+#include <QRegExp>
+#include <QDesktopServices>
 #include "qommunicate.h"
 #include "messenger.h"
 #include "constants.h"
 #include "sendfileprogressdialog.h"
 
-MessageDialog::MessageDialog(Member* receiver, QWidget *parent) : QDialog(parent)
+MessageDialog::MessageDialog(Member* receiver, QWidget *parent) : QDialog(0)
 {
     receivers << receiver;
     ui.setupUi(this);
     messageTimer = NULL;
+
+    setAttachMenu();
     
     m_online = true;
     setWindowTitle(tr("Conversation: %1").arg(receiver->name()));
@@ -27,11 +33,12 @@ MessageDialog::MessageDialog(Member* receiver, QWidget *parent) : QDialog(parent
     
 }
 
-MessageDialog::MessageDialog(QList<Member*> receivers, QWidget *parent) : QDialog(parent)
+MessageDialog::MessageDialog(QList<Member*> receivers, QWidget *parent) : QDialog(0)
 {
     this->receivers = receivers;
     
     ui.setupUi(this);
+    setAttachMenu();
     
     QStringList titleRecvs;
     Member* t;
@@ -40,20 +47,48 @@ MessageDialog::MessageDialog(QList<Member*> receivers, QWidget *parent) : QDialo
     setWindowTitle(tr("Conversation: %1").arg(titleRecvs.join(",")));
 }
 
-MessageDialog::MessageDialog(QWidget *parent) : QDialog(parent)
+MessageDialog::MessageDialog(QWidget *parent) : QDialog(0)
 {
     ui.setupUi(this);
+    setAttachMenu();
     setWindowTitle(tr("Multicast message"));
     // no notifications for multicast
     // TODO: is that the right choice?
     ui.notifyReadCB->setEnabled(false);
 }
 
+void MessageDialog::setAttachMenu()
+{
+    QMenu *m = new QMenu();
+    m->addAction(ui.actionFiles);
+    m->addAction(ui.actionFolder);
+    ui.attachButton->setMenu(m);
+}
+
 void MessageDialog::reject()
 {
     if(receivers.size() == 1)
         ((Qommunicate*) parent())->dialogClosed(receivers[0]);
+    if (messageTimer != NULL)
+        messageTimer->stop();
     QDialog::reject();
+}
+
+QString detectUrls(QString str)
+{
+    QRegExp rx("(http|https|ftp)://\\S+");
+    QStringList links;
+    int pos = 0;
+    while ( (pos=rx.indexIn(str, pos)) != -1 ) {
+        links << rx.cap(0);
+        pos += rx.matchedLength();
+    }
+
+    foreach (const QString link, links) {
+        str.replace(link, "<a href=\""+link+"\">"+link+"</a>");
+    }
+
+    return str;
 }
 
 void MessageDialog::incomingMessage(Message msg)
@@ -61,9 +96,9 @@ void MessageDialog::incomingMessage(Message msg)
     if(msg.sender()->addressString() != receivers[0]->addressString())
         return;
     
-    QString text = QString("<b style=\"color:blue;\">%1 : </b> ")
+    QString text = QString("<b style=\"color:blue;\">%1: </b> ")
                         .arg(Qt::escape(receivers[0]->name()));
-    text += Qt::escape(msg.payload().replace('\a', "").trimmed());
+    text += detectUrls(Qt::escape(msg.payload().replace('\a', "").trimmed()));
     ui.messageEdit->append(text);
     QApplication::alert(this, 0);
     
@@ -131,9 +166,9 @@ void MessageDialog::messageRecvConfirm(Message msg)
         return;
     
     if(! ui.messageInput->text().trimmed().isEmpty())
-        ui.messageEdit->append(QString("<b style=\"color:red;\">%1 : </b> %2")
+        ui.messageEdit->append(QString("<b style=\"color:red;\">%1: </b> %2")
                             .arg(Qt::escape(me().name()))
-                            .arg(Qt::escape(ui.messageInput->text())));
+                            .arg(detectUrls(Qt::escape(ui.messageInput->text()))));
     
     ui.messageInput->clear();
     ui.messageInput->setEnabled(true);
@@ -172,10 +207,49 @@ void MessageDialog::dropEvent(QDropEvent *evt)
     {
         files << url.toLocalFile();
     }
-    
+
     foreach(Member* to, receivers)
     {
         //new FileSendProgressDialog(files, to, ui.messageInput->text());
         fileUtils()->sendFilesUdpRequest(files, to, ui.messageInput->text());
     }
+}
+
+void MessageDialog::on_actionFiles_triggered()
+{
+    QStringList files = QFileDialog::getOpenFileNames(this, "Select files to attach", QDir::homePath());
+    if (files.isEmpty())
+        return;
+
+    foreach(Member* to, receivers)
+    {
+        //new FileSendProgressDialog(files, to, ui.messageInput->text());
+        fileUtils()->sendFilesUdpRequest(files, to, ui.messageInput->text());
+    }
+}
+
+void MessageDialog::on_actionFolder_triggered()
+{
+    QStringList files;
+    files << QFileDialog::getExistingDirectory(this, "Select a folder to attach", QDir::homePath());
+    if (files.at(0).isEmpty())
+        return;
+
+    foreach(Member* to, receivers)
+    {
+        //new FileSendProgressDialog(files, to, ui.messageInput->text());
+        fileUtils()->sendFilesUdpRequest(files, to, ui.messageInput->text());
+    }
+}
+
+void MessageDialog::on_messageEdit_anchorClicked(const QUrl &url)
+{
+    QDesktopServices::openUrl(url);
+}
+
+void MessageDialog::on_messageEdit_customContextMenuRequested(const QPoint &pos)
+{
+    QMenu *menu = ui.messageEdit->createStandardContextMenu(pos);
+    menu->exec(ui.messageEdit->mapToGlobal(pos));
+    delete menu;
 }

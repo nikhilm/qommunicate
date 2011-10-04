@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Qommunicate
+GenericName=IP Messenger Clone
+Comment=A cross platform IP Messenger clone with modern and intuitive user interface
+Exec=qommunicate
+Icon=qommunicate
+Terminal=false
+Type=Application
+Categories=Network;
