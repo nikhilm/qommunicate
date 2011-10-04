@@ -10,6 +10,7 @@
 #include <QSystemTrayIcon>
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
+#include <QByteArray>
 
 #include "membermodel.h"
 #include "messenger.h"
@@ -37,6 +38,7 @@ private slots:
     void on_action_About_triggered();
     void on_action_Settings_triggered();
     void on_actionMulticast_triggered();
+    void on_actionRefresh_triggered();
     void on_actionQuit_triggered();
     
     void on_memberTree_doubleClicked(const QModelIndex&);
@@ -65,6 +67,7 @@ private:
     
     QSystemTrayIcon *trayIcon;
     QLabel memberCountLabel;
+    QByteArray m_geometry;
     
     MemberModel *model;
     MemberFilter *filterModel;
@@ -76,6 +79,7 @@ private:
     void keyPressEvent(QKeyEvent *);
     bool createGroupMemberList(QStandardItem*, QSet<Member*>&);
     
+    void saveGroupSettings(QString);
     void notify(const QString&, const QString&, bool dialog=false);
 };
 

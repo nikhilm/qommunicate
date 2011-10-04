@@ -9,6 +9,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QTimer>
+#include <QFile>
 
 #include "constants.h"
 #include "memberutils.h"
@@ -150,16 +151,53 @@ bool RecvFileProgressDialog::informUser()
         message.append("\n\nMessage: " + msg);
     
     message.append(tr("\n\nDo you want to accept the files?"));
-    if(QMessageBox::No == QMessageBox::question(NULL, 
-                           tr("Receiving files"), 
-                           message, 
-                           QMessageBox::Yes | QMessageBox::No,
-                           QMessageBox::Yes)) // last is default button
-        return false;
-    else
-        m_saveDir = QFileDialog::getExistingDirectory(this, tr("Save To"));
-    
+
+    m_notifyDialog = new QMessageBox(QMessageBox::Question,
+                                tr("Receiving files"),
+                                message,
+                                QMessageBox::Yes | QMessageBox::No);
+    m_notifyDialog->setDefaultButton(QMessageBox::Yes);
+    connect(m_notifyDialog, SIGNAL(buttonClicked(QAbstractButton*)),
+            this, SLOT(userInformed(QAbstractButton*)));
+    m_notifyDialog->setModal(false);
+    m_notifyDialog->show();
     return true;
+}
+
+void RecvFileProgressDialog::userInformed (QAbstractButton *userResponse)
+{
+    disconnect(m_notifyDialog, SIGNAL(buttonClicked(QAbstractButton*)),
+               this, SLOT(userInformed(QAbstractButton*)));
+    QMessageBox::StandardButton userClicked = m_notifyDialog->standardButton(userResponse);
+    if (userClicked == QMessageBox::Yes) {
+        while (true) {
+            m_saveDir = QFileDialog::getExistingDirectory(this, tr("Save To"));
+            if (m_saveDir.isEmpty()) { // browse cancelled
+                reject();
+                return;
+            }
+            else if ( !(QFile::permissions(m_saveDir) & QFile::WriteUser) ) { // no write permissions in destination
+                QMessageBox::StandardButton which = QMessageBox::critical(this, "Error saving files",
+                                                                          "You do not have permission to save files in "+m_saveDir,
+                                                                          QMessageBox::Retry | QMessageBox::Cancel,
+                                                                          QMessageBox::Retry);
+                if (which == QMessageBox::Cancel) { // user does not want to enter another destination
+                    reject();
+                    return;
+                }
+                else { // user wants to retry
+                    continue;
+                }
+            }
+            else {
+                break;
+            }
+        }
+        startReceiving();
+    }
+    else {
+        reject();
+    }
 }
 
 // TODO: share with sending dialog?

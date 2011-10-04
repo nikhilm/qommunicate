@@ -9,6 +9,7 @@
 #include <QProgressDialog>
 #include <QTcpSocket>
 #include <QDir>
+#include <QMessageBox>
 
 #include "messenger.h"
 #include "fileutils.h"
@@ -20,7 +21,7 @@ class RecvFileProgressDialog : public QProgressDialog
     Q_OBJECT
 public:
     RecvFileProgressDialog(Message& msg, QWidget* parent=0) :
-        QProgressDialog("", tr("&Cancel"), 0, 100, parent), m_msg(msg)
+        QProgressDialog("", tr("&Cancel"), 0, 100, 0), m_msg(msg)
     {
         setAttribute(Qt::WA_DeleteOnClose);
         setMinimumDuration(0);
@@ -33,10 +34,7 @@ public:
         m_waitingForData = 0;
         m_inHeader = true;
         
-        if(informUser())
-            startReceiving();
-        else
-            reject();
+        informUser();
     }
     
     ~RecvFileProgressDialog()
@@ -68,8 +66,10 @@ private slots:
     void requestFiles();
     bool informUser();
     void readRequest();
+    void userInformed(QAbstractButton*);
     
 private:
+    QMessageBox *m_notifyDialog;
     Message m_msg;
     QTcpSocket* m_socket;
     int m_requestType;
