@@ -204,13 +204,15 @@ void Qommunicate::on_memberTree_doubleClicked(const QModelIndex& proxyIndex)
 
     if(toDialog.size() == 1)
     {
-        if(!MemberUtils::contains("open_conversations", toDialog[0]))
-            dlg = new MessageDialog( new Member(*toDialog[0]), this );
+        dlg = new MessageDialog( new Member(*toDialog[0]), this );
     }
     else
+    {
         dlg = new MessageDialog( toDialog, this );
+    }
     
     dlg->setModal(false);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
     dlg->show();
 }
 

@@ -30,7 +30,6 @@ MessageDialog::MessageDialog(Member* receiver, QWidget *parent) : QDialog(0)
     connect(messenger(), SIGNAL(msg_entry(Message)), this, SLOT(userOnline(Message)));
     
     ((Qommunicate*)parent)->dialogOpened(receiver);
-    
 }
 
 MessageDialog::MessageDialog(QList<Member*> receivers, QWidget *parent) : QDialog(0)
@@ -67,11 +66,13 @@ void MessageDialog::setAttachMenu()
 
 void MessageDialog::reject()
 {
-    if(receivers.size() == 1)
+    if(receivers.size() == 1) {
         ((Qommunicate*) parent())->dialogClosed(receivers[0]);
-    if (messageTimer != NULL)
-        messageTimer->stop();
+        if (messageTimer != NULL)
+            messageTimer->stop();
+    }
     QDialog::reject();
+    close();
 }
 
 QString detectUrls(QString str)

@@ -46,11 +46,8 @@ public slots:
 
 private:
     Ui::MessageDialog ui;
-    
     QList<Member*> receivers;
-    
     QTimer* messageTimer;
-    
     bool m_online;
 
     void setAttachMenu();
