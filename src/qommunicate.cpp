@@ -307,8 +307,8 @@ void Qommunicate::saveGroupSettings(QString groupName)
     if (groupName == myGroup().name()) {
         // move myGroup to top of the list
         groups.swap(groups.indexOf(groupName), 0);
-        s.setValue("groups", groups);
     }
+    s.setValue("groups", groups);
 }
 
 void Qommunicate::addMemberAndAnswer(Message msg)
