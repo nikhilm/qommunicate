@@ -224,9 +224,15 @@ QStringList Messenger::ips() const
     QStringList ret;
     
     QString ipKey;
-    foreach(ipKey, s.childKeys())
-    {
+    foreach(ipKey, s.childKeys()) {
         ret << s.value(ipKey).toString();
+    }
+
+    // fetch IP Messenger IPs
+    QSettings ipmsg("HSTools", "IpMsgEng");
+    ipmsg.beginGroup("BroadCast");
+    foreach(ipKey, ipmsg.childKeys()) {
+        ret << ipmsg.value(ipKey).toString();
     }
     
     return ret;
