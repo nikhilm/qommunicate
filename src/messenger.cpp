@@ -232,7 +232,9 @@ QStringList Messenger::ips() const
     QSettings ipmsg("HSTools", "IpMsgEng");
     ipmsg.beginGroup("BroadCast");
     foreach(ipKey, ipmsg.childKeys()) {
-        ret << ipmsg.value(ipKey).toString();
+        QString ip = ipmsg.value(ipKey).toString();
+        if (!ret.contains(ip))
+            ret << ip;
     }
     
     return ret;
