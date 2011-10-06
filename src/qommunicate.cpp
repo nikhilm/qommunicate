@@ -175,9 +175,9 @@ bool Qommunicate::createGroupMemberList(QStandardItem* item, QSet<Member*>& rece
     return false;
 }
 
-QStandardItem* Qommunicate::getItemFromIndex(const QModelIndex& i)
+QStandardItem* Qommunicate::itemFromProxyIndex(const QModelIndex& proxyIndex)
 {
-    QModelIndex index = filterModel->mapToSource(i);
+    QModelIndex index = filterModel->mapToSource(proxyIndex);
     return model->itemFromIndex(index);
 }
 
@@ -187,7 +187,7 @@ void Qommunicate::on_memberTree_doubleClicked(const QModelIndex& proxyIndex)
     MessageDialog* dlg;
     QSet<Member*> receivers;
     
-    QStandardItem *with = getItemFromIndex(proxyIndex);
+    QStandardItem *with = itemFromProxyIndex(proxyIndex);
     
     if(with != NULL)
     {
@@ -198,7 +198,7 @@ void Qommunicate::on_memberTree_doubleClicked(const QModelIndex& proxyIndex)
     {
         QModelIndex i;
         foreach(i, ui.memberTree->selectionModel()->selectedRows()) {
-            createGroupMemberList(getItemFromIndex(i), receivers);
+            createGroupMemberList(itemFromProxyIndex(i), receivers);
         }
     }
     
@@ -452,25 +452,25 @@ void Qommunicate::absenceChanged(Message msg)
 //     MemberUtils::get("members_list", msg.sender())->setStatus(status);
 }
 
-void Qommunicate::on_memberTree_collapsed(const QModelIndex& index)
+void Qommunicate::on_memberTree_collapsed(const QModelIndex& proxyIndex)
 {
     if (searching)
         return;
     QSettings s;
     QStringList expanded = s.value("expandedGroups").toStringList();
-    QString groupName = ((Group*)getItemFromIndex(index))->name();
+    QString groupName = ((Group*)itemFromProxyIndex(proxyIndex))->name();
     if (expanded.contains(groupName))
         expanded.removeOne(groupName);
     s.setValue("expandedGroups", expanded);
 }
 
-void Qommunicate::on_memberTree_expanded(const QModelIndex& index)
+void Qommunicate::on_memberTree_expanded(const QModelIndex& proxyIndex)
 {
     if (searching)
         return;
     QSettings s;
     QStringList expanded = s.value("expandedGroups").toStringList();
-    QString groupName = ((Group*)getItemFromIndex(index))->name();
+    QString groupName = ((Group*)itemFromProxyIndex(proxyIndex))->name();
     if (!expanded.contains(groupName))
         expanded << groupName;
     s.setValue("expandedGroups", expanded);
@@ -486,10 +486,11 @@ bool Qommunicate::wasExpanded(QString groupName)
 void Qommunicate::restoreGroupState()
 {
     for (int i=0; i<filterModel->rowCount(); i++) {
-        QStandardItem *item = getItemFromIndex(filterModel->index(i, 0));
+        QModelIndex proxyIndex = filterModel->index(i, 0);
+        QStandardItem *item = itemFromProxyIndex(proxyIndex);
         if (item->type()!=TYPE_GROUP)
             continue;
         QString name = ((Group*)item)->name();
-        ui.memberTree->setExpanded(filterModel->index(i, 0), wasExpanded(name));
+        ui.memberTree->setExpanded(proxyIndex, wasExpanded(name));
     }
 }

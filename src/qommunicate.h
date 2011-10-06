@@ -81,7 +81,7 @@ private:
     
     void keyPressEvent(QKeyEvent *);
     bool createGroupMemberList(QStandardItem*, QSet<Member*>&);
-    QStandardItem* getItemFromIndex(const QModelIndex&);
+    QStandardItem* itemFromProxyIndex(const QModelIndex&);
     void restoreGroupState();
     
     bool wasExpanded(QString);
