@@ -57,8 +57,12 @@ Qommunicate::Qommunicate(QWidget *parent)
 
 void Qommunicate::on_searchEdit_textChanged(const QString &text)
 {
+    searching = !text.isEmpty();
     filterModel->setFilterFixedString(text);
-    ui.memberTree->expandAll();
+    if (searching)
+        ui.memberTree->expandAll();
+    else
+        restoreGroupState();
 }
 
 void Qommunicate::on_action_About_triggered()
@@ -142,12 +146,12 @@ void Qommunicate::populateTree()
     filterModel->setDynamicSortFilter(true);
     filterModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
     
+    searching = false;
     ui.memberTree->setSelectionMode(ui.memberTree->ExtendedSelection);
     ui.memberTree->setModel(filterModel);
     ui.memberTree->setHeaderHidden(true);
     ui.memberTree->setAcceptDrops(true);
     ui.memberTree->setExpandsOnDoubleClick(false);
-    ui.memberTree->expandAll();
 }
 
 /*
@@ -171,27 +175,30 @@ bool Qommunicate::createGroupMemberList(QStandardItem* item, QSet<Member*>& rece
     return false;
 }
 
+QStandardItem* Qommunicate::getItemFromIndex(const QModelIndex& i)
+{
+    QModelIndex index = filterModel->mapToSource(i);
+    return model->itemFromIndex(index);
+}
+
 void Qommunicate::on_memberTree_doubleClicked(const QModelIndex& proxyIndex)
 {
     
     MessageDialog* dlg;
     QSet<Member*> receivers;
     
-    MemberModel* model = (MemberModel*) ( (MemberFilter*) ui.memberTree->model() )->sourceModel();
-    QModelIndex index = ((MemberFilter*)ui.memberTree->model())->mapToSource(proxyIndex);
+    QStandardItem *with = getItemFromIndex(proxyIndex);
     
-    if(index.isValid())
+    if(with != NULL)
     {
         // only single item clicked
-        createGroupMemberList(model->itemFromIndex(index), receivers);
+        createGroupMemberList(with, receivers);
     }
     else
     {
         QModelIndex i;
-        foreach(i, ui.memberTree->selectionModel()->selectedRows())
-        {            
-            QStandardItem* item = model->itemFromIndex(((MemberFilter*)ui.memberTree->model())->mapToSource(i));
-            createGroupMemberList(item, receivers);
+        foreach(i, ui.memberTree->selectionModel()->selectedRows()) {
+            createGroupMemberList(getItemFromIndex(i), receivers);
         }
     }
     
@@ -289,12 +296,12 @@ void Qommunicate::addMember(Message msg)
             else
                 model->appendRow(group);
             saveGroupSettings(groupName);
+            ui.memberTree->setExpanded(filterModel->mapFromSource(model->indexFromItem(group)), wasExpanded(groupName));
         }
     }
     
     MemberUtils::insert("members_list", sender);
     memberCountLabel.setText(QString::number(memberCountLabel.text().toInt() + 1));
-    ui.memberTree->expandAll();
 }
 
 void Qommunicate::saveGroupSettings(QString groupName)
@@ -443,4 +450,46 @@ void Qommunicate::absenceChanged(Message msg)
 //     qDebug() << "absenceChanged "<<name;
 //     QString status = msg.payload().mid(name.length());
 //     MemberUtils::get("members_list", msg.sender())->setStatus(status);
+}
+
+void Qommunicate::on_memberTree_collapsed(const QModelIndex& index)
+{
+    if (searching)
+        return;
+    QSettings s;
+    QStringList expanded = s.value("expandedGroups").toStringList();
+    QString groupName = ((Group*)getItemFromIndex(index))->name();
+    if (expanded.contains(groupName))
+        expanded.removeOne(groupName);
+    s.setValue("expandedGroups", expanded);
+}
+
+void Qommunicate::on_memberTree_expanded(const QModelIndex& index)
+{
+    if (searching)
+        return;
+    QSettings s;
+    QStringList expanded = s.value("expandedGroups").toStringList();
+    QString groupName = ((Group*)getItemFromIndex(index))->name();
+    if (!expanded.contains(groupName))
+        expanded << groupName;
+    s.setValue("expandedGroups", expanded);
+}
+
+bool Qommunicate::wasExpanded(QString groupName)
+{
+    QSettings s;
+    QStringList expanded = s.value("expandedGroups").toStringList();
+    return expanded.contains(groupName);
+}
+
+void Qommunicate::restoreGroupState()
+{
+    for (int i=0; i<filterModel->rowCount(); i++) {
+        QStandardItem *item = getItemFromIndex(filterModel->index(i, 0));
+        if (item->type()!=TYPE_GROUP)
+            continue;
+        QString name = ((Group*)item)->name();
+        ui.memberTree->setExpanded(filterModel->index(i, 0), wasExpanded(name));
+    }
 }
