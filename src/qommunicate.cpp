@@ -181,6 +181,12 @@ QStandardItem* Qommunicate::itemFromProxyIndex(const QModelIndex& proxyIndex)
     return model->itemFromIndex(index);
 }
 
+QModelIndex Qommunicate::proxyIndexFromItem(QStandardItem *item) const
+{
+    QModelIndex index = model->indexFromItem(item);
+    return filterModel->mapFromSource(index);
+}
+
 void Qommunicate::on_memberTree_doubleClicked(const QModelIndex& proxyIndex)
 {
     
@@ -296,7 +302,7 @@ void Qommunicate::addMember(Message msg)
             else
                 model->appendRow(group);
             saveGroupSettings(groupName);
-            ui.memberTree->setExpanded(filterModel->mapFromSource(model->indexFromItem(group)), wasExpanded(groupName));
+            ui.memberTree->setExpanded(proxyIndexFromItem(group), wasExpanded(groupName));
         }
     }
     
