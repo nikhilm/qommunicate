@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>About Qommunicate</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="icons.qrc">
+    <normaloff>:/newPrefix/icons/48x48/qommunicate.png</normaloff>:/newPrefix/icons/48x48/qommunicate.png</iconset>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
