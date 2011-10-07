@@ -97,6 +97,7 @@ void Qommunicate::on_actionQuit_triggered()
 {
     QSettings s;
     s.setValue("geometry", saveGeometry());
+    hide();
     qApp->quit();
 }
 
