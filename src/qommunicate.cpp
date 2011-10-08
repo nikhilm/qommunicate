@@ -110,7 +110,7 @@ void Qommunicate::closeEvent(QCloseEvent * event)
 
 void Qommunicate::iconActivated(QSystemTrayIcon::ActivationReason reason)
 {
-    if( reason == QSystemTrayIcon::Trigger ) {
+    if ( reason == QSystemTrayIcon::Trigger ) {
         if (isVisible()) {
             m_geometry = saveGeometry();
             setVisible(false);
@@ -161,9 +161,9 @@ otherwise assumes item is a member, inserts in receivers and returns false
 */
 bool Qommunicate::createGroupMemberList(QStandardItem* item, QSet<Member*>& receivers)
 {
-    if(item->type() == TYPE_GROUP)
+    if (item->type() == TYPE_GROUP)
     {
-        if(!item->hasChildren())
+        if (!item->hasChildren())
             return true;
         
         for(int i = 0; i < item->rowCount(); i++)
@@ -196,7 +196,7 @@ void Qommunicate::on_memberTree_doubleClicked(const QModelIndex& proxyIndex)
     
     QStandardItem *with = itemFromProxyIndex(proxyIndex);
     
-    if(with != NULL)
+    if (with != NULL)
     {
         // only single item clicked
         createGroupMemberList(with, receivers);
@@ -209,14 +209,14 @@ void Qommunicate::on_memberTree_doubleClicked(const QModelIndex& proxyIndex)
         }
     }
     
-    if(receivers.isEmpty())
+    if (receivers.isEmpty())
         return;
     
     QList<Member*> toDialog = receivers.toList();
-    if(toDialog.size() == 1 && MemberUtils::contains("open_conversations", toDialog[0]))
+    if (toDialog.size() == 1 && MemberUtils::contains("open_conversations", toDialog[0]))
         return;
 
-    if(toDialog.size() == 1)
+    if (toDialog.size() == 1)
     {
         dlg = new MessageDialog( new Member(*toDialog[0]), this );
     }
@@ -237,7 +237,7 @@ void Qommunicate::on_memberTree_doubleClicked(const QModelIndex& proxyIndex)
 
 void Qommunicate::keyPressEvent(QKeyEvent *event)
 {
-    if(event->key() == Qt::Key_Return && ui.memberTree->hasFocus()) {
+    if (event->key() == Qt::Key_Return && ui.memberTree->hasFocus()) {
         event->accept();
         on_memberTree_doubleClicked(QModelIndex());
         return;
@@ -248,7 +248,7 @@ void Qommunicate::keyPressEvent(QKeyEvent *event)
 void Qommunicate::firstRun()
 {
     QSettings s;
-    if( ! s.contains(tr("nick")) )
+    if ( ! s.contains(tr("nick")) )
         ui.action_Settings->trigger();
 }
 
@@ -271,7 +271,7 @@ void Qommunicate::cleanup()
 // Message handling slots
 void Qommunicate::addMember(Message msg)
 {
-    if(MemberUtils::contains("members_list", msg.sender()))
+    if (MemberUtils::contains("members_list", msg.sender()))
         return;
     
     QList<QByteArray> tokens = msg.payload().split('\a');
@@ -280,17 +280,17 @@ void Qommunicate::addMember(Message msg)
     Member* sender = new Member(*msg.sender());
     
     QString groupName;
-    if(tokens.size() > 1)
+    if (tokens.size() > 1)
         groupName = tokens[1];
     
-    if(groupName.isEmpty())
+    if (groupName.isEmpty())
     {
         model->appendRow(sender);
     }
     else
     {
         QList<QStandardItem*> matches = model->findItems(groupName);
-        if(!matches.isEmpty() && matches[0]->type() == TYPE_GROUP)
+        if (!matches.isEmpty() && matches[0]->type() == TYPE_GROUP)
         {
             matches[0]->appendRow(sender);
         }
@@ -336,7 +336,7 @@ void Qommunicate::removeMember(Message msg)
     qDebug() << "removeMember: called with" << msg.sender()->name();
     QList<QByteArray> tokens = msg.payload().split('\a');
     QString groupName;
-    if(tokens.size() > 1)
+    if (tokens.size() > 1)
         groupName = tokens[1];
     
     Member* sender = new Member(*msg.sender());
@@ -344,7 +344,7 @@ void Qommunicate::removeMember(Message msg)
     for(int i = 0; i < model->rowCount(); i++)
     {
         QStandardItem* it = model->item(i, 0);
-        if(it->type() == TYPE_MEMBER && ((Member*)it)->name() == sender->addressString())
+        if (it->type() == TYPE_MEMBER && ((Member*)it)->name() == sender->addressString())
         {
             qDebug() << "removeMember: Deleting" << ((Member*)it->row())->name();
             model->removeRow(it->row());
@@ -353,14 +353,14 @@ void Qommunicate::removeMember(Message msg)
         {
             for(int j = 0; j < it->rowCount(); j++)
             {
-                if(((Member*)it->child(j))->addressString() == sender->addressString())
+                if (((Member*)it->child(j))->addressString() == sender->addressString())
                 {
                     qDebug() << "removeMember: Deleting" << ((Member*)it->child(j))->name();
                     it->removeRow(j);
                 }
             }
             //remove empty group
-            if(it->rowCount() == 0)
+            if (it->rowCount() == 0)
             {
                 model->removeRow(it->row());
             }
@@ -373,23 +373,23 @@ void Qommunicate::removeMember(Message msg)
 
 void Qommunicate::openDialog(Message msg)
 {
-    if(MemberUtils::contains("open_conversations", msg.sender()))
+    if (MemberUtils::contains("open_conversations", msg.sender()))
         return;
     
     // if set to ignore received messages
     QSettings s;
-    if(s.value("no_receive").toBool() && (msg.command() & QOM_MULTICASTOPT))
+    if (s.value("no_receive").toBool() && (msg.command() & QOM_MULTICASTOPT))
     {
         if (s.value("showMulticastPopup").toBool()) {
             notify(tr("Multicast"), tr("Multicast from %1 ignored").arg(MemberUtils::get("members_list", msg.sender())->name()));
         }
-        if(msg.command() & QOM_SENDCHECKOPT)
+        if (msg.command() & QOM_SENDCHECKOPT)
             messenger()->sendMessage(QOM_RECVMSG, QByteArray::number(msg.packetNo()), msg.sender());
         return;
     }
     
     Member* with = MemberUtils::get("members_list", msg.sender());
-    if(!with->isValid())
+    if (!with->isValid())
         with = msg.sender();
     MessageDialog *dlg = new MessageDialog(new Member(*with), this);
     dlg->setModal(false);
@@ -400,7 +400,7 @@ void Qommunicate::openDialog(Message msg)
 /*void Qommunicate::sendAbsenceInfo(Message msg)
 {
     QString payload = ui.statusCombo->currentText();
-    if(payload == tr("Available"))
+    if (payload == tr("Available"))
         payload = "Not absence mode";
     messenger()->multicast(QOM_SENDABSENCEINFO, payload.toAscii());
 }*/
@@ -414,7 +414,7 @@ void Qommunicate::fileSendRequested(QTcpSocket* sock)
 void Qommunicate::fileRecvRequested(Message msg)
 {
     qDebug() << "\n\nRequest for file receiving";
-    if(msg.command() & QOM_SENDCHECKOPT)
+    if (msg.command() & QOM_SENDCHECKOPT)
         messenger()->sendMessage(QOM_RECVMSG, QByteArray::number(msg.packetNo()), msg.sender());
     RecvFileProgressDialog* dlg = new RecvFileProgressDialog(msg);
     //connect(dlg, SIGNAL(downloadDone(QString)), this, SLOT(fileRecvDone(QString)));
@@ -428,11 +428,11 @@ void Qommunicate::fileRecvDone(QString message)
 
 void Qommunicate::notify(const QString& title, const QString& message, bool dialog)
 {
-    if(trayIcon->supportsMessages())
+    if (trayIcon->supportsMessages())
         trayIcon->showMessage(title, message);
     statusBar()->showMessage(message, 10000);
     
-    if(dialog)
+    if (dialog)
         QMessageBox::information(this, title, message);
 }
 
@@ -440,7 +440,7 @@ void Qommunicate::confirmRead(Message msg)
 {
     //if ignoring multicasts, then we aren't gonna reply to the sealed message
     QSettings s;
-    if(s.value("no_receive").toBool())
+    if (s.value("no_receive").toBool())
         return;
     
     QString time = QDateTime::currentDateTime().toString("h:mm:ss");

@@ -37,7 +37,7 @@ public:
     ~FileSendProgressDialog()
     {
         qDebug() << "Destroying dialog";
-        if(m_socket != NULL)
+        if (m_socket != NULL)
         {
             m_socket->close();
         }

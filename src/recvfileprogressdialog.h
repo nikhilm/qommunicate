@@ -39,18 +39,18 @@ public:
     
     ~RecvFileProgressDialog()
     {
-        if(m_socket != NULL)
+        if (m_socket != NULL)
         {
             m_socket->close();
             m_socket->deleteLater();
         }
-        if(m_currentFile != NULL)
+        if (m_currentFile != NULL)
         {
             m_currentFile->close();
             delete m_currentFile;
             m_currentFile = NULL;
         }
-        if(m_dir != NULL)
+        if (m_dir != NULL)
         {
             delete m_dir;
             m_dir = NULL;

@@ -13,7 +13,7 @@ FileUtils* utils = NULL;
 
 FileUtils* fileUtils()
 {
-    if(!utils)
+    if (!utils)
         utils = new FileUtils;
     return utils;
 }
@@ -41,9 +41,9 @@ QString FileUtils::formatSendFilesRequest(QStringList filenames)
 QString FileUtils::formatFileData(QString filename)
 {
     QFileInfo info(filename);
-    if(! info.exists() )
+    if (! info.exists() )
         return "";
-    if(! info.isReadable())
+    if (! info.isReadable())
         return "";
     
     QStringList data;

@@ -66,7 +66,7 @@ void MessageDialog::setAttachMenu()
 
 void MessageDialog::reject()
 {
-    if(receivers.size() == 1) {
+    if (receivers.size() == 1) {
         ((Qommunicate*) parent())->dialogClosed(receivers[0]);
         if (messageTimer != NULL)
             messageTimer->stop();
@@ -94,7 +94,7 @@ QString detectUrls(QString str)
 
 void MessageDialog::incomingMessage(Message msg)
 {
-    if(msg.sender()->addressString() != receivers[0]->addressString())
+    if (msg.sender()->addressString() != receivers[0]->addressString())
         return;
     
     QString text = QString("<b style=\"color:blue;\">%1: </b> ")
@@ -103,19 +103,19 @@ void MessageDialog::incomingMessage(Message msg)
     ui.messageEdit->append(text);
     QApplication::alert(this, 0);
     
-    if(msg.command() & QOM_SENDCHECKOPT)
+    if (msg.command() & QOM_SENDCHECKOPT)
         messenger()->sendMessage(QOM_RECVMSG, QByteArray::number(msg.packetNo()), msg.sender());
     
-    if(msg.command() & QOM_READCHECKOPT)
+    if (msg.command() & QOM_READCHECKOPT)
         messenger()->sendMessage(QOM_READMSG|(msg.command() & QOM_READCHECKOPT), QByteArray::number(msg.packetNo()), msg.sender());
 }
 
 void MessageDialog::on_sendButton_clicked()
 {
-    if(ui.messageInput->text().trimmed().isEmpty())
+    if (ui.messageInput->text().trimmed().isEmpty())
         return;
     
-    if(receivers.isEmpty())
+    if (receivers.isEmpty())
     {
         messenger()->multicast(QOM_SENDMSG|QOM_MULTICASTOPT, ui.messageInput->text().toAscii());
         QTimer::singleShot(500, this, SLOT(accept()));
@@ -130,9 +130,9 @@ void MessageDialog::on_sendButton_clicked()
     {
         messenger()->sendMessage( flags, ui.messageInput->text().toAscii(), m);
     }
-    if(receivers.size() == 1)
+    if (receivers.size() == 1)
     {
-        if(messageTimer != NULL)
+        if (messageTimer != NULL)
             delete messageTimer;
         messageTimer = new QTimer(this);
         messageTimer->setSingleShot(true);
@@ -150,7 +150,7 @@ void MessageDialog::on_sendButton_clicked()
 
 void MessageDialog::messageTimeout()
 {
-    if(QMessageBox::warning(this, 
+    if (QMessageBox::warning(this, 
             tr("Sending Failed"),
             tr("Failed to send message. To <b>retry</b> click Ok"),
             QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Ok)
@@ -163,10 +163,10 @@ void MessageDialog::messageTimeout()
 
 void MessageDialog::messageRecvConfirm(Message msg)
 {
-    if(msg.sender()->addressString() != receivers[0]->addressString())
+    if (msg.sender()->addressString() != receivers[0]->addressString())
         return;
     
-    if(! ui.messageInput->text().trimmed().isEmpty())
+    if (! ui.messageInput->text().trimmed().isEmpty())
         ui.messageEdit->append(QString("<b style=\"color:red;\">%1: </b> %2")
                             .arg(Qt::escape(me().name()))
                             .arg(detectUrls(Qt::escape(ui.messageInput->text()))));
@@ -174,7 +174,7 @@ void MessageDialog::messageRecvConfirm(Message msg)
     ui.messageInput->clear();
     ui.messageInput->setEnabled(true);
     
-    if(receivers.size() == 1 && messageTimer != NULL)
+    if (receivers.size() == 1 && messageTimer != NULL)
         messageTimer->stop();
     
     ui.messageInput->setFocus();
@@ -182,7 +182,7 @@ void MessageDialog::messageRecvConfirm(Message msg)
 
 void MessageDialog::userOffline(Message msg)
 {
-    if(!m_online || msg.sender()->addressString() != receivers[0]->addressString())
+    if (!m_online || msg.sender()->addressString() != receivers[0]->addressString())
         return;
     
     ui.messageEdit->append(QString("<b style=\"color:magenta\">%1 went offline</b>").arg(Qt::escape(msg.sender()->name())));
@@ -192,7 +192,7 @@ void MessageDialog::userOffline(Message msg)
 
 void MessageDialog::userOnline(Message msg)
 {
-    if(m_online || msg.sender()->addressString() != receivers[0]->addressString())
+    if (m_online || msg.sender()->addressString() != receivers[0]->addressString())
         return;
     
     ui.messageEdit->append(QString("<b style=\"color:orange\">%1 came online</b>").arg(Qt::escape(msg.sender()->name())));

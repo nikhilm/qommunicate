@@ -43,7 +43,7 @@ void FileSendProgressDialog::updateStatus(qint64 bytes)
     qDebug() << "updateStatus : sent " << bytes;
 //     m_totalSent += bytes;
 //     setValue( (m_totalSent * 100.0)/ m_fileSize );
-//     if(m_totalSent >= m_fileSize)
+//     if (m_totalSent >= m_fileSize)
 //     {
 //         // we can now start a new transfer
 //         m_writingData = false;
@@ -60,7 +60,7 @@ FileInfo FileSendProgressDialog::parseIncomingFileRequest(const QByteArray& b)
     FileInfo info;
     qDebug() << "parseIncomingFileRequest : " << b;
     QList<QByteArray> tokens = b.split(':');
-    if(tokens.size() < 7)
+    if (tokens.size() < 7)
     {
         qDebug() << "Bad header" << tokens;
         info.type = -1;
@@ -73,9 +73,9 @@ FileInfo FileSendProgressDialog::parseIncomingFileRequest(const QByteArray& b)
         // for now we just store the file name, later we'll resolve the path
         info.fileName = QFileInfo(fileUtils()->resolveFilePath(info.fileID)).fileName();
         
-        if((command & QOM_COMMAND_MASK) == QOM_GETDIRFILES)
+        if ((command & QOM_COMMAND_MASK) == QOM_GETDIRFILES)
             info.type = QOM_FILE_DIR;
-        else if((command & QOM_COMMAND_MASK) == QOM_GETFILEDATA)
+        else if ((command & QOM_COMMAND_MASK) == QOM_GETFILEDATA)
         {
             info.type = QOM_FILE_REGULAR;
             info.offset = tokens[7].toInt();
@@ -87,18 +87,18 @@ FileInfo FileSendProgressDialog::parseIncomingFileRequest(const QByteArray& b)
 void FileSendProgressDialog::nextFileRequested()
 {
     //qDebug() << "nextFileRequested : entered"<<m_writingData << (m_fileList.empty() ? "" : m_fileList[0].fileName);
-    if(m_socket->bytesAvailable())
+    if (m_socket->bytesAvailable())
     {
         qDebug() << "nextFileRequested : parsing header";
         FileInfo next = parseIncomingFileRequest(m_socket->readAll());
-        if(next.fileID != -1)
+        if (next.fileID != -1)
             m_fileList << next;
         qDebug() << "nextFileRequested : header parse done";
     }
     
-    if(!m_fileList.empty())
+    if (!m_fileList.empty())
     {
-        if(m_writingData)
+        if (m_writingData)
         {
             //qDebug() << "nextFileRequested exiting";
             return;
@@ -106,16 +106,16 @@ void FileSendProgressDialog::nextFileRequested()
         //qDebug() << "nextFileRequested : attempting send";
         FileInfo first = m_fileList.takeFirst();
         //qDebug() << first.fileName << first.type;
-        if(first.type == QOM_FILE_REGULAR)
+        if (first.type == QOM_FILE_REGULAR)
             sendFile(first);
-        else if(first.type == QOM_FILE_DIR)
+        else if (first.type == QOM_FILE_DIR)
             sendDir(first);
-        else if(first.type == QOM_FILE_RETPARENT)
+        else if (first.type == QOM_FILE_RETPARENT)
         {
             //qDebug() << fileUtils()->formatFileHeader(first).toAscii();
             writeBlock(fileUtils()->formatFileHeader(first).toAscii());
         }
-        if(m_sendBuffer.size()>0)
+        if (m_sendBuffer.size()>0)
             writeBlock("");
         nextFileRequested();
     }
@@ -129,7 +129,7 @@ void FileSendProgressDialog::nextFileRequested()
 void FileSendProgressDialog::sendFile(const FileInfo& info)
 {
     QFile f( info.fileID == -1 ? QDir::toNativeSeparators(info.fileName) : fileUtils()->resolveFilePath(info.fileID) );
-    if(!f.open(QIODevice::ReadOnly))
+    if (!f.open(QIODevice::ReadOnly))
     {
         qDebug() << "Could not open file for reading" << f.fileName()<<f.errorString();
         reject();
@@ -143,14 +143,14 @@ void FileSendProgressDialog::sendFile(const FileInfo& info)
     // we do the whole splitting thing, since when sending the header
     // we don't want the whole path
     FileInfo copy = info;
-    if(info.fileID == -1)
+    if (info.fileID == -1)
     {
         copy.fileName = info.fileName.split('/').last();
         qDebug() << "sendFile: " << copy.fileName;
         writeBlock(fileUtils()->formatFileHeader(copy).toAscii());
     }
     //qDebug() << fileUtils()->formatFileHeader(copy).toAscii();
-    //if(copy.fileName.contains("elf.h"))
+    //if (copy.fileName.contains("elf.h"))
     //    qDebug() << "Elf " << fileUtils()->formatFileHeader(copy).toAscii();
     m_writingData = true;
     qDebug() << "sendFile: Calling writeFile";
@@ -200,7 +200,7 @@ bool FileSendProgressDialog::writeBlock(QByteArray b)
     {
         bytesWritten = m_socket->write(m_sendBuffer);
         //qDebug() << "writeBlock: wrote = " << m_sendBuffer.left(bytesWritten);
-        if(bytesWritten == -1)
+        if (bytesWritten == -1)
             return false;
         m_sendBuffer.remove(0, bytesWritten);
         bytesToWrite -= bytesWritten;

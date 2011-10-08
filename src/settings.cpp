@@ -80,11 +80,11 @@ void SettingsDialog::dropEvent(QDropEvent *evt)
     {
         QString line = QString(file.readLine());
         line.chop(1);
-        if(!line.contains('='))
+        if (!line.contains('='))
             continue;
         
         QString ip = line.split('=')[1].remove('"');
-        if(!ip.contains(QRegExp("[0-255.]*")))
+        if (!ip.contains(QRegExp("[0-255.]*")))
             continue;
         
         settings->setValue(QString("ips/ip%1").arg(i++), ip);
