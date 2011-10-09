@@ -22,6 +22,10 @@
   <property name="sizeGripEnabled">
    <bool>false</bool>
   </property>
+  <property name="windowIcon">
+   <iconset resource="icons.qrc">
+    <normaloff>:/newPrefix/icons/48x48/qommunicate.png</normaloff>:/newPrefix/icons/48x48/qommunicate.png</iconset>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">

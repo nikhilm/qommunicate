@@ -29,7 +29,7 @@ public:
     
     void dragEnterEvent(QDragEnterEvent *evt)
     {
-        if(evt->mimeData()->hasUrls())
+        if (evt->mimeData()->hasUrls())
         {
             evt->acceptProposedAction();
         }

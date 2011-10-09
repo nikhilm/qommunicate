@@ -42,6 +42,8 @@ private slots:
     void on_actionQuit_triggered();
     
     void on_memberTree_doubleClicked(const QModelIndex&);
+    void on_memberTree_collapsed(const QModelIndex&);
+    void on_memberTree_expanded(const QModelIndex&);
     //void on_statusCombo_currentIndexChanged(const QString&);
     
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
@@ -71,6 +73,7 @@ private:
     
     MemberModel *model;
     MemberFilter *filterModel;
+    bool searching;
         
     void createTrayIcon();
     void populateTree();
@@ -78,7 +81,11 @@ private:
     
     void keyPressEvent(QKeyEvent *);
     bool createGroupMemberList(QStandardItem*, QSet<Member*>&);
+    QStandardItem* itemFromProxyIndex(const QModelIndex&);
+    QModelIndex proxyIndexFromItem(QStandardItem*) const;
+    void restoreGroupState();
     
+    bool wasExpanded(QString);
     void saveGroupSettings(QString);
     void notify(const QString&, const QString&, bool dialog=false);
 };

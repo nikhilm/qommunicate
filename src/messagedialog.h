@@ -27,9 +27,9 @@ public:
     
     void dragEnterEvent(QDragEnterEvent *evt)
     {
-        if(!m_online)
+        if (!m_online)
             evt->ignore();
-        else if(evt->mimeData()->hasUrls())
+        else if (evt->mimeData()->hasUrls())
         {
             evt->acceptProposedAction();
         }
@@ -46,11 +46,8 @@ public slots:
 
 private:
     Ui::MessageDialog ui;
-    
     QList<Member*> receivers;
-    
     QTimer* messageTimer;
-    
     bool m_online;
 
     void setAttachMenu();
