@@ -187,6 +187,7 @@ void MessageDialog::userOffline(Message msg)
     
     ui.messageEdit->append(QString("<b style=\"color:magenta\">%1 went offline</b>").arg(Qt::escape(msg.sender()->name())));
     ui.messageInput->setEnabled(false);
+    ui.attachButton->setEnabled(false);
     m_online = false;
 }
 
@@ -198,6 +199,7 @@ void MessageDialog::userOnline(Message msg)
     ui.messageEdit->append(QString("<b style=\"color:orange\">%1 came online</b>").arg(Qt::escape(msg.sender()->name())));
     
     ui.messageInput->setEnabled(true);
+    ui.attachButton->setEnabled(true);
     m_online = true;
 }
 
