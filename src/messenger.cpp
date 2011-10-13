@@ -16,7 +16,7 @@ Messenger* m = NULL;
 
 Messenger* messenger()
 {
-    if(!m)
+    if (!m)
         m = new Messenger;
     return m;
 }
@@ -99,7 +99,7 @@ void Messenger::reset()
 {
     m_packetNo = 1;
     
-    if(socket) {
+    if (socket) {
         socket->close();
         delete socket;
         socket = NULL;
@@ -107,7 +107,7 @@ void Messenger::reset()
     
     socket = new QUdpSocket(this);
     
-    if(!socket->bind(UDP_PORT))
+    if (!socket->bind(UDP_PORT))
     {
         QMessageBox::critical(0, tr("Connection Error"), tr("Could not bind, perhaps port %1 is being used by another application.").arg(UDP_PORT));
         exit(1);
@@ -164,7 +164,7 @@ void Messenger::receiveData()
         
         socket->readDatagram(data.data(), data.size(), &from);
         
-        if(QNetworkInterface::allAddresses().contains(from))
+        if (QNetworkInterface::allAddresses().contains(from))
         {
             continue;
         }
@@ -193,7 +193,7 @@ void Messenger::receiveData()
                 break;
                 
             case QOM_SENDMSG:
-                if(msg.command() & QOM_FILEATTACHOPT)
+                if (msg.command() & QOM_FILEATTACHOPT)
                     emit msg_fileRecvRequest(msg);
                 else
                     emit msg_recvMsg(msg);
@@ -224,9 +224,17 @@ QStringList Messenger::ips() const
     QStringList ret;
     
     QString ipKey;
-    foreach(ipKey, s.childKeys())
-    {
+    foreach(ipKey, s.childKeys()) {
         ret << s.value(ipKey).toString();
+    }
+
+    // fetch IP Messenger IPs
+    QSettings ipmsg("HSTools", "IpMsgEng");
+    ipmsg.beginGroup("BroadCast");
+    foreach(ipKey, ipmsg.childKeys()) {
+        QString ip = ipmsg.value(ipKey).toString();
+        if (!ret.contains(ip))
+            ret << ip;
     }
     
     return ret;

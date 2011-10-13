@@ -22,6 +22,10 @@
   <property name="windowTitle">
    <string>Settings</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="icons.qrc">
+    <normaloff>:/newPrefix/icons/configure.png</normaloff>:/newPrefix/icons/configure.png</iconset>
+  </property>
   <property name="modal">
    <bool>false</bool>
   </property>

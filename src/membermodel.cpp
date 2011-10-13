@@ -21,7 +21,7 @@ MemberFilter::MemberFilter(QObject *parent=0) : QSortFilterProxyModel(parent) {}
 
 Qt::ItemFlags MemberModel::flags(const QModelIndex& index) const
 {
-    if(index.isValid())
+    if (index.isValid())
         return Qt::ItemIsDropEnabled | Qt::ItemIsEnabled | Qt::ItemIsSelectable;
     return Qt::ItemIsDropEnabled ;
 }
@@ -44,7 +44,7 @@ void MemberModel::setGroupCount(QStandardItem* group)
 
 void MemberModel::updateGroupCount(const QModelIndex& parent)
 {
-    if(parent.isValid() && itemFromIndex(parent)->type() == TYPE_GROUP)
+    if (parent.isValid() && itemFromIndex(parent)->type() == TYPE_GROUP)
         setGroupCount(itemFromIndex(parent));
 }
 
@@ -65,21 +65,21 @@ bool MemberFilter::filterAcceptsRow(int sourceRow, const QModelIndex& sourcePare
 {
     QModelIndex subIndex = sourceModel()->index(sourceRow, 0, sourceParent);
     QStandardItem* it = ((MemberModel*)sourceModel())->itemFromIndex(subIndex);
-    if(it->type() == TYPE_MEMBER)
+    if (it->type() == TYPE_MEMBER)
     {
         // if our group matches, show ourselves too
-        if(it->parent() && it->parent()->data(Qt::DisplayRole).toString().contains(filterRegExp()))
+        if (it->parent() && it->parent()->data(Qt::DisplayRole).toString().contains(filterRegExp()))
             return true;
         return it->data(Qt::DisplayRole).toString().contains(filterRegExp());
     }
-    else if(it->type() == TYPE_GROUP)
+    else if (it->type() == TYPE_GROUP)
     {
-        if(it->data(Qt::DisplayRole).toString().contains(filterRegExp()))
+        if (it->data(Qt::DisplayRole).toString().contains(filterRegExp()))
             return true;
         //if our children match, show ourselves too
         for(int i = 0; i < it->rowCount(); ++i)
         {
-            if(it->child(i)->data(Qt::DisplayRole).toString().contains(filterRegExp()))
+            if (it->child(i)->data(Qt::DisplayRole).toString().contains(filterRegExp()))
                 return true;
         }
     }

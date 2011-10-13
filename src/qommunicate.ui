@@ -58,7 +58,11 @@
        </layout>
       </item>
       <item>
-       <widget class="QTreeView" name="memberTree"/>
+       <widget class="QTreeView" name="memberTree">
+        <property name="animated">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QComboBox" name="statusCombo">

@@ -57,8 +57,12 @@ Qommunicate::Qommunicate(QWidget *parent)
 
 void Qommunicate::on_searchEdit_textChanged(const QString &text)
 {
+    searching = !text.isEmpty();
     filterModel->setFilterFixedString(text);
-    ui.memberTree->expandAll();
+    if (searching)
+        ui.memberTree->expandAll();
+    else
+        restoreGroupState();
 }
 
 void Qommunicate::on_action_About_triggered()
@@ -93,6 +97,7 @@ void Qommunicate::on_actionQuit_triggered()
 {
     QSettings s;
     s.setValue("geometry", saveGeometry());
+    hide();
     qApp->quit();
 }
 
@@ -105,7 +110,7 @@ void Qommunicate::closeEvent(QCloseEvent * event)
 
 void Qommunicate::iconActivated(QSystemTrayIcon::ActivationReason reason)
 {
-    if( reason == QSystemTrayIcon::Trigger ) {
+    if ( reason == QSystemTrayIcon::Trigger ) {
         if (isVisible()) {
             m_geometry = saveGeometry();
             setVisible(false);
@@ -142,12 +147,12 @@ void Qommunicate::populateTree()
     filterModel->setDynamicSortFilter(true);
     filterModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
     
+    searching = false;
     ui.memberTree->setSelectionMode(ui.memberTree->ExtendedSelection);
     ui.memberTree->setModel(filterModel);
     ui.memberTree->setHeaderHidden(true);
     ui.memberTree->setAcceptDrops(true);
     ui.memberTree->setExpandsOnDoubleClick(false);
-    ui.memberTree->expandAll();
 }
 
 /*
@@ -156,9 +161,9 @@ otherwise assumes item is a member, inserts in receivers and returns false
 */
 bool Qommunicate::createGroupMemberList(QStandardItem* item, QSet<Member*>& receivers)
 {
-    if(item->type() == TYPE_GROUP)
+    if (item->type() == TYPE_GROUP)
     {
-        if(!item->hasChildren())
+        if (!item->hasChildren())
             return true;
         
         for(int i = 0; i < item->rowCount(); i++)
@@ -171,46 +176,57 @@ bool Qommunicate::createGroupMemberList(QStandardItem* item, QSet<Member*>& rece
     return false;
 }
 
+QStandardItem* Qommunicate::itemFromProxyIndex(const QModelIndex& proxyIndex)
+{
+    QModelIndex index = filterModel->mapToSource(proxyIndex);
+    return model->itemFromIndex(index);
+}
+
+QModelIndex Qommunicate::proxyIndexFromItem(QStandardItem *item) const
+{
+    QModelIndex index = model->indexFromItem(item);
+    return filterModel->mapFromSource(index);
+}
+
 void Qommunicate::on_memberTree_doubleClicked(const QModelIndex& proxyIndex)
 {
     
     MessageDialog* dlg;
     QSet<Member*> receivers;
     
-    MemberModel* model = (MemberModel*) ( (MemberFilter*) ui.memberTree->model() )->sourceModel();
-    QModelIndex index = ((MemberFilter*)ui.memberTree->model())->mapToSource(proxyIndex);
+    QStandardItem *with = itemFromProxyIndex(proxyIndex);
     
-    if(index.isValid())
+    if (with != NULL)
     {
         // only single item clicked
-        createGroupMemberList(model->itemFromIndex(index), receivers);
+        createGroupMemberList(with, receivers);
     }
     else
     {
         QModelIndex i;
-        foreach(i, ui.memberTree->selectionModel()->selectedRows())
-        {            
-            QStandardItem* item = model->itemFromIndex(((MemberFilter*)ui.memberTree->model())->mapToSource(i));
-            createGroupMemberList(item, receivers);
+        foreach(i, ui.memberTree->selectionModel()->selectedRows()) {
+            createGroupMemberList(itemFromProxyIndex(i), receivers);
         }
     }
     
-    if(receivers.isEmpty())
+    if (receivers.isEmpty())
         return;
     
     QList<Member*> toDialog = receivers.toList();
-    if(toDialog.size() == 1 && MemberUtils::contains("open_conversations", toDialog[0]))
+    if (toDialog.size() == 1 && MemberUtils::contains("open_conversations", toDialog[0]))
         return;
 
-    if(toDialog.size() == 1)
+    if (toDialog.size() == 1)
     {
-        if(!MemberUtils::contains("open_conversations", toDialog[0]))
-            dlg = new MessageDialog( new Member(*toDialog[0]), this );
+        dlg = new MessageDialog( new Member(*toDialog[0]), this );
     }
     else
+    {
         dlg = new MessageDialog( toDialog, this );
+    }
     
     dlg->setModal(false);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
     dlg->show();
 }
 
@@ -221,7 +237,7 @@ void Qommunicate::on_memberTree_doubleClicked(const QModelIndex& proxyIndex)
 
 void Qommunicate::keyPressEvent(QKeyEvent *event)
 {
-    if(event->key() == Qt::Key_Return && ui.memberTree->hasFocus()) {
+    if (event->key() == Qt::Key_Return && ui.memberTree->hasFocus()) {
         event->accept();
         on_memberTree_doubleClicked(QModelIndex());
         return;
@@ -232,7 +248,7 @@ void Qommunicate::keyPressEvent(QKeyEvent *event)
 void Qommunicate::firstRun()
 {
     QSettings s;
-    if( ! s.contains(tr("nick")) )
+    if ( ! s.contains(tr("nick")) )
         ui.action_Settings->trigger();
 }
 
@@ -255,7 +271,7 @@ void Qommunicate::cleanup()
 // Message handling slots
 void Qommunicate::addMember(Message msg)
 {
-    if(MemberUtils::contains("members_list", msg.sender()))
+    if (MemberUtils::contains("members_list", msg.sender()))
         return;
     
     QList<QByteArray> tokens = msg.payload().split('\a');
@@ -264,17 +280,17 @@ void Qommunicate::addMember(Message msg)
     Member* sender = new Member(*msg.sender());
     
     QString groupName;
-    if(tokens.size() > 1)
+    if (tokens.size() > 1)
         groupName = tokens[1];
     
-    if(groupName.isEmpty())
+    if (groupName.isEmpty())
     {
         model->appendRow(sender);
     }
     else
     {
         QList<QStandardItem*> matches = model->findItems(groupName);
-        if(!matches.isEmpty() && matches[0]->type() == TYPE_GROUP)
+        if (!matches.isEmpty() && matches[0]->type() == TYPE_GROUP)
         {
             matches[0]->appendRow(sender);
         }
@@ -287,12 +303,12 @@ void Qommunicate::addMember(Message msg)
             else
                 model->appendRow(group);
             saveGroupSettings(groupName);
+            ui.memberTree->setExpanded(proxyIndexFromItem(group), wasExpanded(groupName));
         }
     }
     
     MemberUtils::insert("members_list", sender);
     memberCountLabel.setText(QString::number(memberCountLabel.text().toInt() + 1));
-    ui.memberTree->expandAll();
 }
 
 void Qommunicate::saveGroupSettings(QString groupName)
@@ -305,8 +321,8 @@ void Qommunicate::saveGroupSettings(QString groupName)
     if (groupName == myGroup().name()) {
         // move myGroup to top of the list
         groups.swap(groups.indexOf(groupName), 0);
-        s.setValue("groups", groups);
     }
+    s.setValue("groups", groups);
 }
 
 void Qommunicate::addMemberAndAnswer(Message msg)
@@ -320,7 +336,7 @@ void Qommunicate::removeMember(Message msg)
     qDebug() << "removeMember: called with" << msg.sender()->name();
     QList<QByteArray> tokens = msg.payload().split('\a');
     QString groupName;
-    if(tokens.size() > 1)
+    if (tokens.size() > 1)
         groupName = tokens[1];
     
     Member* sender = new Member(*msg.sender());
@@ -328,7 +344,7 @@ void Qommunicate::removeMember(Message msg)
     for(int i = 0; i < model->rowCount(); i++)
     {
         QStandardItem* it = model->item(i, 0);
-        if(it->type() == TYPE_MEMBER && ((Member*)it)->name() == sender->addressString())
+        if (it->type() == TYPE_MEMBER && ((Member*)it)->name() == sender->addressString())
         {
             qDebug() << "removeMember: Deleting" << ((Member*)it->row())->name();
             model->removeRow(it->row());
@@ -337,14 +353,14 @@ void Qommunicate::removeMember(Message msg)
         {
             for(int j = 0; j < it->rowCount(); j++)
             {
-                if(((Member*)it->child(j))->addressString() == sender->addressString())
+                if (((Member*)it->child(j))->addressString() == sender->addressString())
                 {
                     qDebug() << "removeMember: Deleting" << ((Member*)it->child(j))->name();
                     it->removeRow(j);
                 }
             }
             //remove empty group
-            if(it->rowCount() == 0)
+            if (it->rowCount() == 0)
             {
                 model->removeRow(it->row());
             }
@@ -357,23 +373,23 @@ void Qommunicate::removeMember(Message msg)
 
 void Qommunicate::openDialog(Message msg)
 {
-    if(MemberUtils::contains("open_conversations", msg.sender()))
+    if (MemberUtils::contains("open_conversations", msg.sender()))
         return;
     
     // if set to ignore received messages
     QSettings s;
-    if(s.value("no_receive").toBool() && (msg.command() & QOM_MULTICASTOPT))
+    if (s.value("no_receive").toBool() && (msg.command() & QOM_MULTICASTOPT))
     {
         if (s.value("showMulticastPopup").toBool()) {
             notify(tr("Multicast"), tr("Multicast from %1 ignored").arg(MemberUtils::get("members_list", msg.sender())->name()));
         }
-        if(msg.command() & QOM_SENDCHECKOPT)
+        if (msg.command() & QOM_SENDCHECKOPT)
             messenger()->sendMessage(QOM_RECVMSG, QByteArray::number(msg.packetNo()), msg.sender());
         return;
     }
     
     Member* with = MemberUtils::get("members_list", msg.sender());
-    if(!with->isValid())
+    if (!with->isValid())
         with = msg.sender();
     MessageDialog *dlg = new MessageDialog(new Member(*with), this);
     dlg->setModal(false);
@@ -384,7 +400,7 @@ void Qommunicate::openDialog(Message msg)
 /*void Qommunicate::sendAbsenceInfo(Message msg)
 {
     QString payload = ui.statusCombo->currentText();
-    if(payload == tr("Available"))
+    if (payload == tr("Available"))
         payload = "Not absence mode";
     messenger()->multicast(QOM_SENDABSENCEINFO, payload.toAscii());
 }*/
@@ -398,7 +414,7 @@ void Qommunicate::fileSendRequested(QTcpSocket* sock)
 void Qommunicate::fileRecvRequested(Message msg)
 {
     qDebug() << "\n\nRequest for file receiving";
-    if(msg.command() & QOM_SENDCHECKOPT)
+    if (msg.command() & QOM_SENDCHECKOPT)
         messenger()->sendMessage(QOM_RECVMSG, QByteArray::number(msg.packetNo()), msg.sender());
     RecvFileProgressDialog* dlg = new RecvFileProgressDialog(msg);
     //connect(dlg, SIGNAL(downloadDone(QString)), this, SLOT(fileRecvDone(QString)));
@@ -412,11 +428,11 @@ void Qommunicate::fileRecvDone(QString message)
 
 void Qommunicate::notify(const QString& title, const QString& message, bool dialog)
 {
-    if(trayIcon->supportsMessages())
+    if (trayIcon->supportsMessages())
         trayIcon->showMessage(title, message);
     statusBar()->showMessage(message, 10000);
     
-    if(dialog)
+    if (dialog)
         QMessageBox::information(this, title, message);
 }
 
@@ -424,7 +440,7 @@ void Qommunicate::confirmRead(Message msg)
 {
     //if ignoring multicasts, then we aren't gonna reply to the sealed message
     QSettings s;
-    if(s.value("no_receive").toBool())
+    if (s.value("no_receive").toBool())
         return;
     
     QString time = QDateTime::currentDateTime().toString("h:mm:ss");
@@ -441,4 +457,47 @@ void Qommunicate::absenceChanged(Message msg)
 //     qDebug() << "absenceChanged "<<name;
 //     QString status = msg.payload().mid(name.length());
 //     MemberUtils::get("members_list", msg.sender())->setStatus(status);
+}
+
+void Qommunicate::on_memberTree_collapsed(const QModelIndex& proxyIndex)
+{
+    if (searching)
+        return;
+    QSettings s;
+    QStringList expanded = s.value("expandedGroups").toStringList();
+    QString groupName = ((Group*)itemFromProxyIndex(proxyIndex))->name();
+    if (expanded.contains(groupName))
+        expanded.removeOne(groupName);
+    s.setValue("expandedGroups", expanded);
+}
+
+void Qommunicate::on_memberTree_expanded(const QModelIndex& proxyIndex)
+{
+    if (searching)
+        return;
+    QSettings s;
+    QStringList expanded = s.value("expandedGroups").toStringList();
+    QString groupName = ((Group*)itemFromProxyIndex(proxyIndex))->name();
+    if (!expanded.contains(groupName))
+        expanded << groupName;
+    s.setValue("expandedGroups", expanded);
+}
+
+bool Qommunicate::wasExpanded(QString groupName)
+{
+    QSettings s;
+    QStringList expanded = s.value("expandedGroups").toStringList();
+    return expanded.contains(groupName);
+}
+
+void Qommunicate::restoreGroupState()
+{
+    for (int i=0; i<filterModel->rowCount(); i++) {
+        QModelIndex proxyIndex = filterModel->index(i, 0);
+        QStandardItem *item = itemFromProxyIndex(proxyIndex);
+        if (item->type()!=TYPE_GROUP)
+            continue;
+        QString name = ((Group*)item)->name();
+        ui.memberTree->setExpanded(proxyIndex, wasExpanded(name));
+    }
 }
